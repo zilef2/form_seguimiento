@@ -26,3 +26,7 @@ return new class extends Migration
 
     }
 };
+/*
+php artisan migrate --path=/database/migrations/2024_05_10_185500_selects_del_formulario.php
+php artisan db:seed --class=TablasFrontendSeeder
+*/

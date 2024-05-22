@@ -54,14 +54,12 @@ class TodaBDExport implements FromQuery, WithTitle, WithHeadings, ShouldAutoSize
 
              return $Result;
          }
-         if($this->NombreTabla === 'Formulario'){
-            $Result = DB::table('formularios')
-                ->join('selecsForm','selecsForm.nombre','=','formularios.unidad_de_medida')
-                ->select('Formulario.*','')
-                ->get();
-
-             return $Result;
-         }
+//         if($this->NombreTabla === 'Formulario'){
+//             return DB::table('formularios')
+//                 ->select('formularios.*', DB::raw('GROUP_CONCAT(selecsForm.label SEPARATOR ", ") as unidad_de_medida_labels'))
+//                 ->join('selecsForm', DB::raw('FIND_IN_SET(selecsForm.value, formularios.unidad_de_medida)'), '>', DB::raw('0'))
+//                 ->groupBy('formularios.id')->orderBy('fomularios.id');
+//         }
          
          
         $Result = $modelInstance::Query()
