@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         $superadmin = User::create([
             'name'              => 'Superadmin',
             'email'             => 'ajelof2+8@gmail.com',
-            'password'          => bcrypt($genPa.'~~'.$genPa),//135_sisedu super0.+-*135_sisedu
+            'password'          => bcrypt($genPa.'~~'.$genPa),//135_sisedu~~135_sisedu
             'email_verified_at' => date('Y-m-d H:i'),
             'sexo' => $genero,
             'identificacion' => '11232454',
@@ -72,9 +72,6 @@ class UserSeeder extends Seeder
 //            else
 //                $unUsuario->assignRole('lider');
         }
-
-
-
     }
 }
 /*

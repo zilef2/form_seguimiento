@@ -24,7 +24,7 @@ const toggleContent2 = () => {
 }
 
 const sidebarButtons = [ //SAME AS WEB.PHP
-    'formulario',
+    // 'formulario',
 ];
 const sidebarButtonsJefe = [ //SAME AS WEB.PHP
 ];

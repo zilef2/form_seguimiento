@@ -40,8 +40,8 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::get('/DB_info', [UserController::class,'todaBD']);
 });
-
 Route::resource('/formulario', FormularioController::class)->except('create', 'show', 'edit');
+
 // ultimo comit 25sept
 
 require __DIR__ . '/auth.php';

@@ -19,7 +19,6 @@ class FormularioController extends Controller
 {
     public $thisAtributos, $FromController = 'formulario';
 
-
     //<editor-fold desc="Construc | mapea | filtro and dependencia">
     public function __construct()
     {
@@ -30,11 +29,12 @@ class FormularioController extends Controller
         $this->thisAtributos = (new formulario())->getFillable(); //not using
     }
 
-    public function Mapear(): Builder{
+    public function Mapear()
+    {
         //$formularios = formulario::with('no_nada');
-        $formularios = formulario::Where('id', '>', 0);
-        return $formularios;
+        return formulario::Where('id', '>', 0);
     }
+
 
     public function Filtros(&$formularios, $request)
     {
@@ -56,7 +56,7 @@ class FormularioController extends Controller
     public function nombreYvalue($tipo)
     {
         $objeto = DB::table('selecsForm')->Where('tipo', $tipo)->pluck('nombre');
-        $returningObject =[];
+        $returningObject = [];
         foreach ($objeto as $index => $gen) {
             $returningObject[$index]['value'] = $gen;
             $returningObject[$index]['label'] = $gen;
@@ -64,7 +64,8 @@ class FormularioController extends Controller
         return $returningObject;
     }
 
-    public function Dependencias(){
+    public function Dependencias()
+    {
         $Selects['unidad_de_medida'] = $this->nombreYvalue('unidad_de_medida');
         $Selects['periodo_de_inicio_de_ejecucion'] = $this->nombreYvalue('periodo_de_inicio_de_ejecucion');
         $Selects['vigencias_anteriores'] = $this->nombreYvalue('vigencias_anteriores');
@@ -77,34 +78,43 @@ class FormularioController extends Controller
 
     //</editor-fold>
 
-    public function welcome(Request $request){
+    //toinfo: SE VALIDAN si el doc ya evaluó o no
+    public function welcome(Request $request)
+    {
 //        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' formularios '));
 //        $formularios = $this->Mapear();
 //        $this->Filtros($formularios, $request);
         $losSelect = $this->Dependencias();
 
-        $UIDformulariosYaDiligenciados = Formulario::Where('enviado',1)->pluck('user_id')->unique();
-        $UIDformulariosGuardados = Formulario::Where('enviado',0)->pluck('user_id')->unique();
+        $UIDformulariosYaDiligenciados = Formulario::Where('enviado', 1)->pluck('user_id')->unique();
+        $UIDformulariosGuardados = Formulario::Where('enviado', 0)->pluck('user_id')->unique();
+//        dd($UIDformulariosGuardados);
         $cedLideresGuardados = User::Where('esLider', 1)
             ->WhereIn('id', $UIDformulariosGuardados)
             ->get()->mapWithKeys(function ($user) {
                 $form = Formulario::Where('user_id', $user->id)
                     ->Where('enviado', 0)
-                    ->orderby('created_at', 'desc')->first();
-                if($form){
-                    $form = Formulario::Where('user_id', $user->id)
+                    ->orderby('updated_at', 'desc')->first();
+                if ($form) {
+                    $forms = Formulario::Where('user_id', $user->id)
                         ->Where('enviado', 0)
-                        ->Where('created_at', $form->created_at)->get();
+                        ->Where('updated_at', $form->updated_at)->get();
+                    foreach ($forms as $index => $form) {
+                        $form->procesos_involucrados = explode(',',$form->procesos_involucrados);
+                        $form->plan_de_mejoramiento_al_que_apunta_la_necesidad = explode(',',$form->plan_de_mejoramiento_al_que_apunta_la_necesidad);
+                        $form->linea_del_plan_desarrollo_al_que_apunta_la_necesidad = explode(',',$form->linea_del_plan_desarrollo_al_que_apunta_la_necesidad);
+                    }
+
                     return [
                         $user->identificacion => [
                             'name' => $user->name,
-                            'email' => 'YaHaSidoGuardado',
-                            'Formulario' => $form
+                            'email' => $user->email,
+                            'Formulario' => $forms
                         ],
                     ];
                 }
             }
-        )->filter()->toArray();
+            )->filter()->toArray();
 
         $cedLideresDiligenciados = User::Where('esLider', 1)
             ->WhereIn('id', $UIDformulariosYaDiligenciados)
@@ -116,7 +126,7 @@ class FormularioController extends Controller
                     ],
                 ];
             }
-        )->toArray();
+            )->toArray();
 
         $cedLideres = User::Where('esLider', 1)
             ->WhereNotIn('id', $UIDformulariosYaDiligenciados)
@@ -146,19 +156,18 @@ class FormularioController extends Controller
     }
 
 
-    public function index(Request $request)
-    {
+    public function index(Request $request){
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' formularios '));
         $formularios = $this->Mapear();
         $this->Filtros($formularios, $request);
         $losSelect = $this->Dependencias();
-
+        //TODO: las dependencias multiples estan hardcode en el welcome
 
         $perPage = $request->has('perPage') ? $request->perPage : 10;
+
         return Inertia::render($this->FromController . '/Index', [
             'fromController' => $formularios->paginate($perPage),
             'total' => $formularios->count(),
-
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . '.index')]],
             'title' => __('app.label.' . $this->FromController),
             'filters' => $request->all(['search', 'field', 'order']),
@@ -167,83 +176,181 @@ class FormularioController extends Controller
             'losSelect' => $losSelect,
         ]);
     }
+
     public function create(){}
     public function store(FormularioStoreRequest $request){
-        try{
+        try {
             Myhelp::EscribirEnLog($this, ' Begin STORE:formularios');
             DB::beginTransaction();
-            $user = User::Where('identificacion',$request->identificacion_user)->first();
-
-            foreach ($request['necesidad'] as $index => $item) {
-                $formulario = formulario::create([
-                    'numero_necesidad' => $index,
-                    'identificacion_user' => $request['identificacion_user'],
-                    'proceso_que_solicita_presupuesto' => $request['proceso_que_solicita_presupuesto'],
-                    'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'],
-                    'valor_total_asignado_en_vigencia_anterior' => 0,
-
-                    'necesidad' => $item,
-                    'justificacion' => $request['justificacion'][$index],
-                    'actividad' => $request['actividad'][$index],
-                    'categoria' => $request['categoria'][$index],
-                    'unidad_de_medida' => $request['unidad_de_medida'][$index],
-                    'cantidad' => $request['cantidad'][$index],
-                    'valor_unitario' => $request['valor_unitario'][$index],
-                    'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index],
-                    'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index],
-                    'vigencias_anteriores' => $request['vigencias_anteriores'][$index],
-                    'valor_asignado_en_la_vigencia_anterior' => $request['valor_asignado_en_la_vigencia_anterior'][$index],
-                    'procesos_involucrados' => $request['procesos_involucrados'][$index],
-                    'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index],
-                    'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index],
-                    'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index],
-                    'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index],
-                    'capacidad_instalada' => $request['capacidad_instalada'][$index],
-                    'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index],
-//                    'anexos' => $this->guardarAnexo($request['anexos'][$index]),
-                    'enviado' => $request['enviado'],
-//                    'user_id' => 1,
-                    'user_id' => $user->id,
-
-                ]);
+            $user = User::Where('identificacion', $request->identificacion_user)->first();
+            $nuevo = 0;
+            $formulario = Formulario::Where('user_id', $user->id)
+//                ->Where('enviado', $request['enviado'])
+                ->get();
+            
+            if ($formulario->count() > 0) {
+                foreach ($request['necesidad'] as $index => $item) {
+                    if (isset($formulario[$index])) {
+                        $this->updateFormulario($formulario[$index],$request, $index, $item, $user);
+                    }else{
+                        $this->guardarFormulario($request, $index, $item, $user);
+                        $nuevo++;
+                    }
+                }
+            } else {
+                foreach ($request['necesidad'] as $index => $item) {
+                    $this->guardarFormulario($request, $index, $item, $user);
+                    $nuevo++;
+                }
             }
-
             DB::commit();
-
 //            Myhelp::EscribirEnLog($this, 'STORE:formularios EXITOSO', 'formulario id:' . $formulario->id . ' | ' . $formulario->nombre, false);
-            return back()->with('success', __('app.label.formulario_created_successfully', ['name' => $formulario->nombre]));
+            return back()->with('success', __('app.label.formulario_created_successfully', ['number' => $formulario->count() + $nuevo]));
         } catch (\Throwable $th) {
             DB::rollback();
             $tempo = 'userid';
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . ' Ubi: ' . $th->getFile() . $th->getLine();
-            dd($mensajeErrorCompleto);
+            dd($mensajeErrorCompleto,
+                $th->getTrace()[0],
+                $th->getTrace()
+            );
 //            Myhelp::EscribirEnLog($this, 'STORE:users', 'usuario id:' . $tempo . ' | ' . $tempo . ' fallo en el guardado', false);
-            return back()->with('error', __('app.label.created_error', ['name' => __('app.label.user')]) . $mensajeErrorCompleto);
+            return back()->with('error', __('app.label.created_error', ['name' => 'Razón: ']) . $mensajeErrorCompleto);
         }
     }
 
-    private function guardarAnexo($anexo){
-        if($anexo){
-            $nombreContenido = str_replace(" ", "", time() . "_" . $anexo->getClientOriginalName());
-            if ($nombreContenido) {
-                $anexo->storeAs('public/anexosPrimerForm', $nombreContenido);
-                return $nombreContenido;
+    private function guardarFormulario($request,$index,$item,$user){
+        if(isset($request['procesos_involucrados'][$index])){
+            $procesosInvol = implode(',', $request['procesos_involucrados'][$index]);
+        } else $procesosInvol = null;
+        
+        if(isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])){
+            $planmejor = implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]);
+        } else $planmejor = null;
+        
+        if(isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])){
+            $lineadelplan = implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]);
+        } else $lineadelplan = null;
+
+        $anexou = '';
+        if($request['anexos'])
+            $anexou = $request['anexos'][$index] ?? '';
+
+        $categori = $request['categoria'][$index] ?? '';
+        formulario::create([
+            'numero_necesidad' => $index,
+            'identificacion_user' => $request['identificacion_user'],
+            'proceso_que_solicita_presupuesto' => $request['proceso_que_solicita_presupuesto'],
+            'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'],
+            'valor_total_asignado_en_vigencia_anterior' => 0,
+
+            'necesidad' => $item,
+            'justificacion' => $request['justificacion'][$index],
+            'actividad' => $request['actividad'][$index],
+            'categoria' => $categori,
+            'unidad_de_medida' => $request['unidad_de_medida'][$index],
+            'cantidad' => $request['cantidad'][$index],
+            'valor_unitario' => $request['valor_unitario'][$index],
+            'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index],
+            'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index],
+            'vigencias_anteriores' => $request['vigencias_anteriores'][$index],
+            'valor_asignado_en_la_vigencia_anterior' => $request['valor_asignado_en_la_vigencia_anterior'][$index],
+
+            'procesos_involucrados' => $procesosInvol,
+            'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $planmejor,
+            'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $lineadelplan,
+
+            'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index],
+            'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index],
+            'capacidad_instalada' => $request['capacidad_instalada'][$index],
+            'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index],
+            'anexos' => $this->guardarAnexo($anexou),
+            'enviado' => $request['enviado'],
+            'user_id' => $user->id,
+        ]);
+    }
+    private function updateFormulario($formulario,$request,$index,$item,$user){
+//        dd(
+//            $request['procesos_involucrados'],
+//            $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index],
+//            $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index],
+//            implode(',', $request['procesos_involucrados'][$index]),
+//            implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]),
+//            implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]),
+//        );
+        if (isset($request['procesos_involucrados'][$index])) {
+            $procesosInvol = implode(',', $request['procesos_involucrados'][$index]);
+        } else $procesosInvol = null;
+
+        if (isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])) {
+            $planmejor = implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]);
+        } else $planmejor = null;
+
+        if (isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])) {
+            $lineadelplan = implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]);
+        } else $lineadelplan = null;
+        
+        $anexou = $request['anexos'][$index] ?? '';
+
+        $formulario->update([
+            'numero_necesidad' => $index,
+            'identificacion_user' => $request['identificacion_user'],
+            'proceso_que_solicita_presupuesto' => $request['proceso_que_solicita_presupuesto'],
+            'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'],
+            'valor_total_asignado_en_vigencia_anterior' => 0,
+
+            'necesidad' => $item,
+            'justificacion' => $request['justificacion'][$index],
+            'actividad' => $request['actividad'][$index],
+            'categoria' => $request['categoria'][$index],
+            'unidad_de_medida' => $request['unidad_de_medida'][$index],
+            'cantidad' => $request['cantidad'][$index],
+            'valor_unitario' => $request['valor_unitario'][$index],
+            'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index],
+            'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index],
+            'vigencias_anteriores' => $request['vigencias_anteriores'][$index],
+            'valor_asignado_en_la_vigencia_anterior' => $request['valor_asignado_en_la_vigencia_anterior'][$index],
+
+            
+            'procesos_involucrados' => $procesosInvol,
+            'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $planmejor,
+            'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $lineadelplan,
+
+            'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index],
+            'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index],
+            'capacidad_instalada' => $request['capacidad_instalada'][$index],
+            'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index],
+            'anexos' => $this->guardarAnexo($anexou),
+            'enviado' => $request['enviado'],
+            'user_id' => $user->id,
+        ]);
+    }
+
+    private function guardarAnexo($anexo)
+    {
+        if ($anexo !== '') {
+            $originalName = $anexo->getClientOriginalName();
+            if ($originalName) {
+                $allowedExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx'];
+                $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+                // Valida la extensión
+                if (in_array($extension, $allowedExtensions)) {
+                    $nombreContenido = str_replace(" ", "", time() . "_" . $originalName);
+                    if ($nombreContenido) {
+                        $anexo->storeAs('public/anexosPrimerForm', $nombreContenido);
+                        return $nombreContenido;
+                    }
+                }
             }
-            return '';
         }
         return '';
-
     }
 
     //fin store functions
 
-    public function show($id)
-    {
-    }
+    public function show($id){}
 
-    public function edit($id)
-    {
-    }
+    public function edit($id){}
 
     public function update(Request $request, $id)
     {

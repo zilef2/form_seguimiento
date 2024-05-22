@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\formulario;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -13,7 +14,7 @@ class TodaBDExport implements FromQuery, WithTitle, WithHeadings, ShouldAutoSize
 
     // private $month;
     private $NombreTabla;
-    private $User,$Empresa,$Videoc,$Operacion,$Tiempo;
+    private $User,$Formulario,$Videoc,$Operacion,$Tiempo;
 
     public function __construct(String $NombreTabla) {
         $this->NombreTabla = $NombreTabla;
@@ -24,12 +25,13 @@ class TodaBDExport implements FromQuery, WithTitle, WithHeadings, ShouldAutoSize
         if(isset($this->User)){
 //            unset($this->{$NombreTabla}['password']);
             unset($this->{$NombreTabla}[2]);
-            unset($this->{$NombreTabla}[3]);
+            unset($this->{$NombreTabla}[3]);//pass
         }
         if(isset($this->formulario)){
-            unset($this->{$NombreTabla}[13]);
-            unset($this->{$NombreTabla}[14]);
-            unset($this->{$NombreTabla}[15]);
+//            dd($this->{$NombreTabla}[1]);
+//            unset($this->{$NombreTabla}[13]);
+//            unset($this->{$NombreTabla}[14]);
+//            unset($this->{$NombreTabla}[15]);
         }
     }
 
@@ -48,14 +50,24 @@ class TodaBDExport implements FromQuery, WithTitle, WithHeadings, ShouldAutoSize
          if($this->NombreTabla === 'User'){
             $Result = $modelInstance::Query()
                 ->select($this->{$this->NombreTabla})
-                ->where('id','>',1);
+                ->where('id','>',2);
 
-         }else{
-            $Result = $modelInstance::Query()
-                ->select($this->{$this->NombreTabla})
-                ->where('id','>',0);
+             return $Result;
          }
-        return $Result;
+         if($this->NombreTabla === 'Formulario'){
+            $Result = DB::table('formularios')
+                ->join('selecsForm','selecsForm.nombre','=','formularios.unidad_de_medida')
+                ->select('Formulario.*','')
+                ->get();
+
+             return $Result;
+         }
+         
+         
+        $Result = $modelInstance::Query()
+            ->select($this->{$this->NombreTabla})
+            ->where('id','>',0);
+         return $Result;
     }
 
 

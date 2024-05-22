@@ -2,13 +2,14 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import SwitchDarkMode from '@/Components/SwitchDarkMode.vue';
 import {Head} from '@inertiajs/vue3';//Link
-import {reactive, watchEffect} from "vue";
+import {reactive, watch, watchEffect} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { form } from './form';
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import {number_format} from "@/global";
 import Toast from "@/Components/Toast.vue";
+import {AumentarForm, DisminuirForm, LimpiarArray} from "@/Pages/formFunctions";
 
 const props = defineProps({
     cedLideres: Object,
@@ -29,7 +30,6 @@ const handleFile = (() => {
                 // form.archivoAux = event.target.files;
                 form.nombre = form.anexos.name.slice(0, -4)
                 data.tamanin = "El archivo pesa aproximadamente " + formpeso + " MB";
-                console.log(data.tamanin)
             } else {
                 data.mensajes = 'El peso del archivo supera los 5MB'
             }
@@ -41,6 +41,7 @@ const handleFile = (() => {
 
 const data = reactive({
     TamanoMAX : (1024 * 1024) * 5, //5MB
+    mensajeYaHaSidoGuardado:'',
     tamanin:'',
     mensajes:'',
     showContent: false,
@@ -48,99 +49,227 @@ const data = reactive({
     identificacion_disbled:false,
     colorDisabled:'',
 
-    //selects
-    proceso_que_solicita_presupuesto: [
-        {label: "RECTORIA", value: "RECTORIA"},
-        {label: "BIENESTAR INSTITUCIONAL", value: "BIENESTAR INSTITUCIONAL"},
-        {label: "CONTROL INTERNO", value: "CONTROL INTERNO"},
-        {label: "SECRETARIA GENERAL", value: "SECRETARIA GENERAL"},
-        {label: "GESTION LEGAL", value: "GESTION LEGAL"},
-        {label: "GESTION DOCUMENTAL", value: "GESTION DOCUMENTAL"},
-        {label: "PLANEACION", value: "PLANEACION"},
-        {label: "PRESUPUESTO PARTICIPATIVO", value: "PRESUPUESTO PARTICIPATIVO"},
-        {label: "ASEGURAMIENTO DE LA CALIDAD ACADÉMICA", value: "ASEGURAMIENTO DE LA CALIDAD ACADÉMICA"},
-        {label: "COMUNICACIONES", value: "COMUNICACIONES"},
-        {label: "VICERRECTORIA ADMINISTRATIVA Y FINANCIERA", value: "VICERRECTORIA ADMINISTRATIVA Y FINANCIERA"},
-        {label: "CONTABILIDAD", value: "CONTABILIDAD"},
-        {label: "TALENTO HUMANO", value: "TALENTO HUMANO"},
-        {label: "SEGURIDAD Y SALUD EN EL TRABAJO", value: "SEGURIDAD Y SALUD EN EL TRABAJO"},
-        {label: "TECNOLOGIA DE INFORMACION Y COMUNICACION", value: "TECNOLOGIA DE INFORMACION Y COMUNICACION"},
-        {label: "BIENES Y SERVICIOS", value: "BIENES Y SERVICIOS"},
-        {label: "INFRAESTRUCTURA", value: "INFRAESTRUCTURA"},
-        {label: "GESTION AMBIENTAL", value: "GESTION AMBIENTAL"},
-        {label: "VICERRECTORIA ACADEMICA", value: "VICERRECTORIA ACADEMICA"},
-        {label: "FACULTAD DE ADMINISTRACION", value: "FACULTAD DE ADMINISTRACION"},
-        {label: "LABOTATORIOS FACULTAD DE ADMINISTRACIÓN", value: "LABOTATORIOS FACULTAD DE ADMINISTRACIÓN"},
-        {label: "FACULTAD CIENCIAS DE LA SALUD", value: "FACULTAD CIENCIAS DE LA SALUD"},
-        {label: "LABORATORIOS FACULTAD CIENCIAS DE LA SALUD", value: "LABORATORIOS FACULTAD CIENCIAS DE LA SALUD"},
-        {label: "LACMA", value: "LACMA"},
-        {label: "FACULTAD CIENCIAS SOCIALES", value: "FACULTAD CIENCIAS SOCIALES"},
-        {label: "FACULTAD ARQUITECTURA E INGENIERIA", value: "FACULTAD ARQUITECTURA E INGENIERIA"},
-        {label: "ADMISIONES, REGISTRO Y CONTROL", value: "ADMISIONES, REGISTRO Y CONTROL"},
-        {label: "PERMANENCIA", value: "PERMANENCIA"},
-        {label: "VIRTUALIDAD", value: "VIRTUALIDAD"},
-        {label: "INTERNACIONALIZACION", value: "INTERNACIONALIZACION"},
-        {label: "BIBLIOTECA", value: "BIBLIOTECA"},
-        {label: "VICERRECTORIA DE INVESTIGACION Y EXTENSION", value: "VICERRECTORIA DE INVESTIGACION Y EXTENSION"},
-        {label: "INVESTIGACION", value: "INVESTIGACION"},
-        {label: "DIRECCION DE EXTENSION Y PROYECCION SOCIAL", value: "DIRECCION DE EXTENSION Y PROYECCION SOCIAL"},
-        {label: "CENTRO DE LENGUAS", value: "CENTRO DE LENGUAS"},
-        {label: "GRADUADOS", value: "GRADUADOS"},
-        {label: "EJECUCION DE CONTRATOS Y CONVENIOS", value: "EJECUCION DE CONTRATOS Y CONVENIOS"}
+    //data selects multiples
+    planmejoramientonecesidad:[
+        {value:1,label:'PM Institucional'},
+        {value:2,label:'PM Programas'},
+        {value:3,label:'PM Auditorias'},
+        {value:0,label:'Ninguno'},
     ],
+    lineadelplan:[
+        {value:1,label:'1. Academia Pertinente e Incluyente'},
+        {value:2,label:'2. Relacionamiento y Aportes al Entorno Social y Productivo'},
+        {value:3,label:'3. Transformación para la Educación'},
+        {value:4,label:'4. Gestión Humana y Sostenible'},
+    ],
+    proceso_que_solicita_presupuesto: [
+      {label: "ADMISIONES, REGISTRO Y CONTROL", value: 1},
+      {label: "ASEGURAMIENTO DE LA CALIDAD ACADÉMICA", value: 2},
+      {label: "BIBLIOTECA", value: 3},
+      {label: "BIENES Y SERVICIOS", value: 4},
+      {label: "BIENESTAR INSTITUCIONAL", value: 5},
+      {label: "CENTRO DE LENGUAS", value: 6},
+      {label: "COMUNICACIONES", value: 7},
+      {label: "CONTABILIDAD", value: 8},
+      {label: "CONTROL INTERNO", value: 9},
+      {label: "DIRECCION DE EXTENSION Y PROYECCION SOCIAL", value: 10},
+      {label: "EJECUCION DE CONTRATOS Y CONVENIOS", value: 11},
+      {label: "FACULTAD ARQUITECTURA E INGENIERIA", value: 12},
+      {label: "FACULTAD CIENCIAS DE LA SALUD", value: 13},
+      {label: "FACULTAD CIENCIAS SOCIALES", value: 14},
+      {label: "FACULTAD DE ADMINISTRACION", value: 15},
+      {label: "GESTION AMBIENTAL", value: 16},
+      {label: "GESTION DOCUMENTAL", value: 17},
+      {label: "GESTION LEGAL", value: 18},
+      {label: "GRADUADOS", value: 19},
+      {label: "INFRAESTRUCTURA", value: 20},
+      {label: "INTERNACIONALIZACION", value: 21},
+      {label: "INVESTIGACION", value: 22},
+      {label: "LACMA", value: 23},
+      {label: "LABORATORIOS FACULTAD CIENCIAS DE LA SALUD", value: 24},
+      {label: "LABOTATORIOS FACULTAD DE ADMINISTRACIÓN", value: 25},
+      {label: "PERMANENCIA", value: 26},
+      {label: "PLANEACION", value: 27},
+      {label: "PRESUPUESTO PARTICIPATIVO", value: 28},
+      {label: "RECTORIA", value: 29},
+      {label: "SECRETARIA GENERAL", value: 30},
+      {label: "SEGURIDAD Y SALUD EN EL TRABAJO", value: 31},
+      {label: "TALENTO HUMANO", value: 32},
+      {label: "TECNOLOGIA DE INFORMACION Y COMUNICACION", value: 33},
+      {label: "VICERRECTORIA ACADEMICA", value: 34},
+      {label: "VICERRECTORIA ADMINISTRATIVA Y FINANCIERA", value: 35},
+      {label: "VICERRECTORIA DE INVESTIGACION Y EXTENSION", value: 36},
+      {label: "VIRTUALIDAD", value: 37}
+    ],
+
+    actividades:[
+      {value:1,label:'Realizar apoyo técnico o profesional'},
+      {value:2,label:'Realizar apoyo para administración software Investiga y Gestión de la información'},
+      {value:3,label:'Realizar apoyo a la gestión estrategíca de grupos de invetigación y el mejoramiento en la categorización de investigadores ante MinCiencias, dirigir el proceso editorial de la revista SINERGIA y apoyar los trámites de certificación de productos de investigació'},
+      {value:4,label:'Realizar apoyo en temas de protección de la propiedad intelectual y la transferencia tecnológica y de conocimiento de la Institución '},
+      {value:5,label:'Realizar el apoyo administrativo, técnico y logístico al  proceso de Investigación'},
+      {value:6,label:'Prestar servicios de apoyo educativo dentro del proceso de Investigación '},
+      {value:7,label:'Realizar apoyo y acompañamiento en la gestión de los programas del Centro de Emprendimiento, Innovación y trasnferencia tecnologica '},
+      {value:8,label:'Realizar apoyo para desarrollar la evaluación de Proyectos de investigación, productos, artículos revista y escalafonamiento docente'},
+      {value:9,label:'Apoyar la generacion de productos derivados de proyectos de investigacion '},
+      {value:10,label:'Prestar los servicios de preparación y presentación de impuestos y tasas para la protección de propiedad intelectual '},
+      {value:11,label:'Realizar salidas académicas para presentación de resultados de investigación y  Actividades de trabajo de campo para recolección de datos, toma de muestras, Movilidad aerea'},
+      {value:12,label:'Realizar salidas académicas para presentación de resultados de investigación y  Actividades de trabajo de campo para recolección de datos, toma de muestras, Movilidad terrestre'},
+      {value:13,label:'Prestar servicio de hospedaje para las salidas academicas  y  Actividades de trabajo de campo para recolección de datos, toma de muestras'},
+      {value:14,label:'Realizar la compra de equipos requeridos en proyectos de investigación'},
+      {value:15,label:'Realizar compra de insumos para proyectos de investigación'},
+      {value:16,label:'Realizar afiliaciones a redes académicas e investigación y pagos de membresía'},
+      {value:17,label:'Realizar publicaciones y procesos editoriales.'},
+      {value:18,label:'Realizar  soporte tecnico de los sistemas academicos al proceso de  Admisiones , Registro y Control '},
+      {value:19,label:'Realizar  apoyo  y asesoria  a estudiantes en los procesos de de  Admisiones , Registro y Control '},
+      {value:20,label:'Realizar la compra de insumos como diplomas, actas, portadiplomas  para ceremonias de grado de la institución'},
+      {value:21,label:'Prestar servicios profesionales para apoyar el logro de las metas de programas e institucional, propuestas en el Proceso de Aseguramiento de la Calidad Académica'},
+      {value:22,label:'Preservar los libros, revistas, colecciones , bases de datos de la biblioteca Institucinal '},
+      {value:23,label:'Actualizar programas y herramientas digitales de la Biblioteca '},
+      {value:24,label:'Realizar apoyo técnico y/o profesional al proceso Biblioteca '},
+      {value:25,label:'Realizar Mantenimiento de equipos (Antenas, Equipos RFID y TAG).'},
+      {value:26,label:'Desarrollar proyectos, organización y participación en eventos.'},
+      {value:27,label:'Realizar afiliaciones a redes académicas y pagos de membresía'},
+      {value:28,label:'Realizar apoyo tecnico, operativo y logistico al proceso de internacionalización'},
+      {value:29,label:'Realizar movilidad saliente y entrante para estudiantes  que  particpen en  eventos academicos '},
+      {value:30,label:'Realizar apoyo tecnico y/o profesional en educación artistica y cultural al proceso de Bienestar Institucional'},
+      {value:31,label:'Realizar apoyo tecnico y/o profesional en la línea de deportes ofertada desde el proceso de Bienestar Institucional'},
+      {value:32,label:'Brindar apoyo asistencial a los programas de promoción de la salud y y prevención desarrollados para la comunidad institucional'},
+      {value:33,label:'Realizar apoyo tecnico y/o profesional en la parte administratova y logistica del proceso de Bienestar'},
+      {value:34,label:'Implementar Programa de seguridad alimentaria'},
+      {value:35,label:'Implementar servicios de bienestar institucional'},
+      {value:36,label:'Realizar afiliación anual ASCUN, fortalecimiento de las líneas de desarrollo humano, deporte y cultura.'},
+      {value:37,label:'Realizar mantenimiento a los implementos de las aulas de Bienestar Institucional'},
+      {value:38,label:'Realizar traslados de los grupos de deporte, cultura y otras activiades '},
+      {value:39,label:'Realizar Montaje, diseño y proyección de obras de arte'},
+      {value:40,label:'Realizar adquisición y mantenimiento de instrumentos musicales '},
+      {value:41,label:'Desarrollar actividades deportivas y recreativas '},
+      {value:42,label:'Realizar envío masivo de correos, sms, IVR y recolección de leads e interesados, usada para comunicación interna y externa con los públicos de interés'},
+      {value:43,label:'Realizar apoyo en la planeación y desarrollo de estrategias en marketing e imagen en el proceso de Comunicaciones_Bienestar'},
+      {value:44,label:'Implementar el Plan de medios masivos y pauta digital, y fortalecimiento de la página web institucional'},
+      {value:45,label:'Realizar productos audiovisuales para campañas internas y externas de la Institución.'},
+      {value:46,label:'Realizar apoyo en diseño gráfico de material publicitario Institucional y diseño de campañas.'},
+      {value:47,label:'Realizar apoyo en el desarrollo de estrategias de comunicaciones y mercadeo de la Institución'},
+      {value:48,label:'Implementar la señalética que se debe actualizar en el campus institucional'},
+      {value:49,label:'Adquirir souvenirs para estretagias institucionales y de comunicaciones'},
+      {value:50,label:'Realizar compra de equipos para el fortalecimiento del material audiovisual del Proceso de Comunicación y Mercadeo'},
+      {value:51,label:'Relizar apoyo profesionales de comunicación y diseño gráfico de los programas y servicios de bienestar a la comunidad institucional. '},
+      {value:52,label:'Implementar la carnetización en la comunidad Institucional'},
+      {value:53,label:'Realizar apoyo en el desarrollo de estrategias de comunicaciones y mercadeo de la Institución. Virtualidad - '},
+      {value:54,label:'Implementar las estrategias del Plan de Comunicaciones y Mercadeo Institucional'},
+      {value:55,label:'Realizar los  programas de promoción de la salud y y prevención desarrollados para la comunidad institucional por parte del proceso de Bienestar Institucional ( Universidades preventivas)'},
+      {value:56,label:'Realizar apoyo al proceso de Vicerectoria Académica '},
+      {value:57,label:'Realizar apoyo técnico y/o profesional al Centro de graduados '},
+      {value:58,label:'Adquirir software para administración y gestión de la bolsa de empleo'},
+      {value:59,label:'Adquirir placas para los estudiantes de práctica de la institución'},
+      {value:60,label:'Realizar eventos académicos y de relacionamiento con graduados  y sector productivo '},
+      {value:61,label:'Realizar pasantias empresariales  para estudiantes y docentes '},
+      {value:62,label:'Realizar la gestión de la información del Observatorio de Permanencia y Calidad '},
+      {value:63,label:'Realizar apoyo educativo en el proceso  de ingreso, permanencia y graduación '},
+      {value:64,label:'Realizar  apoyo técnico y/o profesional en  producción audiovisual para la grabación, edición y posproduccion de videos y contenido audiovisual que acompañan los cursos '},
+      {value:65,label:'Realizar apoyo técnico y/o profesional en  diseño gráfico, para la realización de piezas graficas y animaciones del  proceso de Virtualidad'},
+      {value:66,label:'Realizar apoyo técnico y/o profesional al proceso de  Virtualidad de cara al ensamble y diseño instruccional '},
+      {value:67,label:'Realizar apoyo Profesional  con experiencia en instalación y migración de sistemas o plataformas tipo Moodle'},
+      {value:68,label:'Realizar apoyo logistico y administrativo en el Centro de Lenguas'},
+      {value:69,label:'Participar de membresias organizaciones nacionales e internacionales .  Fac. Administración.'},
+      {value:70,label:'Realizar acompañamiento al desarrollo de las estrategias académicas desarrolladas   de la Fac. Administación'},
+      {value:71,label:'Realizar apoyo logistico y administrativo en la Facultad de Administración.'},
+      {value:72,label:'Realizar la compra de materia prima como alimentos, granos, cereales, proteinas animales y vegetales y elementos de aseo para gastronomia.  Fac. Administración '},
+      {value:73,label:'Realizar mantenimiento  (preventivo , correctivo)  de las aulas moviles, economato  y laboratorios de los programas de Gastronomia  Fac. Administración. '},
+      {value:74,label:'Realizar salidas académicas regionales y nacionales. Facultad de Administración.'},
+      {value:75,label:'Prestar el servicio de acompañamiento a los procesos administrativos y logisticos de la Facultad de Arquitectura e Ingenieria. '},
+      {value:76,label:'Participar de redes y   membresias   Fac. Arquitectura e ingenieria.'},
+      {value:77,label:'Realizar mantenimiento a los  laboratorios (preventivo , correctivo) , facultad de Arquitectura e Ingenieria'},
+      {value:78,label:'Realizar salidas académicas  asociadas a los curriculos de los programas y visitas de  practicas   de la facultad de Arquitectura e Ingenieria'},
+      {value:79,label:'Participar en membresias  u organizaciones académicas . Fac Salud'},
+      {value:80,label:'Prestar los servicios como ingeniero biomédico para la Facultad de Ciencias de la Salud. '},
+      {value:81,label:'Prestar los servicios como químico para la Facultad de Ciencias de la Salud. '},
+      {value:82,label:'Realizar diagnóstico y asesoría en biotecnología, como parte de las actividades de extensión de la Facultad de  Ciencias de la Salud (biotecnología). '},
+      {value:83,label:'Realizar apoyo operativo y administrativo en los laboratorios  en la  facultad de Ciencias de la Salud'},
+      {value:84,label:'Realizar calibración de equipos. '},
+      {value:85,label:'Realizar la compra de insumos, químicos, reactivos y kits de  diagnóstico'},
+      {value:86,label:'Realizar mantenimiento y reparación de equipos '},
+      {value:87,label:'Realizar salidas académicas regionales y nacionales. Facultad de Salud'},
+      {value:88,label:'Prestar servicio de hospedaje para las salidas academicas  y  Actividades de trabajo de campo para recolección de datos, toma de muestras. Fac sociales'},
+      {value:89,label:'Realizar apoyo técnico y/o profesional a la facultad de Ciencias Sociales y de educación'},
+      {value:90,label:'Realizar afiliaciones a redes académicas. facultad de Ciencias Sociales y de educación '},
+      {value:91,label:'Realizar apoyo al desarrollo de estrategias que favorezcan a los  procesos academicos  de la Facultad de Ciencias Sociales y de Educación'},
+      {value:92,label:'Realizar movilidad académicas hacia diferentes experiencias representativas para los programas. facultad de Ciencias Sociales y de educación'},
+      {value:93,label:'Realizar apoyo al desarrollo de estrategias que favorezcan a los procesos académicos de la institución. Vicerrectoría Académica'},
+      {value:94,label:'Realizar mantenimiento y reparación de equipos'},
+      {value:95,label:'Realizar calibración de equipos. LACMA'},
+      {value:96,label:'Prestar servicios de LACMA en el Valle de Aburra y municipios cercanos al departamento de Antioquia.'},
+      {value:97,label:'Participar en ensayos interlaboratorios de calidad externos'},
+      {value:98,label:'Prestar servicios profesionales en el laboratorio LACMA'},
+      {value:99,label:'Realizar el apoyo administrativo, técnico y logístico  en el proceso de Tecnologia y medios audiovisuales'},
+      {value:100,label:'Realizar la dotación de infraestructrua tecnologica requerida'},
+      {value:101,label:'Realizar mantenimiento de infraestructrua tecnologica requerida'},
+      {value:102,label:'Dotar y actualizar aplicativos de software de uso institucional'},
+      {value:103,label:'Realizar la Formulación del plan maestro integral de infraestructura física institucional'},
+      {value:104,label:'Mejorar Infraestructura física de la Institución Universitaria Colegio Mayor de Antioquia'},
+      {value:105,label:'Realizar mejoramiento  y adecuación de de las áreas de estudio de los bloques institucionales'},
+      {value:106,label:'Realizar mejoramiento y recuperación de las zonas verdes de la institución'},
+      {value:107,label:'Realizar el apoyo administrativo, técnico y logístico al  proceso de Infraestructura Fisica '},
+      {value:108,label:'Realizar el apoyo profesional al proceso de Infraestructura Fisica '},
+      {value:109,label:'Realizar la automatización de puertas principales.'},
+      {value:110,label:'Reserva Realizar la Formulación del plan maestro integral de infraestructura física intitucional'},
+      {value:111,label:'Realizar adecuaciones electricas para el fortalecimiento de la infraestructura'},
+      {value:112,label:'Realizar montajes, instalaciones y las adecuaciones  requeridas dentro de la infraestructura física de la institución'},  
+    ],
+    //selects
     categoria: [
-        {label: "CONTRATISTA", value: "CONTRATISTA"},
-        {label: "INSUMOS", value: "INSUMOS"},
-        {label: "SOPORTE", value: "SOPORTE"},
-        {label: "MANTENIMIENTO", value: "MANTENIMIENTO"},
-        {label: "CALIBRACIONES", value: "CALIBRACIONES"},
-        {label: "INSTALACIONES Y REPARACIONES", value: "INSTALACIONES Y REPARACIONES"},
-        {label: "MOVILIDAD ACADEMICA", value: "MOVILIDAD ACADEMICA"},
-        {label: "PRACTICANTE", value: "PRACTICANTE"},
-        {label: "SUBVENCION", value: "SUBVENCION"},
-        {label: "EQUIPOS E INTRUMENTOS", value: "EQUIPOS E INTRUMENTOS"},
-        {label: "MOBILIARIO", value: "MOBILIARIO"},
-        {label: "BASES DE DATOS", value: "BASES DE DATOS"},
-        {label: "LICENCIAS Y MEMBRESIAS", value: "LICENCIAS Y MEMBRESIAS"},
-        {label: "SOFTWARE", value: "SOFTWARE"},
-        {label: "SEGUROS Y POLIZAS", value: "SEGUROS Y POLIZAS"},
-        {label: "SERVICIOS PUBLICOS", value: "SERVICIOS PUBLICOS"},
-        {label: "TELEFONIACELULAR E INTERNET", value: "TELEFONIACELULAR E INTERNET"},
-        {label: "CUOTA DE FISCALIZACION", value: "CUOTA DE FISCALIZACION"},
-        {label: "SUMINISTRO DE COMIDAD Y REFRIGERIOS", value: "SUMINISTRO DE COMIDAD Y REFRIGERIOS"},
-        {label: "GASTOS LEGALES", value: "GASTOS LEGALES"},
-        {label: "GASTOS DE VIAJE-TRASNPORTE", value: "GASTOS DE VIAJE-TRASNPORTE"},
-        {label: "GASTOS DE VIAJE-ALIMENTACION", value: "GASTOS DE VIAJE-ALIMENTACION"},
-        {label: "GASTOS DE VIAJE-HOSPEDAJE", value: "GASTOS DE VIAJE-HOSPEDAJE"},
-        {label: "CAJA MENOR", value: "CAJA MENOR"},
-        {label: "SEGURIDAD ALIMENTARIA", value: "SEGURIDAD ALIMENTARIA"},
-        {label: "INSCRIPCIONES,AFILIACIONES Y RENOVACIONES", value: "INSCRIPCIONES,AFILIACIONES Y RENOVACIONES"},
-        {label: "EVENTOS", value: "EVENTOS"},
-        {label: "SERVICIOS DE AUDITORIA Y ACREDITACION", value: "SERVICIOS DE AUDITORIA Y ACREDITACION"},
-        {label: "SOUVENIRS", value: "SOUVENIRS"},
-        {
-            label: "PLAN DE COMUNICACIÓN Y MERCADO Y PLAN DE MEDIOS",
-            value: "PLAN DE COMUNICACIÓN Y MERCADO Y PLAN DE MEDIOS"
-        },
-        {
-            label: "PLATAFORMA DE ENVÍO MASIVO DE CORREOS, SMS, IVR Y RECOLECCIÓN DE LEADS E INTERESADOS",
-            value: "PLATAFORMA DE ENVÍO MASIVO DE CORREOS, SMS, IVR Y RECOLECCIÓN DE LEADS E INTERESADOS"
-        },
-        {label: "ARL", value: "ARL"},
-        {label: "VIATICOS", value: "VIATICOS"},
-        {label: "SERVICIO DE MENSAJERIA", value: "SERVICIO DE MENSAJERIA"},
-        {label: "SERVICIO DE IMPRESORAS Y DE FOTOCOPIAS", value: "SERVICIO DE IMPRESORAS Y DE FOTOCOPIAS"},
-        {label: "AREA PROTEGIDA", value: "AREA PROTEGIDA"},
-        {label: "EXEMENES MEDICOS", value: "EXEMENES MEDICOS"},
-        {label: "ESTIMULOS DOCENTES", value: "ESTIMULOS DOCENTES"},
-        {label: "EDICTOS", value: "EDICTOS"},
-        {label: "PLAN DE CAPACITACION", value: "PLAN DE CAPACITACION"},
-        {label: "GMF", value: "GMF"},
-        {label: "PUBLICACIONES Y PROCESOS EDITORIALES", value: "PUBLICACIONES Y PROCESOS EDITORIALES"},
-        {label: "PATENTES", value: "PATENTES"},
-        {label: "REGIONALIZACION-HOSPEDAJE", value: "REGIONALIZACION-HOSPEDAJE"},
-        {label: "REGIONALIZACION-ALIMENTACION", value: "REGIONALIZACION-ALIMENTACION"},
-        {label: "REGIONALIZACION-TRANSPORTE", value: "REGIONALIZACION-TRANSPORTE"}
+      {label: "AREA PROTEGIDA", value: 1},
+      {label: "ARL", value: 2},
+      {label: "BASES DE DATOS", value: 3},
+      {label: "CALIBRACIONES", value: 4},
+      {label: "CAJA MENOR", value: 5},
+      {label: "CONTRATISTA", value: 6},
+      {label: "CUOTA DE FISCALIZACION", value: 7},
+      {label: "EDICTOS", value: 8},
+      {label: "EQUIPOS E INTRUMENTOS", value: 9},
+      {label: "ESTIMULOS DOCENTES", value: 10},
+      {label: "EVENTOS", value: 11},
+      {label: "EXEMENES MEDICOS", value: 12},
+      {label: "GASTOS DE VIAJE-ALIMENTACION", value: 13},
+      {label: "GASTOS DE VIAJE-HOSPEDAJE", value: 14},
+      {label: "GASTOS DE VIAJE-TRASNPORTE", value: 15},
+      {label: "GASTOS LEGALES", value: 16},
+      {label: "GMF", value: 17},
+      {label: "INSCRIPCIONES,AFILIACIONES Y RENOVACIONES", value: 18},
+      {label: "INSUMOS", value: 19},
+      {label: "INSTALACIONES Y REPARACIONES", value: 20},
+      {label: "LICENCIAS Y MEMBRESIAS", value: 21},
+      {label: "MANTENIMIENTO", value: 22},
+      {label: "MOBILIARIO", value: 23},
+      {label: "MOVILIDAD ACADEMICA", value: 24},
+      {label: "PATENTES", value: 25},
+      {label: "PLAN DE CAPACITACION", value: 26},
+      {
+        label: "PLAN DE COMUNICACIÓN Y MERCADO Y PLAN DE MEDIOS",
+        value: 27
+      },
+      {
+        label: "PLATAFORMA DE ENVÍO MASIVO DE CORREOS, SMS, IVR Y RECOLECCIÓN DE LEADS E INTERESADOS",
+        value: 28
+      },
+      {label: "PRACTICANTE", value: 29},
+      {label: "PUBLICACIONES Y PROCESOS EDITORIALES", value: 30},
+      {label: "REGIONALIZACION-ALIMENTACION", value: 31},
+      {label: "REGIONALIZACION-HOSPEDAJE", value: 32},
+      {label: "REGIONALIZACION-TRANSPORTE", value: 33},
+      {label: "SEGUROS Y POLIZAS", value: 34},
+      {label: "SEGURIDAD ALIMENTARIA", value: 35},
+      {label: "SERVICIO DE IMPRESORAS Y DE FOTOCOPIAS", value: 36},
+      {label: "SERVICIO DE MENSAJERIA", value: 37},
+      {label: "SERVICIOS DE AUDITORIA Y ACREDITACION", value: 38},
+      {label: "SERVICIOS PUBLICOS", value: 39},
+      {label: "SOFTWARE", value: 40},
+      {label: "SOPORTE", value: 41},
+      {label: "SOUVENIRS", value: 42},
+      {label: "SUBVENCION", value: 43},
+      {label: "SUMINISTRO DE COMIDAD Y REFRIGERIOS", value: 44},
+      {label: "TELEFONIACELULAR E INTERNET", value: 45},
+      {label: "VIATICOS", value: 46}
     ],
     vigencias_anteriores:[
         {
@@ -152,7 +281,7 @@ const data = reactive({
             'label': "No",
         }
     ],
-
+    desabilitar_vigencias_anteriores:[false],
     //resumen final
 
     ArrayNecesidad:[],
@@ -160,10 +289,18 @@ const data = reactive({
     ConteoCosas:1,
     total_todo:0,
     DataRecuperada:false,
-
-
+    valor_total_solicitatdo_por_necesidad:[],
+    Otras_unidad_de_medida:[false],
+    Otras_capacidad_instalada:[false],
+    showanexos:[],
+    
+  
     //Way to present info
-    classOfTxtAreas:"min-w-[1000px] max-h-[110px]",
+    classOfTxtAreas:"min-w-[500px] max-h-[110px] p-4",
+    classOfText:"min-w-[200px] max-h-[110px] p-4",
+    classOfText2:"min-w-[320px] max-h-[110px] p-4",
+    classOfTextLG:"min-w-[400px] max-h-[110px] p-4",
+    classOfText_checkbox:"min-w-[380px] max-h-[250px] overflow-y-scroll p-4 ring-1 ring-zinc-400",
 });
 
 function esLocalhost() {
@@ -171,34 +308,61 @@ function esLocalhost() {
     return hostname === 'localhost' || hostname === '127.0.0.1';
 }
 if(esLocalhost()){
-    data.classOfTxtAreas = "min-w-[100px] max-h-[110px]";
+    // data.classOfTxtAreas = "min-w-[20px] max-h-[110px] p-4";
+    // data.classOfText = "min-w-[110px] max-h-[110px] p-4";
+    // data.classOfText2 = "min-w-[120px] max-h-[110px] p-4";
 }
 
-const create = (enviado) => {
-    form.enviado = enviado
-    if(data.DataRecuperada && enviado){
-        form.enviado = 2
-    }
-    form.valor_total_de_la_solicitud_actual = data.total_todo
-    if(data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0){
-
-        form.post(route('formulario.store'), {
-            preserveScroll: true,
-            forceFormData: true,
-            onSuccess: () => {
-                // emit("close")
-                form.reset()
-            },
-            onError: () => alert(JSON.stringify(form.errors)),
-            onFinish: () => null,
-        })
-    }else{
-        data.MensajeError = 'Hay un error inesperado'
-        alert(
-            data.ConteoCosas + ' necesidades para un total de: ' + form.valor_total_de_la_solicitud_actual
-        );
+// <!--<editor-fold desc="Toogle multipleselections">-->
+function toggleSelection1(value, conteoi) {
+    const selectedIndex = form.procesos_involucrados[conteoi].indexOf(value);
+    if (selectedIndex === -1) {
+        form.procesos_involucrados[conteoi].push(value);
+    } else {
+        form.procesos_involucrados[conteoi].splice(selectedIndex, 1);
     }
 }
+function isSelected1(value) {return form.procesos_involucrados.includes(value);}
+
+function toggleSelection2(value, conteoi) {
+  let selectedIndex = form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].indexOf(value);
+  if (!form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)) {
+    if (selectedIndex === -1) {
+        form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].push(value);
+    } else {
+        form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
+    }
+  }else{
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] = [0]
+    if(value == 0)
+      form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
+  }
+}
+
+function isSelected2(value,conteoi) {
+    if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] && 
+        form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)){
+        // return false;
+        return value === 0;
+      //elninguno
+    }
+    if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] && form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].length){
+        return form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(value);
+    }
+    return false;
+}
+
+function toggleSelection3(value, conteoi) {
+    const selectedIndex = form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].indexOf(value);
+    if (selectedIndex === -1) {
+        form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].push(value);
+    } else {
+        form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
+    }
+}
+function isSelected3(value) {return form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad.includes(value);}
+// <!--</editor-fold>-->
+
 
 // <!--<editor-fold desc="no important functions">-->
 const onContent = () => {
@@ -206,68 +370,104 @@ const onContent = () => {
 }
 const offContent = () => {
     data.showContent = false
+    form.identificacion_user = ''
+    data.identificacion_disbled = false
+
 }
 // <!--</editor-fold>-->
-
 function RecuperarInfoGuardada(Formulario) {
     data.DataRecuperada = true
     form.proceso_que_solicita_presupuesto = Formulario[0].proceso_que_solicita_presupuesto
     // form.enviado = 0
     form.valor_total_de_la_solicitud_actual = Formulario[0].valor_total_de_la_solicitud_actual
     data.ConteoCosas = Formulario.length
-    Formulario.forEach((element,index) => {
-        form.necesidad[index] = element.necesidad
-        form.justificacion[index] = element.justificacion
-        form.actividad[index] = element.actividad
-        form.categoria[index] = element.categoria
-        form.unidad_de_medida[index] = element.unidad_de_medida
-        form.cantidad[index] = element.cantidad
-        form.valor_unitario[index] = element.valor_unitario
-        form.valor_total_solicitatdo_por_necesidad[index] = element.valor_total_solicitatdo_por_necesidad
-        form.periodo_de_inicio_de_ejecucion[index] = element.periodo_de_inicio_de_ejecucion
-        form.vigencias_anteriores[index] = element.vigencias_anteriores
-        form.valor_asignado_en_la_vigencia_anterior[index] = element.valor_asignado_en_la_vigencia_anterior
-        form.procesos_involucrados[index] = element.procesos_involucrados
-        form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index] = element.plan_de_mejoramiento_al_que_apunta_la_necesidad
-        form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index] = element.linea_del_plan_desarrollo_al_que_apunta_la_necesidad
-        form.frecuencia_de_uso[index] = element.frecuencia_de_uso
-        form.mantenimientos_requeridos[index] = element.mantenimientos_requeridos
-        form.capacidad_instalada[index] = element.capacidad_instalada
-        form.riesgo_de_la_inversion[index] = element.riesgo_de_la_inversion
-    });
-
-    onContent(); //emitir mensaje y mostrar demas del form
+  
+    setTimeout(()=> recuperaform(Formulario), 200)
 }
 
-watchEffect(() => {
+function recuperaform(Formulario){
+  Formulario.forEach((element, index) => {
+    form.necesidad[index] = element.necesidad
+    form.justificacion[index] = element.justificacion
+    form.actividad[index] = element.actividad
+    form.categoria[index] = element.categoria
+    form.unidad_de_medida[index] = element.unidad_de_medida
+    form.cantidad[index] = parseInt(element.cantidad)
+    form.valor_unitario[index] = parseInt(element.valor_unitario)
+    form.valor_total_solicitatdo_por_necesidad[index] = element.valor_total_solicitatdo_por_necesidad
+    form.periodo_de_inicio_de_ejecucion[index] = element.periodo_de_inicio_de_ejecucion
+    form.vigencias_anteriores[index] = element.vigencias_anteriores
+    form.valor_asignado_en_la_vigencia_anterior[index] = parseInt(element.valor_asignado_en_la_vigencia_anterior)
 
-    // console.log(form.identificacion_user.length)
-    if(!data.identificacion_disbled){
-        if(form.identificacion_user > 1000){
-            if(buscarEnProps(form.identificacion_user, props.cedLideres)){
-                data.nombreLider = props.cedLideres[form.identificacion_user]
-                if(data.nombreLider){
-                    onContent(); //emitir mensaje y mostrar demas del form
-                    data.identificacion_disbled = true
-                    data.colorDisabled = 'bg-zinc-400 text-white'
-                }else{
-                    offContent();
-                }
-            }else{
-                if (buscarEnProps(form.identificacion_user, props.cedLideresGuardados)) {
-                    // console.log(props.cedLideresGuardados,form.identificacion_user)
-                    RecuperarInfoGuardada(props.cedLideresGuardados[form.identificacion_user]['Formulario'])
-                }else{
-                    if (buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados)) {
-                        Alert('Ya se ha diligenciado, lo esperamos el proximo semestre!')
-                    }else{
-                        offContent();
-                    }
-                }
-            }
-        }
+    let mento;
+    let eleInteger;
+    let checkboxNinguno
+    // form.procesos_involucrados = []
+
+    if (element.procesos_involucrados.length) {
+      form.procesos_involucrados[index] = []
+      element.procesos_involucrados.forEach(proceso => {
+        eleInteger = parseInt(proceso)
+        data.proceso_que_solicita_presupuesto.forEach((item, i) => {
+          if (item.value && item.value === eleInteger) {
+            form.procesos_involucrados[index].push(item.value)
+            checkboxNinguno = document.getElementById(item.value + '_a' + index);
+            if (checkboxNinguno) checkboxNinguno.checked = true;
+          }
+        });
+      });
     }
 
+    if (element.plan_de_mejoramiento_al_que_apunta_la_necesidad.length) {
+      form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index] = []
+      element.plan_de_mejoramiento_al_que_apunta_la_necesidad.forEach(generico => {
+        eleInteger = parseInt(generico)
+        data.planmejoramientonecesidad.forEach((item, i) => {
+          if (item.value === eleInteger) {//elninguno
+            form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index].push(item.value)// = item.value
+            checkboxNinguno = document.getElementById(item.value + '_b' + index);
+            if (checkboxNinguno) checkboxNinguno.checked = true;
+          }
+        });
+      });
+    }
+
+    if (element.linea_del_plan_desarrollo_al_que_apunta_la_necesidad.length) {
+      form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index] = []
+      element.linea_del_plan_desarrollo_al_que_apunta_la_necesidad.forEach(generico => {
+        eleInteger = parseInt(generico)
+        data.lineadelplan.forEach((item, i) => {
+          if (item.value === eleInteger) {
+            form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index][i] = item.value
+            checkboxNinguno = document.getElementById(item.value + '_c' + index);
+            if (checkboxNinguno) checkboxNinguno.checked = true;
+          }
+        });
+      });
+    }
+
+
+    form.frecuencia_de_uso[index] = element.frecuencia_de_uso
+    form.mantenimientos_requeridos[index] = element.mantenimientos_requeridos
+    form.riesgo_de_la_inversion[index] = element.riesgo_de_la_inversion
+
+    if (element.capacidad_instalada !== 'No') {
+      data.Otras_capacidad_instalada[index] = true
+    }
+    form.capacidad_instalada[index] = element.capacidad_instalada
+    if (element.unidad_de_medida !== 'Meses' && element.unidad_de_medida !== 'Unidades') {
+      data.Otras_unidad_de_medida[index] = true
+    }
+    form.unidad_de_medida[index] = element.unidad_de_medida
+    data.showanexos[index] = element.anexos
+  });
+}
+
+
+// <!--<editor-fold desc="watches">-->
+watchEffect(() => {
+  if(data.ConteoCosas > 101) data.ConteoCosas = 100
+    //calcular la suma de los valores unitarios
     if(form.cantidad && form.valor_unitario && form.cantidad.length > 0 && form.valor_unitario.length > 0){
         data.total_todo = 0
         form.cantidad.forEach(function (canti,index) {
@@ -276,11 +476,14 @@ watchEffect(() => {
                 let INTcanti = parseInt(canti)
                 if(!isNaN(INTcanti) && !isNaN(INTvalunitario)){
                     form.valor_total_solicitatdo_por_necesidad[index] = INTvalunitario * INTcanti
+                    data.valor_total_solicitatdo_por_necesidad[index] = number_format(form.valor_total_solicitatdo_por_necesidad[index],0,1)
                 }else{
                     form.valor_total_solicitatdo_por_necesidad[index] = 0
+                    data.valor_total_solicitatdo_por_necesidad[index] = 0
                 }
             }catch(exceptionVar){
                 form.valor_total_solicitatdo_por_necesidad[index] = 0
+                data.valor_total_solicitatdo_por_necesidad[index] = 0
             }finally{
                 data.total_todo += form.valor_total_solicitatdo_por_necesidad[index]
             }
@@ -288,15 +491,37 @@ watchEffect(() => {
     }
 })
 
-function buscarPorCedula(cedulaBuscada){
-    for (let cedula in props.cedLideres){
-        cedula = parseInt(cedula)
-        if(cedula === cedulaBuscada){
-            return true;
-        }
+watch( ()=> form.vigencias_anteriores,(NuevaVig) =>{
+  NuevaVig.forEach((element, index) => {
+    if(element === 'No'){
+      data.desabilitar_vigencias_anteriores[index] = true
+      form.valor_asignado_en_la_vigencia_anterior[index] = 0
+    }else{
+      data.desabilitar_vigencias_anteriores[index] = false
     }
-    return false;
-}
+  })
+}, {deep:true});
+
+watch(()=> form.plan_de_mejoramiento_al_que_apunta_la_necesidad,(nuevoVal) =>{
+  //elninguno
+  let ponerTodoCero = []
+    let checkboxNinguno
+    nuevoVal.forEach((element,index) => {
+      console.log("=>(Welcome.vue:508) element", element);
+        checkboxNinguno = document.getElementById('0_b' + index);
+        ponerTodoCero[index] = false
+      //TODO: uy parce hay que probar bien. porque tira el servidor
+        // if(checkboxNinguno && checkboxNinguno.checked) ponerTodoCero[index] = true
+        //
+        // if(element && element.length){
+        //   element.forEach((ele) => {
+        //       if(ele === 0){
+        //           form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index] = [0];
+        //       }
+        //     });
+        // }
+    });
+},{deep: true});
 
 function buscarEnProps(cedulaBuscada,elprops){
     for (let cedula in elprops){
@@ -307,380 +532,651 @@ function buscarEnProps(cedulaBuscada,elprops){
     }
     return false;
 }
+
+watch(() => form.unidad_de_medida, (nuevaUnidaddeMedidad) => {
+    watchunidad(nuevaUnidaddeMedidad)
+}, {deep: true});
+
+const watchunidad = (nuevaUnidaddeMedidad)=>{
+    nuevaUnidaddeMedidad.forEach((element, index) => {
+        if (element === 'Otras') {
+            data.Otras_unidad_de_medida[index] = true
+            form.unidad_de_medida[index] = ''
+        }
+    });
+}
+
+watch(() => form.capacidad_instalada, (nuevx) => {
+    nuevx.forEach((element, index) => {
+        if(element === 'Si, ¿Cual?'){
+            data.Otras_capacidad_instalada[index] = true
+            form.capacidad_instalada[index] = ''
+        }
+    });
+}, {deep: true});
+
+watch(() => data.ConteoCosas, (nuev) => {
+
+    let tamanoActual = form.necesidad.length;
+
+    if (nuev > tamanoActual) {
+        for (let i = tamanoActual; i < nuev; i++) {
+            AumentarForm(form)
+        }
+    } else if (nuev < tamanoActual) {
+        DisminuirForm(form,nuev)
+    }
+    //fin cambio de tamano
+
+
+    for (let i = 0; i <= nuev;i++){
+        data.Otras_unidad_de_medida[i] = false;
+        data.Otras_capacidad_instalada[i] = false;
+        data.desabilitar_vigencias_anteriores[i] = false;
+    }
+});
+// <!--</editor-fold>-->
+
+const handleEnterCedula = ()=>{
+  if (!data.identificacion_disbled) {
+    if (form.identificacion_user > 100) {
+      console.log("=>(Welcome.vue:583) buscarEnProps(form.identificacion_user, props.cedLideres)", buscarEnProps(form.identificacion_user, props.cedLideres));
+      if (buscarEnProps(form.identificacion_user, props.cedLideres)) {
+        data.nombreLider = props.cedLideres[form.identificacion_user]
+        if (data.nombreLider) {
+          onContent(); //emitir mensaje y mostrar demas del form
+          data.identificacion_disbled = true
+          data.colorDisabled = 'bg-zinc-400 text-white dark:bg-black'
+        }
+      } else {
+          console.log("=>(Welcome.vue:592) buscarEnProps(form.identificacion_user, props.cedLideresGuardados)", buscarEnProps(form.identificacion_user, props.cedLideresGuardados));
+        if (buscarEnProps(form.identificacion_user, props.cedLideresGuardados)) {
+          data.nombreLider = props.cedLideresGuardados[form.identificacion_user]
+          data.identificacion_disbled = true
+          onContent(); //emitir mensaje y mostrar demas del form
+          
+          setTimeout(() => {
+            RecuperarInfoGuardada(props.cedLideresGuardados[form.identificacion_user]['Formulario'])
+          }, 400)
+        } else {
+            console.log("=>(Welcome.vue:602) buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados)", buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados));
+          if (buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados)) {
+            alert('Ya se ha diligenciado, lo esperamos el proximo semestre!')
+            data.mensajeYaHaSidoGuardado = "Si requiere realizar algún tipo de modificación o corrección por favor comunicarse con el proceso de Presupuesto o Planeación."
+            data.identificacion_disbled = true
+          } else {
+            offContent();
+            data.identificacion_disbled = false //desbloquea la escritura en la cedula
+          }
+        }
+      }
+    }
+  } 
+}
+
+const create = (enviado) => {
+  form.enviado = enviado
+  var EstaSeguro = true
+  if(form.enviado === 1)
+    EstaSeguro = confirm('Esta seguro? ¡¡¡después de enviar no podrá hacer más ajustes!!!');
+  
+  form.valor_total_de_la_solicitud_actual = data.total_todo
+  if(EstaSeguro) {
+    if (data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0) {
+
+      form.post(route('formulario.store'), {
+        preserveScroll: true,
+        forceFormData: true,
+        onSuccess: () => {
+          form.reset()
+          offContent()
+          // setTimeout(location.reload(), 3_000);
+        },
+        onError: () => {
+          // alert(JSON.stringify(form.errors))
+          alert('Hay campos con faltantes!')
+        },
+        onFinish: () => null,
+      })
+    } else {
+      data.MensajeError = 'Hay un error inesperado'
+      alert('¡Faltan datos!');
+    }
+  }
+}
 </script>
 
 <template>
+    <div>
+        <Head :title="lang().label.welcome"/>
+        <Toast :flash="$page.props.flash" class=""/>
 
-    <Head :title="lang().label.welcome" />
-    <Toast :flash="$page.props.flash" class=""/>
-
-    <div class="relative flex justify-center min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 items-center sm:pt-0">
-        <section class="items-center w-full m-10 lg:mx-20 xl:mx-40 sm:px-6 lg:px-8 2xl:px-auto">
-            <article class="flex pt-8 px-4 sm:px-0 sm:pt-0">
-                <div class="flex mx-auto text-center items-center">
-                    <ApplicationLogo class="h-14 w-auto text-primary fill-current" />
-                    <p class="text-3xl 2xl:text-4xl sm:text-3xl mx-auto text-primary">Necesidades economicas anuales por dependencia
-                        {{ anioActual }}</p>
-                </div>
-                <div class="flex items-center">
-                    <!-- <SwitchLangNavbar /> -->
-                    <SwitchDarkMode />
-                </div>
-            </article>
-
-            <!-- component -->
-            <form v-if="!TodosDiligenciados" @submit.prevent="create" method="POST" enctype="multipart/form-data"
-                  class="py-4">
-                <div class="mx-auto container max-w-[2100px] shadow-md">
-                    <div class="bg-gray-100 dark:bg-gray-600 p-1 border-t-2 bg-opacity-25 border-gray-700 dark:border-gray-300 rounded-t">
-<!--                        <div class="max-w-sm mx-auto md:w-full md:mx-0">-->
-<!--                            <div class="inline-flex items-center space-x-4">-->
-<!--                                <img class="w-10 h-10 object-cover rounded-md" alt="User avatar" src="https://avatars3.githubusercontent.com/u/72724639?s=400&u=964a4803693899ad66a9229db55953a3dbaad5c6&v=4"/>-->
-<!--                                <h1 class="text-gray-600 dark:text-white"></h1>-->
-<!--                            </div>-->
-<!--                        </div>-->
+        <div class="relative flex justify-center min-h-screen bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-gray-100 items-center sm:pt-0">
+            <section class="items-center w-full m-10 lg:mx-20 xl:mx-40 sm:px-6 lg:px-8 2xl:px-auto">
+                <article class="flex pt-8 px-4 sm:px-0 sm:pt-0">
+                    <div class="flex mx-auto text-center items-center">
+                        <ApplicationLogo class="h-32 w-auto text-primary fill-current"/>
+                        <p class="text-3xl 2xl:text-4xl sm:text-3xl mx-auto text-[#499884] font-medium">Necesidades económicas anuales por dependencia {{ anioActual + 1 }}</p>
                     </div>
-                    <section class="bg-white dark:bg-gray-800 space-y-6">
-                        <div class="md:inline-flex space-y-4 md:space-y-0 w-full p-4 text-gray-500 items-center">
-                            <h2 class="md:w-1/2 max-w-sm mx-auto dark:text-gray-100 2xl:text-xl">Por favor, digite el numero de documento para empezar:</h2>
-                            <div class="md:w-1/2 max-w-sm mx-auto">
-                                <label class="text-sm text-gray-400"></label>
-                                <div class="w-full inline-flex my-6">
-                                    <div class="pt-2 w-1/12 bg-gray-100 bg-opacity-50">
-                                        <svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <div class="flex items-center">
+                        <!-- <SwitchLangNavbar /> -->
+                        <SwitchDarkMode/>
+                    </div>
+                </article>
+
+                <!-- component -->
+                <form v-if="!TodosDiligenciados" @submit.prevent="create" method="POST" enctype="multipart/form-data"
+                      class="py-4">
+                    <div class="mx-auto container max-w-[2100px] rounded-2xl">
+                        <section class="bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-900 space-y-6 rounded-2xl">
+                            <div  class="md:inline-flex space-y-4 md:space-y-0 w-full p-4 text-gray-700 dark:text-gray-200 items-center">
+                                <h2 v-show="!data.showContent" class="md:w-1/2 max-w-sm mx-auto dark:text-gray-100 2xl:text-xl">Por favor, digite el numero de documento para empezar:
+                                </h2>
+                                <div class="md:w-2/3 max-w-lg mx-auto">
+                                    <label class="text-md text-gray-400"></label>
+                                    <div class="w-full inline-flex my-6">
+                                        <div class="pt-2 w-1/12 bg-gray-100 bg-opacity-50 rounded-l-lg">
+                                            <svg fill="none" class="w-6 text-gray-400 mx-auto dark:text-black" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        </div>
+                                        <input v-model="form.identificacion_user" type="number" min="0"
+                                               max="999999999999"
+                                               :disabled="data.identificacion_disbled"
+                                               :class="data.colorDisabled"
+                                               @keyup.enter="handleEnterCedula"
+                                               class="dark:text-white w-11/12 focus:text-gray-600 p-2 border-0 dark:bg-gray-700 bg-gray-100 bg-opacity-50 rounded-r-lg
+                                                       focus:border-blue-400 placeholder-gray-500 text-gray-700 focus:placeholder-gray-400 dark:focus:placeholder-gray-100
+                                                       focus:bg-blue-50 focus:shadow-outline"
+                                               placeholder="Escriba aqui su identificacion"
+                                        />
+                                        <InputError class="mt-2" :message="form.errors.identificacion_user"/>
                                     </div>
-                                    <input v-model="form.identificacion_user" type="number" min="0" max="99999999999"
-                                        :disabled="data.identificacion_disbled"
-                                           :class="data.colorDisabled"
-                                        class=" w-11/12 focus:text-gray-600 p-2 dark:bg-gray-700 border-0
-                                         focus:border-blue-400 placeholder-gray-500 text-gray-700 focus:placeholder-gray-400 dark:focus:placeholder-gray-100
-                                         focus:bg-blue-50 focus:shadow-outline bg-gray-200"
-                                        placeholder="Escriba aqui su identificacion"
-                                    />
-                                   <InputError class="mt-2" :message="form.errors.identificacion_user" />
-                                </div>
-                                <div v-if="form.identificacion_user > 1000" class="w-full inline-flex my-6">
-                                    <div class="pt-2 w-1/2 bg-gray-100 bg-opacity-50">
-<!--                                        <svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>-->
-                                        ¿Cuantas Necesidades?
+                                    <div v-if="form.identificacion_user > 1000 && data.showContent" class="w-full grid grid-cols-3 gap-1 my-1 rounded-lg">
+                                        <div class="px-4 py-1 w-full rounded-x-lg">
+                                          <div class="px-4 py-2 w-full bg-transparent rounded-x-lg">
+                                              ¿Cuántas Necesidades?
+                                          </div>
+                                          <input v-model="data.ConteoCosas" type="number" min="0" max="100"
+                                                 class="dark:bg-black w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                 placeholder="Escriba aqui su identificacion"
+                                          />
+                                          <InputError class="mt-2" :message="form.errors.identificacion_user"/>
+                                        </div>
+                                      <div class="col-span-2 px-4 py-2 w-full bg-transparent rounded-x-lg mt-9">
+                                        <p class="ml-8">Proceso que solicita el Presupuesto</p>
+                                          <SelectInput v-model="form.proceso_que_solicita_presupuesto"
+                                                       :dataSet="data.proceso_que_solicita_presupuesto"
+                                                       class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                       autocomplete="off" placeholder="Especifique"/>
+                                          <InputError class="mt-2"
+                                                      :message="form.errors.proceso_que_solicita_presupuesto"/>
+                                      </div>
                                     </div>
-                                    <input v-model="data.ConteoCosas" type="number" min="0" max="100"
-                                            class=" w-1/2 focus:text-gray-600 p-2 dark:bg-gray-700 border-0
-                                         focus:border-blue-400 placeholder-gray-500 text-gray-700 focus:placeholder-gray-400 dark:focus:placeholder-gray-100
-                                         focus:bg-blue-50 focus:shadow-outline bg-gray-200"
-                                        placeholder="Escriba aqui su identificacion"
-                                    />
-                                   <InputError class="mt-2" :message="form.errors.identificacion_user" />
-                                </div>
-                                <div v-if="form.identificacion_user > 1000" class="w-full inline-flex">
-                                    Proceso que solicita el Presupuesto
-                                    <SelectInput v-model="form.proceso_que_solicita_presupuesto"
-                                                 :dataSet="data.proceso_que_solicita_presupuesto"
-                                                 class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                 autocomplete="off"/>
-                                    <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>
                                 </div>
                             </div>
-                        </div>
-
-
-                        <div class="mx-auto text-center">
-                            <div v-for="(value,index) in data.nombreLider" :key="index"
-                                 class="my-auto mb-4 md:inline-flex max-w-md w-full space-y-2 py-4 px-8 text-gray-500 items-center">
-                                <h2 v-if="index === 'name'" class="max-w-md mx-auto uppercase font-bold">Nombre del lider</h2>
-                                <h2 v-else class="w-1/4 max-w-md mx-auto uppercase font-bold">{{ index }}</h2>
-                                <div class="w-1/2 md:pl-9 max-w-sm mx-auto space-y-5 md:inline-flex pl-2">
-                                    <div class="w-full inline-flex border-sky-600 border-b-2">
-                                        <label> {{ value }} </label>
+                          
+                            <div v-if="data.showContent" class="mx-auto text-center">
+                                <div class="bg-my-auto mb-4 md:inline-flex max-w-md w-full space-y-2 py-4 px-8 text-gray-600 dark:text-white items-center">
+                                    <h2 class="max-w-md mx-auto uppercase font-bold">Nombre del líder</h2>
+                                    <div class="w-full md:pl-9 max-w-md mx-auto space-y-5 md:inline-flex pl-2">
+                                      <div class="w-full inline-flex border-sky-600 border-b-2">
+                                        <label> {{ data.nombreLider['name'] }} </label>
+                                      </div>
+                                    </div>
+                                </div>
+                                <div class="bg-my-auto mb-4 md:inline-flex max-w-md w-full space-y-2 py-4 px-8 text-gray-600 dark:text-white items-center">
+                                    <h2 class="max-w-md mx-auto uppercase font-bold">Cédula</h2>
+                                    <div class="w-full md:pl-9 max-w-md mx-auto space-y-5 md:inline-flex pl-2">
+                                      <div class="w-full inline-flex border-sky-600 border-b-2">
+                                        <label> {{ data.nombreLider['email'] }} </label>
+                                      </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <hr class="mb-4"/>
-                        <transition v-for="(indexFila,conteoi) in data.ConteoCosas" v-if="data.showContent" name="fade">
-                            <div>
-                                <div class="md:inline-flex  space-y-4 md:space-y-0  w-full p-4 text-gray-500 items-center">
-<!--                                    <h2 class="md:w-1/5 mx-auto max-w-sm">Informacion financiera</h2>-->
-                                    <div class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[158px]">
-            <!--                            elin-->
+                          
+                            <hr class="mb-4"/>
+                            <div v-for="(indexFila,conteoi) in data.ConteoCosas" v-show="data.showContent" name="fade">
+                              <div>
+                                    <div class="md:inline-flex  space-y-4 md:space-y-0 w-full p-4 text-gray-700 items-center">
+                                        <div class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[190px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl">
                                             <div :class="data.classOfTxtAreas">
-                                                <label class="text-sm text-gray-400 capitalize">necesidad</label>
+                                                <label class="text-md text-gray-900 capitalize"> necesidad {{conteoi+1}}</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500 mb-12">Relacione de manera específica la necesidad a solicitar</p>
                                                 <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <textarea cols="100" rows="3"  v-model="form.necesidad[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
+                                                    <textarea cols="100" rows="7" v-model="form.necesidad[conteoi]"
+                                                              type="text"
+                                                              class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                              autocomplete="off"/>
                                                 </div>
-                                                <InputError class="mt-2" :message="form.errors.necesidad" />
+                                                <InputError class="mt-2" :message="form.errors.necesidad"/>
                                             </div>
-                                            <div :class="data.classOfTxtAreas">
-                                                <label class="text-sm text-gray-400 capitalize">justificacion</label>
+                                            <div class="min-w-[660px] max-h-[110px] p-4">
+                                                <label class="text-md text-gray-900 capitalize">justificación</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Qué impactos concretos tendrá esta adquisición? Que pasaría si no se hace la adquisición? Si es Talento Humano, especifique las actividades que desarrollará y qué entregables generará</p>
                                                 <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <textarea cols="100" rows="3"  v-model="form.justificacion[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.justificacion" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">actividad</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.actividad[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.actividad" />
+                                                    <textarea cols="100" rows="7" v-model="form.justificacion[conteoi]"
+                                                              type="text"
+                                                              class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                              autocomplete="off"/>
+                                                    <InputError class="mt-2" :message="form.errors.justificacion"/>
                                                 </div>
                                             </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">categoria</label>
+                                            <div :class="data.classOfTextLG">
+                                                <label class="text-md text-gray-900 capitalize">actividad</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione la actividad acorde a su necesidad. En caso de no encontrarla en el listado, seleccione la opción otra y descríbala de manera detallada</p>
                                                 <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput v-model="form.categoria[conteoi]" :dataSet="data.categoria"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.categoria" />
+<!--                                                  <SelectInput v-model="form.actividad[conteoi]"-->
+<!--                                                           :dataSet="data.actividades"-->
+<!--                                                           class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"-->
+<!--                                                           />-->
+                                                  <input v-model="form.actividad[conteoi]"
+                                                         type="text"
+                                                         class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                         autocomplete="off"/>
+                                                  <InputError class="mt-2" :message="form.errors.actividad"/>
                                                 </div>
                                             </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">unidad de medida</label>
+                                            <div :class="data.classOfTextLG">
+                                                <label class="text-md text-gray-900 capitalize">categoría</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione la categoría acorde a la necesidad descrita en los pasos anteriores</p>
                                                 <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <SelectInput v-model="form.categoria[conteoi]"
+                                                                 :dataSet="data.categoria"
+                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                                 autocomplete="off"/>
+                                                    <InputError class="mt-2" :message="form.errors.categoria"/>
+                                                </div>
+                                            </div>
+                                            <div :class="data.classOfText">
+                                                <label class="text-md text-gray-900 capitalize">unidad de medida</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Describir la forma de cuantificar el recurso solicitado</p>
+                                                <div v-if="data.Otras_unidad_de_medida[conteoi] === false"
+                                                     class="w-full inline-flex">
                                                     <SelectInput v-model="form.unidad_de_medida[conteoi]"
-                                                                 :dataSet="props.losSelect.unidad_de_medida" class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.unidad_de_medida" />
+                                                                 :dataSet="props.losSelect.unidad_de_medida"
+                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                                 autocomplete="off"/>
+
+                                                    <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
+                                                </div>
+                                                <div v-else class="w-full inline-flex">
+                                                    <input v-model="form.unidad_de_medida[conteoi]" type="text"
+                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                           autocomplete="off"/>
+                                                    <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
                                                 </div>
                                             </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">cantidad</label>
+                                            <div :class="data.classOfText">
+                                                <label class="text-md text-gray-900 capitalize">cantidad</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Describir la forma de cuantificar el recurso solicitado</p>
                                                 <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
                                                     <input v-model="form.cantidad[conteoi]"
-                                                           type="number"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.cantidad" />
+                                                           type="number"
+                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                           autocomplete="off"/>
+                                                    <InputError class="mt-2" :message="form.errors.cantidad"/>
                                                 </div>
                                             </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">valor unitario</label>
+                                            <div class="min-w-[360px] max-h-[110px] p-4">
+                                                <label class="text-md text-gray-900 capitalize">valor unitario</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Cual es el valor estimado de cada unidad de medida En caso de ser en dólares, usar el valor proyectado de la TRM según la fecha estimada de compra</p>
                                                 <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.valor_unitario[conteoi]" type="number" min="0"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.valor_unitario" />
+                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <input v-model="form.valor_unitario[conteoi]" type="number" min="0"
+                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                           autocomplete="off"/>
+                                                    <InputError class="mt-2" :message="form.errors.valor_unitario"/>
                                                 </div>
                                             </div>
-                                            <div class="min-w-[230px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">valor total</label>
+                                            <div :class="data.classOfText2">
+                                                <label class="text-md text-gray-900 capitalize">valor total</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Cantidad x valor unitario</p>
                                                 <label class="text-xs text-gray-400"> (solicitado por necesidad)</label>
                                                 <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input disabled v-model="form.valor_total_solicitatdo_por_necesidad[conteoi]"  class="w-full bg-zinc-400 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.valor_total_solicitatdo_por_necesidad" />
-                                                </div>
-                                            </div>
-
-
-
-
-
-
-
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">periodo de inicio de ejecucion</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="props.losSelect.periodo_de_inicio_de_ejecucion" v-model="form.periodo_de_inicio_de_ejecucion[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.periodo_de_inicio_de_ejecucion" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">vigencias anteriores</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="data.vigencias_anteriores" v-model="form.vigencias_anteriores[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.vigencias_anteriores" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[250px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400">Valor asignado en la vigencia anterior</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.valor_asignado_en_la_vigencia_anterior[conteoi]" type="number" min="0"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.valor_asignado_en_la_vigencia_anterior" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">procesos involucrados</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.procesos_involucrados[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.procesos_involucrados" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[310px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400">Plan de mejoramiento al que apunta la necesidad</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.plan_de_mejoramiento_al_que_apunta_la_necesidad" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[360px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400">Linea del plan desarrollo al que apunta la necesidad</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.linea_del_plan_desarrollo_al_que_apunta_la_necesidad" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[300px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">frecuencia de uso</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="props.losSelect.frecuencia_de_uso" v-model="form.frecuencia_de_uso[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.frecuencia_de_uso" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[300px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">mantenimientos requeridos</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="props.losSelect.mantenimientos_requeridos" v-model="form.mantenimientos_requeridos[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.mantenimientos_requeridos" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">capacidad instalada</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="props.losSelect.capacidad_instalada" v-model="form.capacidad_instalada[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.capacidad_instalada" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[200px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">riesgo de la inversion</label>
-                                                <div class="w-full inline-flex">
-<!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="props.losSelect.riesgo_de_la_inversion" v-model="form.riesgo_de_la_inversion[conteoi]" type="text"  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500" autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.riesgo_de_la_inversion" />
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[500px] max-h-[110px]">
-                                                <label class="text-sm text-gray-400 capitalize">anexos</label>
-                                                <div class="w-full flex">
-            <!--                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"-->
-                                                    <input id="anexos" type="file" @input="form.anexos = $event.target.files[0]"
-                                                           @change="handleFile" accept="application/pdf"
-                                                           class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <input disabled
+                                                           v-model="data.valor_total_solicitatdo_por_necesidad[conteoi]"
+                                                           class="w-full bg-zinc-400 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                            autocomplete="off"/>
-                                                            <p v-if="form.anexos" class="w-full my-2 text-green-600">
-                                                                {{ form.anexos.name }}
-                                                            </p>
                                                 </div>
-                                                <progress v-if="form.progress" :value="form.progress.percentage" max="100"
-                                                          class="bg-sky-200">
-                                                    {{ form.progress.percentage }}%
-                                                </progress>
                                             </div>
-                                            <InputError class="mt-2" :message="form.errors.anexos" />
+
+                                            <div :class="data.classOfText2">
+                                                <label class="text-md text-gray-900 capitalize">período de inicio de ejecución</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">En que trimestre iniciará la ejecución de los recursos solicitados	</p>
+                                                <div class="w-full inline-flex">
+                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <SelectInput
+                                                        :dataSet="props.losSelect.periodo_de_inicio_de_ejecucion"
+                                                        v-model="form.periodo_de_inicio_de_ejecucion[conteoi]"
+                                                        type="text"
+                                                        class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                        autocomplete="off"/>
+                                                    <InputError class="mt-2"
+                                                                :message="form.errors.periodo_de_inicio_de_ejecucion"/>
+                                                </div>
+                                            </div>
+                                            <div :class="data.classOfText">
+                                                <label class="text-md text-gray-900 capitalize">vigencias anteriores</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Especifique el valor en pesos asignado en 2024 para esta misma necesidad	</p>
+                                                <div class="w-full inline-flex">
+                                                    <SelectInput :dataSet="data.vigencias_anteriores"
+                                                                 v-model="form.vigencias_anteriores[conteoi]"
+                                                                 type="text"
+                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                    />
+                                                    <InputError class="mt-2"
+                                                                :message="form.errors.vigencias_anteriores"/>
+                                                </div>
+                                            </div>
+                                            <div :class="data.classOfText2">
+                                                <label class="text-md text-gray-400">Valor asignado en la vigencia anterior</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Especifique el valor en pesos asignado en 2024 para esta misma necesidad	</p>
+                                                <div class="w-full inline-flex">
+                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <input
+                                                        v-model="form.valor_asignado_en_la_vigencia_anterior[conteoi]"
+                                                        type="number" min="0"
+                                                        class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                        :disabled="data.desabilitar_vigencias_anteriores[conteoi]"/>
+                                                    <InputError class="mt-2"
+                                                                :message="form.errors.valor_asignado_en_la_vigencia_anterior"/>
+                                                </div>
+                                            </div>
+
+
+                                            <!--                                        selectmultipledos1-->
+                                            <div :class="data.classOfText_checkbox">
+                                                <label for="multi-select" class="mb-4 text-lg text-gray-400 ">Procesos involucrados</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Para esta inversión se requiere apoyo, información, asesoría, recursos o aprobaciones de las siguientes áreas:	</p>
+                                                <div v-for="(option,inde) in data.proceso_que_solicita_presupuesto"
+                                                     :key="inde" class="mt-3">
+                                                    <input type="checkbox" :id="option.value+'_a'+conteoi"
+                                                           :value="option.value"
+                                                           @change="toggleSelection1(option.value,conteoi)"
+                                                           :checked="isSelected1(option.value)"
+                                                           class="p-1 w-7 h-7 ring-1 ring-zinc-400"
+                                                    />
+                                                    <label :for="option.value" class="mx-2">{{ option.label }}</label>
+                                                </div>
+                                                <InputError class="mt-2" :message="form.errors.procesos_involucrados"/>
+                                            </div>
+                                            <div :class="data.classOfText_checkbox">
+                                                <label for="multi-select" class="mb-4 text-lg text-gray-400">Procesos seleccionados</label>
+                                                <p v-if="form.procesos_involucrados[conteoi]"
+                                                   v-for="itemsito in form.procesos_involucrados[conteoi]"
+                                                   class="font-bold mt-1">
+                                                    - {{ data.proceso_que_solicita_presupuesto.find((item) => item.value === itemsito)?.label }}
+                                                </p>
+                                            </div>
+
+
+                                            <!--                                            selectmultipledos2-->
+                                            <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
+                                                <label class="text-md text-gray-400">Plan de mejoramiento al que apunta la necesidad</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione el Plan de Mejoramiento  al cual  se articula 	</p>
+                                                <div v-for="option in data.planmejoramientonecesidad"
+                                                     :key="option.value" class="mt-3">
+                                                    <input type="checkbox" :id="option.value+'_b'+conteoi"
+                                                           :value="option.value"
+                                                           @change="toggleSelection2(option.value,conteoi)"
+                                                           :checked="isSelected2(option.value,conteoi)"
+                                                           class="p-1 w-7 h-7 ring-1 ring-zinc-400"
+                                                    />
+                                                    <label :for="option.value+'_'+conteoi" class="mx-1">{{ option.label }}</label>
+                                                </div>
+                                                <InputError class="mt-2"
+                                                            :message="form.errors.plan_de_mejoramiento_al_que_apunta_la_necesidad"/>
+                                            </div>
+                                            <div class="min-w-[250px] max-h-[250px] p-4 border-x-2 border-zinc-400">
+                                                <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Planes seleccionados</label>
+                                                <p v-if="form.plan_de_mejoramiento_al_que_apunta_la_necesidad"
+                                                   v-for="itemsito2 in form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi]"
+                                                   class="font-bold mt-1">
+                                                    - {{ data.planmejoramientonecesidad.find((item) => item.value === itemsito2)?.label }}</p>
+                                            </div>
+                                            <!--                                            selectmultipledos3-->
+                                            <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
+                                                <label class="text-md text-gray-400">Línea del plan desarrollo al que
+                                                    apunta la necesidad</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione una de las líneas	</p>
+                                                <div v-for="option in data.lineadelplan"
+                                                     :key="option.value" class="mt-3">
+                                                    <input type="checkbox" :id="option.value+'_c'+conteoi"
+                                                           :value="option.value"
+                                                           @change="toggleSelection3(option.value,conteoi)"
+                                                           :checked="isSelected3(option.value)"
+                                                           class="p-1 w-7 h-7 ring-1 ring-zinc-400"
+                                                    />
+                                                    <label :for="option.value" class="mx-1">{{ option.label }}</label>
+                                                </div>
+                                                <InputError class="mt-2"
+                                                            :message="form.errors.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"/>
+                                            </div>
+                                            <div class="min-w-[350px] max-h-[250px] p-4 border-x-2 border-zinc-400">
+                                                <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Líneas seleccionadas</label>
+                                                <p v-if="form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"
+                                                   v-for="itemsito3 in form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi]"
+                                                   class="font-bold mt-1"> - {{
+                                                        data.lineadelplan.find((item) => item.value === itemsito3)?.label
+                                                    }}</p>
+
+                                            </div>
+
+                                            <!-- fin selectmultipledo-->
+                                            <div class="min-w-[450px] max-h-[110px] p-4">
+                                                <label class="text-md text-gray-900 capitalize">frecuencia de uso</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Relacionar la periodicidad de usos que se le darán a la adquisición</p>
+                                                <div class="w-full inline-flex">
+                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <SelectInput :dataSet="props.losSelect.frecuencia_de_uso"
+                                                                 v-model="form.frecuencia_de_uso[conteoi]" type="text"
+                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                                 autocomplete="off"/>
+                                                    <InputError class="mt-2" :message="form.errors.frecuencia_de_uso"/>
+                                                </div>
+                                            </div>
+                                            <div class="min-w-[460px] max-h-[110px] p-4">
+                                                <label class="text-md text-gray-900 capitalize">mantenimientos requeridos</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500"> Relacionar la cantidad y periodicidad de los mantenimientos requeridos después de hecha la adquisición.</p>
+                                                <div class="w-full inline-flex">
+                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                                                    <SelectInput :dataSet="props.losSelect.mantenimientos_requeridos"
+                                                                 v-model="form.mantenimientos_requeridos[conteoi]"
+                                                                 type="text"
+                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                                 autocomplete="off"/>
+                                                    <InputError class="mt-2"
+                                                                :message="form.errors.mantenimientos_requeridos"/>
+                                                </div>
+                                            </div>
+                                            <div class="min-w-[460px] max-h-[110px] p-4">
+                                                <label class="text-md text-gray-900 capitalize">capacidad instalada</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Disponibilidad actual de este bien o servicio en
+                                                la Institución. Si se trata de Talento Humano, explique con qué recursos se están desarrollando actualmente las actividades	</p>
+                                                <div v-if="data.Otras_capacidad_instalada[conteoi] === false"
+                                                     class="w-full inline-flex">
+                                                    <SelectInput :dataSet="props.losSelect.capacidad_instalada"
+                                                                 v-model="form.capacidad_instalada[conteoi]" type="text"
+                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                                 autocomplete="off"/>
+                                                    <InputError class="mt-2"
+                                                                :message="form.errors.capacidad_instalada"/>
+                                                </div>
+                                                <div v-else class="w-full inline-flex">
+                                                    <input v-model="form.capacidad_instalada[conteoi]" type="text"
+                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                           autocomplete="off"/>
+                                                    <InputError class="mt-2"
+                                                                :message="form.errors.capacidad_instalada"/>
+                                                </div>
+                                            </div>
+                                            <div class="min-w-[300px] max-h-[110px] p-4">
+                                                <label class="text-md text-gray-900">Riesgo de la inversión</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500">
+                                                Valore el riesgo de que la necesidad no sea totalmente solucionada 1: Bajo riesgo   5: Alto riesgo</p>
+                                                <div class="w-full inline-flex">
+                                                    <SelectInput :dataSet="props.losSelect.riesgo_de_la_inversion"
+                                                                 v-model="form.riesgo_de_la_inversion[conteoi]"
+                                                                 type="text"
+                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                                 autocomplete="off"/>
+                                                    <InputError class="mt-2"
+                                                                :message="form.errors.riesgo_de_la_inversion"/>
+                                                </div>
+                                            </div>
+                                            <div class="min-w-[500px] max-h-[110px] p-4">
+                                                <label class="text-md text-gray-900 capitalize">anexos</label>
+                                              <p v-if="conteoi === 0" class="text-md text-gray-500 my-2">
+                                                Relacionar los anexos que hacen parte del ítem de la inversión, compra o reposición, donde se enuncien
+                                                las especificaciones técnicas.
+                                                Si la solicitud es una reposición, adjuntar el informe técnico con código de inventario para asegurar
+                                                la baja posterior por parte del solicitante. Formatos Permitidos: Word, Excel, PDF
+                                              </p>
+                                                <div class="w-full flex">
+                                                    <!--                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"-->
+                                                    <input id="anexos" type="file"
+                                                           @input="form.anexos[conteoi] = $event.target.files[0]"
+                                                           @change="handleFile" accept="application/pdf"
+                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                           autocomplete="off"/>
+                                                    <p v-if="form.anexos[conteoi]"
+                                                       class="w-full my-2 mx-6 text-green-700 underline">
+                                                        {{ form.anexos[conteoi].name }}
+                                                    </p>
+                                                    <p v-if="data.showanexos[conteoi]"
+                                                       class="w-full my-2 mx-6 text-green-700 underline">
+                                                        {{ data.showanexos[conteoi] }}
+                                                    </p>
+                                                </div>
+                                                <!--                                                <progress v-if="form.progress" :value="form.progress.percentage" max="100"-->
+                                                <!--                                                          class="bg-sky-200">-->
+                                                <!--                                                    {{ form.progress.percentage }}%-->
+                                                <!--                                                </progress>-->
+                                            </div>
+                                            <InputError class="mt-2" :message="form.errors.anexos"/>
                                         </div>
                                     </div>
                                     <!--   elfin-->
 
-                                <!-- total-->
+                                    <!-- total-->
+                                </div>
                             </div>
-                        </transition>
-                        <section v-if="data.showContent">
-                            <div class="px-1 flex py-2 text-gray-500 items-center text-center">
-                                <div class="mx-auto relative overflow-x-auto shadow-md sm:rounded-lg">
-                                    <table class="w-full text-xl text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                        <thead class="text-lg text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                        <tr>
-                                            <th scope="col" class="px-6 py-3">
-                                                Necesidad
-                                            </th>
-                                            <th scope="col" class="px-6 py-3">
-                                                Subtotal
-                                            </th>
-                                        </tr>
-                                        </thead>
-                                        <tbody  class="items-center">
+                          
+                          
+                          
+                            <section v-if="data.showContent">
+                                <div class="px-1 flex py-2 text-gray-500 items-center text-center bg-transparent p-0">
+                                    <div class="mx-auto relative overflow-x-auto shadow-md rounded-2xl">
+                                        <table class="w-full text-xl text-center rtl:text-right sm:rounded-lg text-gray-500 dark:text-gray-400">
+                                            <thead class="text-lg text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
+                                              <tr>
+                                                  <th scope="col" class="p-6">#</th>
+                                                  <th scope="col" class="col-span-2 p-6">Necesidad</th>
+                                                  <th scope="col" class="p-6">Categoria</th>
+                                                  <th scope="col" class="p-6">Unidad de medida</th>
+                                                  <th scope="col" class="p-6">Cantidad</th>
+                                                  <th scope="col" class="p-6">Valor unitario</th>
+                                                  <th scope="col" class="p-6">Subtotal</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody class="items-center">
                                             <tr v-for="(element, indexNecesidad) in form.necesidad"
                                                 class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                            <!--                                            <div class="w-full md:pl-9 max-w-sm mx-auto space-y-5 md:inline-flex pl-2">-->
-                                                    <td class="w-full text-left">
-                                                         {{ element }}
-                                                    </td>
-    <!--                                            </div>-->
-    <!--                                            <div class="w-full md:pl-9 max-w-sm mx-auto space-y-5 pl-2">-->
-                                                    <td class="w-full text-right">
-                                                        {{ number_format(form.valor_total_solicitatdo_por_necesidad[indexNecesidad], 0, 1) }}
-                                                    </td>
-    <!--                                            </div>-->
+                                                <td class="w-full text-center py-2 -px-1">{{indexNecesidad+1}}</td>
+                                                <td v-if="element.length > 80" class="w-full text-center py-2 col-span-2">
+                                                    {{ element.slice(0, 80) }} ...
+                                                </td>
+                                                <td v-else class="w-full text-center py-2 col-span-2">{{ element }}</td>
+                                                <td v-if="!isNaN(form.categoria[indexNecesidad])" class="w-full text-center py-2">
+                                                  {{ data.categoria.find((item) => item.value == form.categoria[indexNecesidad])?.label }}
+                                                </td>
+                                                <td v-else class="w-full text-center py-2">{{ (form.categoria[indexNecesidad]) }}</td>
+                                                <td class="w-full text-center py-2">{{ (form.unidad_de_medida[indexNecesidad]) }}</td>
+                                                <td class="w-full text-center py-2">{{ (form.cantidad[indexNecesidad]) }}</td>
+                                                <td class="w-full text-center py-2">{{ number_format(form.valor_unitario[indexNecesidad], 0, 1) }}</td>
+                                                <td class="w-full text-center py-2">{{ number_format(form.valor_total_solicitatdo_por_necesidad[indexNecesidad], 0, 1) }}</td>
                                             </tr>
-                                        </tbody>
-
-<!--                            <div v-for="(element, indexNecesidad) in form.necesidad" class="md:inline-flex w-full space-y-4 md:space-y-0 p-8 text-gray-500 items-center">-->
-<!--                                <div class="w-full md:pl-9 max-w-sm mx-auto space-y-5 md:inline-flex pl-2">-->
-<!--                                    <div class="w-full inline-flex">-->
-<!--                                        <label> {{ element }} </label>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                                <div class="w-full md:pl-9 max-w-sm mx-auto space-y-5 md:inline-flex pl-2">-->
-<!--                                    <div class="w-full inline-flex">-->
-<!--                                        <label class="font-bold"> {{ number_format(form.valor_total_solicitatdo_por_necesidad[indexNecesidad],0,1) }} </label>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </div>-->
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="w-full text-center md:pl-9 max-w-sm mx-auto my-5 pl-2">
+                                    <div class="w-full text-center mx-auto">
+                                        <label class="text-xl text-center"> Total final:<small class="px-3 font-bold text-2xl">{{ number_format(data.total_todo, 0, 1) }}</small> </label>
+                                    </div>
+                                </div>
+                                <hr/>
+                            </section>
+                            <!-- botones de guardado    -->
+                            <div v-if="data.showContent"
+                                 class="md:inline-flex w-full my-2 md:space-y-0 p-8 text-gray-500 items-center">
+                              <div v-if="Object.keys(form.errors).length">
+                                <p class="text-xl text-red-800">Por favor, Corrija los siguientes errores</p>
+                                <ul>
+                                  <li v-for="(error, field) in form.errors" :key="field"
+                                    class="text-lg text-red-800">
+                                     {{ error.replace(/_/g, " ").replace(/justificacion\.(\d+)/, (match, p1) => {
+                                          let nuevoNumero = parseInt(p1, 10) + 1;
+                                          return `justificacion.${nuevoNumero}`;
+                                        }) 
+                                    }}
+                                  </li>
+                                </ul>
+                              </div>
+                                <div class="grid grid-cols-2 gap-8 mx-auto text-center md:pl-6">
+                                  
+                                    <PrimaryButton
+                                        class="text-white w-full mx-auto max-w-sm rounded-md text-center bg-indigo-400 py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
+                                        :class="{ 'opacity-25': form.processing }"
+                                        :disabled="form.processing"
+                                        @click="create(0)"
+                                    >
+                                        <!--                                    <svg fill="none" class="w-4 text-white mr-2" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>-->
+                                        Guardar sin enviar
+                                    </PrimaryButton>
+                                    <PrimaryButton
+                                        class="text-white w-full mx-auto max-w-sm rounded-md text-center bg-black-400 py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
+                                        :class="{ 'opacity-25': form.processing }"
+                                        :disabled="form.processing"
+                                        @click="create(1)"
+                                    >
+                                        <svg fill="none" class="w-4 text-white mr-2" viewBox="0 0 24 24"
+                                             stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                        </svg>
+                                        Enviar Definitivamente
+                                    </PrimaryButton>
                                 </div>
                             </div>
-                            <div class="w-full text-center md:pl-9 max-w-sm mx-auto space-y-5 pl-2">
-                                <div class="w-full text-center mx-auto">
-                                    <label class="text-lg text-center"> Total final:
-                                        <small class="font-bold text-xl">{{ number_format(data.total_todo,0,1) }}</small> </label>
-                                </div>
-                            </div>
-                            <hr/>
                         </section>
-                        <!-- botones de guardado    -->
-                        <div v-if="data.showContent"
-                             class="md:inline-flex w-full space-y-4 md:space-y-0 p-8 text-gray-500 items-center">
-                            <div class="grid grid-cols-2 gap-8 mx-auto text-center md:pl-6">
-                                <PrimaryButton
-                                    class="text-white w-full mx-auto max-w-sm rounded-md text-center bg-indigo-400 py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
-                                    :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing"
-                                    @click="create(0)"
-                                >
-                                    <svg fill="none" class="w-4 text-white mr-2" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                    Guardar y no enviar
-                                </PrimaryButton>
-                                <PrimaryButton
-                                    class="text-white w-full mx-auto max-w-sm rounded-md text-center bg-indigo-400 py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
-                                    :class="{ 'opacity-25': form.processing }"
-                                    :disabled="form.processing"
-                                    @click="create(1)"
-                                >
-                                    <svg fill="none" class="w-4 text-white mr-2" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                                    Enviar
-                                </PrimaryButton>
-                            </div>
-                        </div>
-                    </section>
+                    </div>
+                </form>
+              
+              
+              
+                <div class="sm:flex justify-between mt-4 text-md text-gray-500">
+                    <div v-if="data.mensajeYaHaSidoGuardado === ''" class="flex mx-4 sm:mx-0 flex-row justify-center text-center">
+                        <p class="text-lg text-black dark:text-white">{{ $page.props.app.name }} ©️</p>
+                    </div>
+                    <div v-else class="flex text-[#499884] font-medium text-lg mx-4 sm:mx-0 flex-row justify-center text-center">
+                        <p>{{data.mensajeYaHaSidoGuardado}}</p>
+                    </div>
                 </div>
-            </form>
-
-            <div class="sm:flex justify-between mt-4 text-sm text-gray-500">
-                <div class="flex mx-4 sm:mx-0 flex-row justify-center text-center">
-                    <p><a href="https://brive.erikwibowo.com" target="_blank">{{ $page.props.app.name }}</a> ©️</p>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
 </template>
 <style>
 ::-webkit-scrollbar {
-    height: 6px; /* Altura del scrollbar vertical */
-    width: 3px; /* Ancho del scrollbar horizontal */
+    height: 14px; /* Altura del scrollbar vertical */
+    width: 4px; /* Ancho del scrollbar horizontal */
+    border-radius: 2px;
 }
 /* Estilo del thumb del scrollbar */
 ::-webkit-scrollbar-thumb {
     background-color: #00004f; /* Color del thumb */
     border-radius: 1px; /* Radio de borde del thumb */
 }
-
 </style>

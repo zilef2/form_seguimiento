@@ -1,1 +1,0 @@
-import{o as r,f as s}from"./app-9e3c5959.js";const _=(o,t)=>{const c=o.__vccOpts||o;for(const[e,n]of t)c[e]=n;return c},a={},p={src:"logoEmpresa.png",alt:"nop",srcset:""};function f(o,t){return r(),s("img",p)}const l=_(a,[["render",f]]);export{l as A,_};

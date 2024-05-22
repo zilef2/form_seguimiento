@@ -26,3 +26,4 @@ class StoreFormularioRequest extends FormRequest
         ];
     }
 }
+

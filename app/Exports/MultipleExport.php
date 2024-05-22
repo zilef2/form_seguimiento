@@ -20,9 +20,7 @@ class MultipleExport implements WithMultipleSheets,ShouldAutoSize
     }
 
 
-    public function sheets(): array
-    {
-
+    public function sheets(): array{
         $nombresModelos = $this->listarModelos();
         foreach ($nombresModelos as $sheet) {
             $sheets[] = new TodaBDExport($sheet);
@@ -30,8 +28,7 @@ class MultipleExport implements WithMultipleSheets,ShouldAutoSize
         return $sheets;
     }
 
-    protected function listarModelos()
-    {
+    protected function listarModelos(){
         $directorioModelos = app_path('Models'); // Ruta al directorio de modelos
 
         // Obtener todos los archivos en el directorio de modelos
@@ -41,17 +38,14 @@ class MultipleExport implements WithMultipleSheets,ShouldAutoSize
             "Parametro",
             "Permission",
             "Role",
-//            "formulario",
         ];
 
         // Filtrar los nombres de clase que sean modelos
         $nombresModelos = collect($archivos)
             ->map(function ($archivo) use ($ListaNegra) {
-
                 $nombre = pathinfo($archivo, PATHINFO_FILENAME);
                 if(!in_array($nombre,$ListaNegra)) return $nombre;
             })->filter();
-
         return $nombresModelos;
     }
 }

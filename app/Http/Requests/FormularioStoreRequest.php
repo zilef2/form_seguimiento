@@ -27,7 +27,7 @@ class FormularioStoreRequest extends FormRequest
         return [
     //        'name' => 'required|string|max:255|unique:'.Permission::class,
             'numero_necesidad' => 'nullable',
-            'identificacion_user' => 'nullable',
+            'identificacion_user' => 'required',
             'proceso_que_solicita_presupuesto' => 'required',
             'valor_total_de_la_solicitud_actual' => 'required',
             'valor_total_asignado_en_vigencia_anterior' => 'nullable',
@@ -43,9 +43,11 @@ class FormularioStoreRequest extends FormRequest
             'periodo_de_inicio_de_ejecucion.*' => 'required',
             'vigencias_anteriores.*' => 'required',
             'valor_asignado_en_la_vigencia_anterior.*' => 'required',
-            'procesos_involucrados.*' => 'required',
+
+            'procesos_involucrados.*' => 'nullable',
             'plan_de_mejoramiento_al_que_apunta_la_necesidad.*' => 'required',
             'linea_del_plan_desarrollo_al_que_apunta_la_necesidad.*' => 'required',
+
             'frecuencia_de_uso.*' => 'required',
             'mantenimientos_requeridos.*' => 'required',
             'capacidad_instalada.*' => 'required',

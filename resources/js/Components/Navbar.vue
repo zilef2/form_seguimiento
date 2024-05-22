@@ -86,7 +86,9 @@ const downloadExcel = () => { window.open('DB_info' , '_blank') }
                                     <DropdownLink :href="route('profile.edit')"> {{ lang().label.profile }}
                                     </DropdownLink>
                                     <form @submit.prevent="downloadExcel" id="downloadprestamo" v-if="can(['create user'])" class="hover:bg-gray-100">
-                                            <button class="mx-4 my-2" type="submit">
+                                            <button
+                                                class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
+                                            type="submit">
                                                 Base de datos
                                             </button>
                                     </form>

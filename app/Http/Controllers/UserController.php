@@ -10,7 +10,7 @@ use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Imports\PersonalImport;
 use App\Models\Permission;
-use App\Models\formulario;
+use App\Models\Formulario;
 use App\Models\Role;
 use App\Models\User;
 use App\Exports\MultipleExport;
@@ -37,18 +37,18 @@ class UserController extends Controller {
     }
 
     public function Dashboard() {
-        $numberPermissions = CargosModelos::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' Dashboard'));
-        if($numberPermissions > 1){
+//        $numberPermissions = CargosModelos::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' Dashboard'));
+//        if($numberPermissions > 1){
 
             return Inertia::render('Dashboard', [
                 'users'         => (int) User::count(),
                 'roles'         => (int) Role::count(),
-                'formularios'      => (int) formulario::Where('enviado',1)->count(),
+                'formularios'      => (int) Formulario::Where('enviado',1)->count(),
                 'permissions'   => (int) Permission::count(),
             ]);
-        }else{
-            return redirect()->route('formulario.index');
-        }
+//        }else{
+//            return redirect()->route('Dashboard.index');
+//        }
 
     }
     public function SelectsMasivos($numberPermissions) {
@@ -329,7 +329,7 @@ class UserController extends Controller {
 
     public function todaBD(): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        return Excel::download(new MultipleExport, 'GenericDB.xlsx');
+        return Excel::download(new MultipleExport, 'CMA_Respaldo.xlsx');
     }
 
 

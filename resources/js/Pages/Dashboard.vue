@@ -26,7 +26,7 @@ const colores =[
     'bg-green-500',
     // 'bg-blue-500',
 ];
-const laImg =[ //todo:
+const laImg =[
     'KeyIcon',
     'KeyIcon',
     // 'KeyIcon',
@@ -86,23 +86,23 @@ const laImg =[ //todo:
 
 
                 <div v-if="can(['isSuper'])">
-                    <div
-                        class="rounded-t-none sm:rounded-t-lg px-4 py-6 flex justify-between bg-amber-600/70 dark:bg-amber-500/80 items-center overflow-hidden">
-                        <div class="flex flex-col">
-                            <p class="text-4xl font-bold">{{ props.permissions }}</p>
-                            <p class="text-md md:text-lg uppercase">{{ lang().label.permission }}</p>
-                        </div>
-                        <!-- <div>
-                            <ShieldCheckIcon class="w-16 h-auto" />
-                        </div> -->
-                    </div>
-                    <div
-                        class="bg-amber-600 dark:bg-amber-600/80 rounded-b-none sm:rounded-b-lg p-2 overflow-hidden hover:bg-amber-600/90 dark:hover:bg-amber-600/70">
-                        <Link :href="route('permission.index')" class="flex justify-between items-center">
-                        <p>{{ lang().label.more }}</p>
-                        <ChevronRightIcon class="w-5 h-5" />
-                        </Link>
-                    </div>
+<!--                    <div-->
+<!--                        class="rounded-t-none sm:rounded-t-lg px-4 py-6 flex justify-between bg-amber-600/70 dark:bg-amber-500/80 items-center overflow-hidden">-->
+<!--                        <div class="flex flex-col">-->
+<!--                            <p class="text-4xl font-bold">{{ props.permissions }}</p>-->
+<!--                            <p class="text-md md:text-lg uppercase">{{ lang().label.permission }}</p>-->
+<!--                        </div>-->
+<!--                        <div>-->
+<!--                            <ShieldCheckIcon class="w-16 h-auto" />-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div-->
+<!--                        class="bg-amber-600 dark:bg-amber-600/80 rounded-b-none sm:rounded-b-lg p-2 overflow-hidden hover:bg-amber-600/90 dark:hover:bg-amber-600/70">-->
+<!--                        <Link :href="route('permission.index')" class="flex justify-between items-center">-->
+<!--                        <p>{{ lang().label.more }}</p>-->
+<!--                        <ChevronRightIcon class="w-5 h-5" />-->
+<!--                        </Link>-->
+<!--                    </div>-->
                 </div>
             </div>
         </div>
