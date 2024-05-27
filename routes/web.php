@@ -34,13 +34,13 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::resource('/permission', PermissionController::class)->except('create', 'show', 'edit');
     Route::post('/permission/destroy-bulk', [PermissionController::class, 'destroyBulk'])->name('permission.destroy-bulk');
-
-
+    
     Route::resource('/parametro', ParametrosController::class);
 
     Route::get('/DB_info', [UserController::class,'todaBD']);
 });
 Route::resource('/formulario', FormularioController::class)->except('create', 'show', 'edit');
+Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
 
 // ultimo comit 25sept
 

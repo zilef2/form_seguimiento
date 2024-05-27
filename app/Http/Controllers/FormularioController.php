@@ -177,49 +177,77 @@ class FormularioController extends Controller
         ]);
     }
 
-    public function create(){}
-    public function store(FormularioStoreRequest $request){
-        try {
-            Myhelp::EscribirEnLog($this, ' Begin STORE:formularios');
+    public function EnviarFormulario(FormularioStoreRequest $request){
+        try{
+            Myhelp::EscribirEnLog($this, ' Begin Guardar:formularios');
             DB::beginTransaction();
             $user = User::Where('identificacion', $request->identificacion_user)->first();
             $nuevo = 0;
-            $formulario = Formulario::Where('user_id', $user->id)
-//                ->Where('enviado', $request['enviado'])
-                ->get();
-            
+            $formulario = Formulario::Where('user_id', $user->id)->get();
+
             if ($formulario->count() > 0) {
                 foreach ($request['necesidad'] as $index => $item) {
                     if (isset($formulario[$index])) {
-                        $this->updateFormulario($formulario[$index],$request, $index, $item, $user);
-                    }else{
-                        $this->guardarFormulario($request, $index, $item, $user);
+                        $arrayForm = $this->arrayFormulario($request, $index, $user);
+                        $formulario[$index]->update($arrayForm);
+                    } else {
+                        $arrayForm = $this->arrayFormulario($request, $index, $user);
+                        Formulario::create($arrayForm);
                         $nuevo++;
                     }
                 }
             } else {
                 foreach ($request['necesidad'] as $index => $item) {
-                    $this->guardarFormulario($request, $index, $item, $user);
+                    $arrayForm = $this->arrayFormulario($request, $index, $user);
+                    Formulario::create($arrayForm);
                     $nuevo++;
                 }
             }
             DB::commit();
-//            Myhelp::EscribirEnLog($this, 'STORE:formularios EXITOSO', 'formulario id:' . $formulario->id . ' | ' . $formulario->nombre, false);
             return back()->with('success', __('app.label.formulario_created_successfully', ['number' => $formulario->count() + $nuevo]));
         } catch (\Throwable $th) {
             DB::rollback();
-            $tempo = 'userid';
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . ' Ubi: ' . $th->getFile() . $th->getLine();
-            dd($mensajeErrorCompleto,
-                $th->getTrace()[0],
-                $th->getTrace()
-            );
-//            Myhelp::EscribirEnLog($this, 'STORE:users', 'usuario id:' . $tempo . ' | ' . $tempo . ' fallo en el guardado', false);
+            return back()->with('error', __('app.label.created_error', ['name' => 'Razón: ']) . $mensajeErrorCompleto);
+        }
+    }
+    
+    public function store(Request $request){ //guardar
+        try {
+            Myhelp::EscribirEnLog($this, ' Begin Guardar:formularios');
+            DB::beginTransaction();
+            $user = User::Where('identificacion', $request->identificacion_user)->first();
+            $nuevo = 0;
+            $formulario = Formulario::Where('user_id', $user->id)->get();
+            
+            if ($formulario->count() > 0) {
+                foreach ($request['necesidad'] as $index => $item) {
+                    if (isset($formulario[$index])) {
+                        $arrayForm = $this->arrayFormulario($request, $index, $user);
+                        $formulario[$index]->update($arrayForm);
+                    }else{
+                        $arrayForm = $this->arrayFormulario($request, $index, $user);
+                        Formulario::create($arrayForm);
+                        $nuevo++;
+                    }
+                }
+            } else {
+                foreach ($request['necesidad'] as $index => $item) {
+                    $arrayForm = $this->arrayFormulario($request, $index, $user);
+                    Formulario::create($arrayForm);
+                    $nuevo++;
+                }
+            }
+            DB::commit();
+            return back()->with('success', __('app.label.formulario_created_successfully', ['number' => $formulario->count() + $nuevo]));
+        } catch (\Throwable $th) {
+            DB::rollback();
+            $mensajeErrorCompleto = $th->getMessage() . ' L:' . ' Ubi: ' . $th->getFile() . $th->getLine();
             return back()->with('error', __('app.label.created_error', ['name' => 'Razón: ']) . $mensajeErrorCompleto);
         }
     }
 
-    private function guardarFormulario($request,$index,$item,$user){
+    private function arrayFormulario($request,$index,$user){
         if(isset($request['procesos_involucrados'][$index])){
             $procesosInvol = implode(',', $request['procesos_involucrados'][$index]);
         } else $procesosInvol = null;
@@ -233,101 +261,44 @@ class FormularioController extends Controller
         } else $lineadelplan = null;
 
         $anexou = '';
-        if($request['anexos'])
+        if(isset($request['anexos']))
             $anexou = $request['anexos'][$index] ?? '';
 
         $categori = $request['categoria'][$index] ?? '';
-        formulario::create([
+        return [
             'numero_necesidad' => $index,
             'identificacion_user' => $request['identificacion_user'],
             'proceso_que_solicita_presupuesto' => $request['proceso_que_solicita_presupuesto'],
-            'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'],
+            'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'] ?? '',
             'valor_total_asignado_en_vigencia_anterior' => 0,
 
-            'necesidad' => $item,
-            'justificacion' => $request['justificacion'][$index],
-            'actividad' => $request['actividad'][$index],
+            'necesidad' => $request['necesidad'][$index] ?? '',
+            'justificacion' => $request['justificacion'][$index] ?? '',
+            'actividad' => $request['actividad'][$index] ?? '',
             'categoria' => $categori,
-            'unidad_de_medida' => $request['unidad_de_medida'][$index],
-            'cantidad' => $request['cantidad'][$index],
-            'valor_unitario' => $request['valor_unitario'][$index],
-            'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index],
-            'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index],
-            'vigencias_anteriores' => $request['vigencias_anteriores'][$index],
-            'valor_asignado_en_la_vigencia_anterior' => $request['valor_asignado_en_la_vigencia_anterior'][$index],
+            'unidad_de_medida' => $request['unidad_de_medida'][$index] ?? '',
+            'cantidad' => $request['cantidad'][$index] ?? '',
+            'valor_unitario' => str_replace(['.','$'],'',$request['valor_unitario'][$index]) ?? '',
+            'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index] ?? '',
+            'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index] ?? '',
+            'vigencias_anteriores' => $request['vigencias_anteriores'][$index] ?? '',
+            'valor_asignado_en_la_vigencia_anterior' => $request['valor_asignado_en_la_vigencia_anterior'][$index] ?? '',
 
             'procesos_involucrados' => $procesosInvol,
             'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $planmejor,
             'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $lineadelplan,
 
-            'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index],
-            'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index],
-            'capacidad_instalada' => $request['capacidad_instalada'][$index],
-            'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index],
+            'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index] ?? '',
+            'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index] ?? '',
+            'capacidad_instalada' => $request['capacidad_instalada'][$index] ?? '',
+            'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index] ?? '',
             'anexos' => $this->guardarAnexo($anexou),
             'enviado' => $request['enviado'],
             'user_id' => $user->id,
-        ]);
-    }
-    private function updateFormulario($formulario,$request,$index,$item,$user){
-//        dd(
-//            $request['procesos_involucrados'],
-//            $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index],
-//            $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index],
-//            implode(',', $request['procesos_involucrados'][$index]),
-//            implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]),
-//            implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]),
-//        );
-        if (isset($request['procesos_involucrados'][$index])) {
-            $procesosInvol = implode(',', $request['procesos_involucrados'][$index]);
-        } else $procesosInvol = null;
-
-        if (isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])) {
-            $planmejor = implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]);
-        } else $planmejor = null;
-
-        if (isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])) {
-            $lineadelplan = implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]);
-        } else $lineadelplan = null;
-        
-        $anexou = $request['anexos'][$index] ?? '';
-
-        $formulario->update([
-            'numero_necesidad' => $index,
-            'identificacion_user' => $request['identificacion_user'],
-            'proceso_que_solicita_presupuesto' => $request['proceso_que_solicita_presupuesto'],
-            'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'],
-            'valor_total_asignado_en_vigencia_anterior' => 0,
-
-            'necesidad' => $item,
-            'justificacion' => $request['justificacion'][$index],
-            'actividad' => $request['actividad'][$index],
-            'categoria' => $request['categoria'][$index],
-            'unidad_de_medida' => $request['unidad_de_medida'][$index],
-            'cantidad' => $request['cantidad'][$index],
-            'valor_unitario' => $request['valor_unitario'][$index],
-            'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index],
-            'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index],
-            'vigencias_anteriores' => $request['vigencias_anteriores'][$index],
-            'valor_asignado_en_la_vigencia_anterior' => $request['valor_asignado_en_la_vigencia_anterior'][$index],
-
-            
-            'procesos_involucrados' => $procesosInvol,
-            'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $planmejor,
-            'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $lineadelplan,
-
-            'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index],
-            'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index],
-            'capacidad_instalada' => $request['capacidad_instalada'][$index],
-            'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index],
-            'anexos' => $this->guardarAnexo($anexou),
-            'enviado' => $request['enviado'],
-            'user_id' => $user->id,
-        ]);
+        ];
     }
 
-    private function guardarAnexo($anexo)
-    {
+    private function guardarAnexo($anexo){ //TODO: avisar que el nombre, no se guarda si no se puede obtener getClientOriginalName
         if ($anexo !== '') {
             $originalName = $anexo->getClientOriginalName();
             if ($originalName) {

@@ -9,13 +9,15 @@ import { watchEffect } from 'vue';
 const props = defineProps({
     users: Number,
     roles: Number,
-    formularios: Number,
+    formulariosEnviados: Number,
+    formulariosGuardados: Number,
     permissions: Number,
 })
 
 const dashboard =[
     'users',
-    'formularios',
+    'formulariosEnviados',
+    'formulariosGuardados',
     // 'roles',
 ];
 const dashSinS = dashboard.map((value, index, array) => {
@@ -24,9 +26,11 @@ const dashSinS = dashboard.map((value, index, array) => {
 const colores =[
     'bg-blue-500',
     'bg-green-500',
+    'bg-amber-500',
     // 'bg-blue-500',
 ];
 const laImg =[
+    'KeyIcon',
     'KeyIcon',
     'KeyIcon',
     // 'KeyIcon',
@@ -40,8 +44,7 @@ const laImg =[
     <AuthenticatedLayout>
         <Breadcrumb :title="'Resumen'" :breadcrumbs="[]" />
         <div class="space-y-4">
-            <div
-                class="text-white dark:text-gray-100 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4 overflow-hidden shadow-sm">
+            <div class="text-white dark:text-gray-100 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4 overflow-hidden shadow-sm">
                 <div v-for="(modelo, index) in dashboard" :key="index">
                     <div
                         class="rounded-t-none sm:rounded-t-lg px-4 py-6 flex justify-between items-center overflow-hidden"

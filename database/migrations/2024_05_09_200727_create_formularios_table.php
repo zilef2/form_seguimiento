@@ -59,3 +59,7 @@ return new class extends Migration
         Schema::dropIfExists('formularios');
     }
 };
+/*
+php artisan db:seed--class=NombreDelSeeder
+php artisan migrate--path =/database / migrations / nombre_de_archivo_migracion . php
+*/

@@ -41,9 +41,10 @@ class UserController extends Controller {
 //        if($numberPermissions > 1){
 
             return Inertia::render('Dashboard', [
-                'users'         => (int) User::count(),
-                'roles'         => (int) Role::count(),
-                'formularios'      => (int) Formulario::Where('enviado',1)->count(),
+                'users' => (int) User::count(),
+                'roles' => (int) Role::count(),
+                'formulariosEnviados'  => (int) Formulario::Where('enviado',1)->count(),
+                'formulariosGuardados' =>(int) Formulario::Where('enviado',0)->count(),
                 'permissions'   => (int) Permission::count(),
             ]);
 //        }else{

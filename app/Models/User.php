@@ -30,9 +30,9 @@ class User extends Authenticatable
         'agregado',
 
         'identificacion',
-        'sexo',
-        'fecha_nacimiento',
-        'celular',
+//        'sexo',
+//        'fecha_nacimiento',
+//        'celular',
     ];
     /**
      * The attributes that should be hidden for serialization.

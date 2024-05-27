@@ -237,6 +237,13 @@ import {toInteger} from "lodash";
         return amount_parts.join(' ');
     }
 
+
+    export function plata_format(value) {
+        // Eliminar el símbolo de dólar y cualquier punto existente
+        value = value.toString().replace(/\$|\./g, '');
+        return '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
     export function CalcularEdad(nacimiento){
         const anioHoy = new Date().getFullYear();
         const anioNacimiento = new Date(nacimiento).getFullYear();

@@ -38,6 +38,7 @@ class MultipleExport implements WithMultipleSheets,ShouldAutoSize
             "Parametro",
             "Permission",
             "Role",
+            "actividades",
         ];
 
         // Filtrar los nombres de clase que sean modelos

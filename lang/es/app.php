@@ -2,6 +2,8 @@
 
 return [
     'label' => [
+        'formulariosEnviados' => 'formularios Enviados',
+        'formulariosGuardados' => 'formularios Guardados',
         'formulario' => 'formulario',
         'Formulario' => 'Formulario',
         'empresa' => 'empresa',

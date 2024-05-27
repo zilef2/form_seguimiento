@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         $superadmin = User::create([
             'name'              => 'Superadmin',
             'email'             => 'ajelof2+8@gmail.com',
-            'password'          => bcrypt($genPa.'~~'.$genPa),//135_sisedu~~135_sisedu
+            'password'          => bcrypt($genPa.'~~'.$genPa),
             'email_verified_at' => date('Y-m-d H:i'),
             'sexo' => $genero,
             'identificacion' => '11232454',
@@ -60,7 +60,7 @@ class UserSeeder extends Seeder
             $unUsuario = User::create([
                 'name'              => $key,
                 'email'             => $key . '@' . $key . '.com',
-                'password'          => bcrypt($genPa.'asd+-*'),//
+                'password'          => bcrypt($genPa.'123+'),//
                 'email_verified_at' => date('Y-m-d H:i'),
                 'identificacion' => $value,
                 'celular' => '123456',

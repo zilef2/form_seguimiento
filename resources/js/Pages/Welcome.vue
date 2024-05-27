@@ -4,388 +4,482 @@ import SwitchDarkMode from '@/Components/SwitchDarkMode.vue';
 import {Head} from '@inertiajs/vue3';//Link
 import {reactive, watch, watchEffect} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { form } from './form';
+import {form} from './form';
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
-import {number_format} from "@/global";
+import {number_format, plata_format} from "@/global";
 import Toast from "@/Components/Toast.vue";
 import {AumentarForm, DisminuirForm, LimpiarArray} from "@/Pages/formFunctions";
 
 const props = defineProps({
-    cedLideres: Object,
-    losSelect: Object,
-    cedLideresGuardados: Object,
-    cedLideresDiligenciados: Object,
-    TodosDiligenciados: Boolean,
+  cedLideres: Object,
+  losSelect: Object,
+  cedLideresGuardados: Object,
+  cedLideresDiligenciados: Object,
+  TodosDiligenciados: Boolean,
 })
 
 let anioActual = new Date().getFullYear();
 
-const handleFile = (() => {
-    if (form.anexos) {
-        // form.type = form.anexos.type
-        // if (form.type === "application/pdf") {
-            var formpeso = (Math.round(form.anexos.size / (1024 * 1024)))
-            if (formpeso < data.TamanoMAX) {
-                // form.archivoAux = event.target.files;
-                form.nombre = form.anexos.name.slice(0, -4)
-                data.tamanin = "El archivo pesa aproximadamente " + formpeso + " MB";
-            } else {
-                data.mensajes = 'El peso del archivo supera los 5MB'
-            }
-        // } else {
-        //     data.mensajes = 'El archivo debe ser un PDF'
-        // }
+const GuardarArchivo = (() => {
+  if (form.anexos) {
+    // form.type = form.anexos.type
+    // if (form.type === "application/pdf") {
+    var formpeso = (Math.round(form.anexos.size / (1024 * 1024)))
+    if (formpeso < data.TamanoMAX) {
+      // form.archivoAux = event.target.files;
+      form.nombre = form.anexos.name.slice(0, -4)
+      data.tamanin = "El archivo pesa aproximadamente " + formpeso + " MB";
+    } else {
+      data.mensajes = 'El peso del archivo supera los 5MB'
     }
+    // } else {
+    //     data.mensajes = 'El archivo debe ser un PDF'
+    // }
+  }
 })
 
 const data = reactive({
-    TamanoMAX : (1024 * 1024) * 5, //5MB
-    mensajeYaHaSidoGuardado:'',
-    tamanin:'',
-    mensajes:'',
-    showContent: false,
-    nombreLider:'',
-    identificacion_disbled:false,
-    colorDisabled:'',
+  // modoCero:false,
+  TamanoMAX: (1024 * 1024) * 5, //5MB
+  mensajeYaHaSidoGuardado: '',
+  tamanin: '',
+  mensajes: '',
+  showContent: false,
+  nombreLider: '',
+  identificacion_disbled: false,
+  colorDisabled: '',
 
-    //data selects multiples
-    planmejoramientonecesidad:[
-        {value:1,label:'PM Institucional'},
-        {value:2,label:'PM Programas'},
-        {value:3,label:'PM Auditorias'},
-        {value:0,label:'Ninguno'},
-    ],
-    lineadelplan:[
-        {value:1,label:'1. Academia Pertinente e Incluyente'},
-        {value:2,label:'2. Relacionamiento y Aportes al Entorno Social y Productivo'},
-        {value:3,label:'3. Transformación para la Educación'},
-        {value:4,label:'4. Gestión Humana y Sostenible'},
-    ],
-    proceso_que_solicita_presupuesto: [
-      {label: "ADMISIONES, REGISTRO Y CONTROL", value: 1},
-      {label: "ASEGURAMIENTO DE LA CALIDAD ACADÉMICA", value: 2},
-      {label: "BIBLIOTECA", value: 3},
-      {label: "BIENES Y SERVICIOS", value: 4},
-      {label: "BIENESTAR INSTITUCIONAL", value: 5},
-      {label: "CENTRO DE LENGUAS", value: 6},
-      {label: "COMUNICACIONES", value: 7},
-      {label: "CONTABILIDAD", value: 8},
-      {label: "CONTROL INTERNO", value: 9},
-      {label: "DIRECCION DE EXTENSION Y PROYECCION SOCIAL", value: 10},
-      {label: "EJECUCION DE CONTRATOS Y CONVENIOS", value: 11},
-      {label: "FACULTAD ARQUITECTURA E INGENIERIA", value: 12},
-      {label: "FACULTAD CIENCIAS DE LA SALUD", value: 13},
-      {label: "FACULTAD CIENCIAS SOCIALES", value: 14},
-      {label: "FACULTAD DE ADMINISTRACION", value: 15},
-      {label: "GESTION AMBIENTAL", value: 16},
-      {label: "GESTION DOCUMENTAL", value: 17},
-      {label: "GESTION LEGAL", value: 18},
-      {label: "GRADUADOS", value: 19},
-      {label: "INFRAESTRUCTURA", value: 20},
-      {label: "INTERNACIONALIZACION", value: 21},
-      {label: "INVESTIGACION", value: 22},
-      {label: "LACMA", value: 23},
-      {label: "LABORATORIOS FACULTAD CIENCIAS DE LA SALUD", value: 24},
-      {label: "LABOTATORIOS FACULTAD DE ADMINISTRACIÓN", value: 25},
-      {label: "PERMANENCIA", value: 26},
-      {label: "PLANEACION", value: 27},
-      {label: "PRESUPUESTO PARTICIPATIVO", value: 28},
-      {label: "RECTORIA", value: 29},
-      {label: "SECRETARIA GENERAL", value: 30},
-      {label: "SEGURIDAD Y SALUD EN EL TRABAJO", value: 31},
-      {label: "TALENTO HUMANO", value: 32},
-      {label: "TECNOLOGIA DE INFORMACION Y COMUNICACION", value: 33},
-      {label: "VICERRECTORIA ACADEMICA", value: 34},
-      {label: "VICERRECTORIA ADMINISTRATIVA Y FINANCIERA", value: 35},
-      {label: "VICERRECTORIA DE INVESTIGACION Y EXTENSION", value: 36},
-      {label: "VIRTUALIDAD", value: 37}
-    ],
+  //data selects multiples
+  planmejoramientonecesidad: [
+    {value: 1, label: 'PM Institucional'},
+    {value: 2, label: 'PM Programas'},
+    {value: 3, label: 'PM Auditorias'},
+    {value: 0, label: 'Ninguno'},
+  ],
+  lineadelplan: [
+    {value: 1, label: '1. Academia Pertinente e Incluyente'},
+    {value: 2, label: '2. Relacionamiento y Aportes al Entorno Social y Productivo'},
+    {value: 3, label: '3. Transformación para la Educación'},
+    {value: 4, label: '4. Gestión Humana y Sostenible'},
+  ],
+  proceso_que_solicita_presupuesto: [
+    {label: "ADMISIONES, REGISTRO Y CONTROL", value: 1},
+    {label: "ASEGURAMIENTO DE LA CALIDAD ACADÉMICA", value: 2},
+    {label: "BIBLIOTECA", value: 3},
+    {label: "BIENES Y SERVICIOS", value: 4},
+    {label: "BIENESTAR INSTITUCIONAL", value: 5},
+    {label: "CENTRO DE LENGUAS", value: 6},
+    {label: "COMUNICACIONES", value: 7},
+    {label: "CONTABILIDAD", value: 8},
+    {label: "CONTROL INTERNO", value: 9},
+    {label: "DIRECCION DE EXTENSION Y PROYECCION SOCIAL", value: 10},
+    {label: "EJECUCION DE CONTRATOS Y CONVENIOS", value: 11},
+    {label: "FACULTAD ARQUITECTURA E INGENIERIA", value: 12},
+    {label: "FACULTAD CIENCIAS DE LA SALUD", value: 13},
+    {label: "FACULTAD CIENCIAS SOCIALES", value: 14},
+    {label: "FACULTAD DE ADMINISTRACION", value: 15},
+    {label: "GESTION AMBIENTAL", value: 16},
+    {label: "GESTION DOCUMENTAL", value: 17},
+    {label: "GESTION LEGAL", value: 18},
+    {label: "GRADUADOS", value: 19},
+    {label: "INFRAESTRUCTURA", value: 20},
+    {label: "INTERNACIONALIZACION", value: 21},
+    {label: "INVESTIGACION", value: 22},
+    {label: "LACMA", value: 23},
+    {label: "LABORATORIOS FACULTAD CIENCIAS DE LA SALUD", value: 24},
+    {label: "LABOTATORIOS FACULTAD DE ADMINISTRACIÓN", value: 25},
+    {label: "PERMANENCIA", value: 26},
+    {label: "PLANEACION", value: 27},
+    {label: "PRESUPUESTO PARTICIPATIVO", value: 28},
+    {label: "RECTORIA", value: 29},
+    {label: "SECRETARIA GENERAL", value: 30},
+    {label: "SEGURIDAD Y SALUD EN EL TRABAJO", value: 31},
+    {label: "TALENTO HUMANO", value: 32},
+    {label: "TECNOLOGIA DE INFORMACION Y COMUNICACION", value: 33},
+    {label: "VICERRECTORIA ACADEMICA", value: 34},
+    {label: "VICERRECTORIA ADMINISTRATIVA Y FINANCIERA", value: 35},
+    {label: "VICERRECTORIA DE INVESTIGACION Y EXTENSION", value: 36},
+    {label: "VIRTUALIDAD", value: 37}
+  ],
 
-    actividades:[
-      {value:1,label:'Realizar apoyo técnico o profesional'},
-      {value:2,label:'Realizar apoyo para administración software Investiga y Gestión de la información'},
-      {value:3,label:'Realizar apoyo a la gestión estrategíca de grupos de invetigación y el mejoramiento en la categorización de investigadores ante MinCiencias, dirigir el proceso editorial de la revista SINERGIA y apoyar los trámites de certificación de productos de investigació'},
-      {value:4,label:'Realizar apoyo en temas de protección de la propiedad intelectual y la transferencia tecnológica y de conocimiento de la Institución '},
-      {value:5,label:'Realizar el apoyo administrativo, técnico y logístico al  proceso de Investigación'},
-      {value:6,label:'Prestar servicios de apoyo educativo dentro del proceso de Investigación '},
-      {value:7,label:'Realizar apoyo y acompañamiento en la gestión de los programas del Centro de Emprendimiento, Innovación y trasnferencia tecnologica '},
-      {value:8,label:'Realizar apoyo para desarrollar la evaluación de Proyectos de investigación, productos, artículos revista y escalafonamiento docente'},
-      {value:9,label:'Apoyar la generacion de productos derivados de proyectos de investigacion '},
-      {value:10,label:'Prestar los servicios de preparación y presentación de impuestos y tasas para la protección de propiedad intelectual '},
-      {value:11,label:'Realizar salidas académicas para presentación de resultados de investigación y  Actividades de trabajo de campo para recolección de datos, toma de muestras, Movilidad aerea'},
-      {value:12,label:'Realizar salidas académicas para presentación de resultados de investigación y  Actividades de trabajo de campo para recolección de datos, toma de muestras, Movilidad terrestre'},
-      {value:13,label:'Prestar servicio de hospedaje para las salidas academicas  y  Actividades de trabajo de campo para recolección de datos, toma de muestras'},
-      {value:14,label:'Realizar la compra de equipos requeridos en proyectos de investigación'},
-      {value:15,label:'Realizar compra de insumos para proyectos de investigación'},
-      {value:16,label:'Realizar afiliaciones a redes académicas e investigación y pagos de membresía'},
-      {value:17,label:'Realizar publicaciones y procesos editoriales.'},
-      {value:18,label:'Realizar  soporte tecnico de los sistemas academicos al proceso de  Admisiones , Registro y Control '},
-      {value:19,label:'Realizar  apoyo  y asesoria  a estudiantes en los procesos de de  Admisiones , Registro y Control '},
-      {value:20,label:'Realizar la compra de insumos como diplomas, actas, portadiplomas  para ceremonias de grado de la institución'},
-      {value:21,label:'Prestar servicios profesionales para apoyar el logro de las metas de programas e institucional, propuestas en el Proceso de Aseguramiento de la Calidad Académica'},
-      {value:22,label:'Preservar los libros, revistas, colecciones , bases de datos de la biblioteca Institucinal '},
-      {value:23,label:'Actualizar programas y herramientas digitales de la Biblioteca '},
-      {value:24,label:'Realizar apoyo técnico y/o profesional al proceso Biblioteca '},
-      {value:25,label:'Realizar Mantenimiento de equipos (Antenas, Equipos RFID y TAG).'},
-      {value:26,label:'Desarrollar proyectos, organización y participación en eventos.'},
-      {value:27,label:'Realizar afiliaciones a redes académicas y pagos de membresía'},
-      {value:28,label:'Realizar apoyo tecnico, operativo y logistico al proceso de internacionalización'},
-      {value:29,label:'Realizar movilidad saliente y entrante para estudiantes  que  particpen en  eventos academicos '},
-      {value:30,label:'Realizar apoyo tecnico y/o profesional en educación artistica y cultural al proceso de Bienestar Institucional'},
-      {value:31,label:'Realizar apoyo tecnico y/o profesional en la línea de deportes ofertada desde el proceso de Bienestar Institucional'},
-      {value:32,label:'Brindar apoyo asistencial a los programas de promoción de la salud y y prevención desarrollados para la comunidad institucional'},
-      {value:33,label:'Realizar apoyo tecnico y/o profesional en la parte administratova y logistica del proceso de Bienestar'},
-      {value:34,label:'Implementar Programa de seguridad alimentaria'},
-      {value:35,label:'Implementar servicios de bienestar institucional'},
-      {value:36,label:'Realizar afiliación anual ASCUN, fortalecimiento de las líneas de desarrollo humano, deporte y cultura.'},
-      {value:37,label:'Realizar mantenimiento a los implementos de las aulas de Bienestar Institucional'},
-      {value:38,label:'Realizar traslados de los grupos de deporte, cultura y otras activiades '},
-      {value:39,label:'Realizar Montaje, diseño y proyección de obras de arte'},
-      {value:40,label:'Realizar adquisición y mantenimiento de instrumentos musicales '},
-      {value:41,label:'Desarrollar actividades deportivas y recreativas '},
-      {value:42,label:'Realizar envío masivo de correos, sms, IVR y recolección de leads e interesados, usada para comunicación interna y externa con los públicos de interés'},
-      {value:43,label:'Realizar apoyo en la planeación y desarrollo de estrategias en marketing e imagen en el proceso de Comunicaciones_Bienestar'},
-      {value:44,label:'Implementar el Plan de medios masivos y pauta digital, y fortalecimiento de la página web institucional'},
-      {value:45,label:'Realizar productos audiovisuales para campañas internas y externas de la Institución.'},
-      {value:46,label:'Realizar apoyo en diseño gráfico de material publicitario Institucional y diseño de campañas.'},
-      {value:47,label:'Realizar apoyo en el desarrollo de estrategias de comunicaciones y mercadeo de la Institución'},
-      {value:48,label:'Implementar la señalética que se debe actualizar en el campus institucional'},
-      {value:49,label:'Adquirir souvenirs para estretagias institucionales y de comunicaciones'},
-      {value:50,label:'Realizar compra de equipos para el fortalecimiento del material audiovisual del Proceso de Comunicación y Mercadeo'},
-      {value:51,label:'Relizar apoyo profesionales de comunicación y diseño gráfico de los programas y servicios de bienestar a la comunidad institucional. '},
-      {value:52,label:'Implementar la carnetización en la comunidad Institucional'},
-      {value:53,label:'Realizar apoyo en el desarrollo de estrategias de comunicaciones y mercadeo de la Institución. Virtualidad - '},
-      {value:54,label:'Implementar las estrategias del Plan de Comunicaciones y Mercadeo Institucional'},
-      {value:55,label:'Realizar los  programas de promoción de la salud y y prevención desarrollados para la comunidad institucional por parte del proceso de Bienestar Institucional ( Universidades preventivas)'},
-      {value:56,label:'Realizar apoyo al proceso de Vicerectoria Académica '},
-      {value:57,label:'Realizar apoyo técnico y/o profesional al Centro de graduados '},
-      {value:58,label:'Adquirir software para administración y gestión de la bolsa de empleo'},
-      {value:59,label:'Adquirir placas para los estudiantes de práctica de la institución'},
-      {value:60,label:'Realizar eventos académicos y de relacionamiento con graduados  y sector productivo '},
-      {value:61,label:'Realizar pasantias empresariales  para estudiantes y docentes '},
-      {value:62,label:'Realizar la gestión de la información del Observatorio de Permanencia y Calidad '},
-      {value:63,label:'Realizar apoyo educativo en el proceso  de ingreso, permanencia y graduación '},
-      {value:64,label:'Realizar  apoyo técnico y/o profesional en  producción audiovisual para la grabación, edición y posproduccion de videos y contenido audiovisual que acompañan los cursos '},
-      {value:65,label:'Realizar apoyo técnico y/o profesional en  diseño gráfico, para la realización de piezas graficas y animaciones del  proceso de Virtualidad'},
-      {value:66,label:'Realizar apoyo técnico y/o profesional al proceso de  Virtualidad de cara al ensamble y diseño instruccional '},
-      {value:67,label:'Realizar apoyo Profesional  con experiencia en instalación y migración de sistemas o plataformas tipo Moodle'},
-      {value:68,label:'Realizar apoyo logistico y administrativo en el Centro de Lenguas'},
-      {value:69,label:'Participar de membresias organizaciones nacionales e internacionales .  Fac. Administración.'},
-      {value:70,label:'Realizar acompañamiento al desarrollo de las estrategias académicas desarrolladas   de la Fac. Administación'},
-      {value:71,label:'Realizar apoyo logistico y administrativo en la Facultad de Administración.'},
-      {value:72,label:'Realizar la compra de materia prima como alimentos, granos, cereales, proteinas animales y vegetales y elementos de aseo para gastronomia.  Fac. Administración '},
-      {value:73,label:'Realizar mantenimiento  (preventivo , correctivo)  de las aulas moviles, economato  y laboratorios de los programas de Gastronomia  Fac. Administración. '},
-      {value:74,label:'Realizar salidas académicas regionales y nacionales. Facultad de Administración.'},
-      {value:75,label:'Prestar el servicio de acompañamiento a los procesos administrativos y logisticos de la Facultad de Arquitectura e Ingenieria. '},
-      {value:76,label:'Participar de redes y   membresias   Fac. Arquitectura e ingenieria.'},
-      {value:77,label:'Realizar mantenimiento a los  laboratorios (preventivo , correctivo) , facultad de Arquitectura e Ingenieria'},
-      {value:78,label:'Realizar salidas académicas  asociadas a los curriculos de los programas y visitas de  practicas   de la facultad de Arquitectura e Ingenieria'},
-      {value:79,label:'Participar en membresias  u organizaciones académicas . Fac Salud'},
-      {value:80,label:'Prestar los servicios como ingeniero biomédico para la Facultad de Ciencias de la Salud. '},
-      {value:81,label:'Prestar los servicios como químico para la Facultad de Ciencias de la Salud. '},
-      {value:82,label:'Realizar diagnóstico y asesoría en biotecnología, como parte de las actividades de extensión de la Facultad de  Ciencias de la Salud (biotecnología). '},
-      {value:83,label:'Realizar apoyo operativo y administrativo en los laboratorios  en la  facultad de Ciencias de la Salud'},
-      {value:84,label:'Realizar calibración de equipos. '},
-      {value:85,label:'Realizar la compra de insumos, químicos, reactivos y kits de  diagnóstico'},
-      {value:86,label:'Realizar mantenimiento y reparación de equipos '},
-      {value:87,label:'Realizar salidas académicas regionales y nacionales. Facultad de Salud'},
-      {value:88,label:'Prestar servicio de hospedaje para las salidas academicas  y  Actividades de trabajo de campo para recolección de datos, toma de muestras. Fac sociales'},
-      {value:89,label:'Realizar apoyo técnico y/o profesional a la facultad de Ciencias Sociales y de educación'},
-      {value:90,label:'Realizar afiliaciones a redes académicas. facultad de Ciencias Sociales y de educación '},
-      {value:91,label:'Realizar apoyo al desarrollo de estrategias que favorezcan a los  procesos academicos  de la Facultad de Ciencias Sociales y de Educación'},
-      {value:92,label:'Realizar movilidad académicas hacia diferentes experiencias representativas para los programas. facultad de Ciencias Sociales y de educación'},
-      {value:93,label:'Realizar apoyo al desarrollo de estrategias que favorezcan a los procesos académicos de la institución. Vicerrectoría Académica'},
-      {value:94,label:'Realizar mantenimiento y reparación de equipos'},
-      {value:95,label:'Realizar calibración de equipos. LACMA'},
-      {value:96,label:'Prestar servicios de LACMA en el Valle de Aburra y municipios cercanos al departamento de Antioquia.'},
-      {value:97,label:'Participar en ensayos interlaboratorios de calidad externos'},
-      {value:98,label:'Prestar servicios profesionales en el laboratorio LACMA'},
-      {value:99,label:'Realizar el apoyo administrativo, técnico y logístico  en el proceso de Tecnologia y medios audiovisuales'},
-      {value:100,label:'Realizar la dotación de infraestructrua tecnologica requerida'},
-      {value:101,label:'Realizar mantenimiento de infraestructrua tecnologica requerida'},
-      {value:102,label:'Dotar y actualizar aplicativos de software de uso institucional'},
-      {value:103,label:'Realizar la Formulación del plan maestro integral de infraestructura física institucional'},
-      {value:104,label:'Mejorar Infraestructura física de la Institución Universitaria Colegio Mayor de Antioquia'},
-      {value:105,label:'Realizar mejoramiento  y adecuación de de las áreas de estudio de los bloques institucionales'},
-      {value:106,label:'Realizar mejoramiento y recuperación de las zonas verdes de la institución'},
-      {value:107,label:'Realizar el apoyo administrativo, técnico y logístico al  proceso de Infraestructura Fisica '},
-      {value:108,label:'Realizar el apoyo profesional al proceso de Infraestructura Fisica '},
-      {value:109,label:'Realizar la automatización de puertas principales.'},
-      {value:110,label:'Reserva Realizar la Formulación del plan maestro integral de infraestructura física intitucional'},
-      {value:111,label:'Realizar adecuaciones electricas para el fortalecimiento de la infraestructura'},
-      {value:112,label:'Realizar montajes, instalaciones y las adecuaciones  requeridas dentro de la infraestructura física de la institución'},  
-    ],
-    //selects
-    categoria: [
-      {label: "AREA PROTEGIDA", value: 1},
-      {label: "ARL", value: 2},
-      {label: "BASES DE DATOS", value: 3},
-      {label: "CALIBRACIONES", value: 4},
-      {label: "CAJA MENOR", value: 5},
-      {label: "CONTRATISTA", value: 6},
-      {label: "CUOTA DE FISCALIZACION", value: 7},
-      {label: "EDICTOS", value: 8},
-      {label: "EQUIPOS E INTRUMENTOS", value: 9},
-      {label: "ESTIMULOS DOCENTES", value: 10},
-      {label: "EVENTOS", value: 11},
-      {label: "EXEMENES MEDICOS", value: 12},
-      {label: "GASTOS DE VIAJE-ALIMENTACION", value: 13},
-      {label: "GASTOS DE VIAJE-HOSPEDAJE", value: 14},
-      {label: "GASTOS DE VIAJE-TRASNPORTE", value: 15},
-      {label: "GASTOS LEGALES", value: 16},
-      {label: "GMF", value: 17},
-      {label: "INSCRIPCIONES,AFILIACIONES Y RENOVACIONES", value: 18},
-      {label: "INSUMOS", value: 19},
-      {label: "INSTALACIONES Y REPARACIONES", value: 20},
-      {label: "LICENCIAS Y MEMBRESIAS", value: 21},
-      {label: "MANTENIMIENTO", value: 22},
-      {label: "MOBILIARIO", value: 23},
-      {label: "MOVILIDAD ACADEMICA", value: 24},
-      {label: "PATENTES", value: 25},
-      {label: "PLAN DE CAPACITACION", value: 26},
-      {
-        label: "PLAN DE COMUNICACIÓN Y MERCADO Y PLAN DE MEDIOS",
-        value: 27
-      },
-      {
-        label: "PLATAFORMA DE ENVÍO MASIVO DE CORREOS, SMS, IVR Y RECOLECCIÓN DE LEADS E INTERESADOS",
-        value: 28
-      },
-      {label: "PRACTICANTE", value: 29},
-      {label: "PUBLICACIONES Y PROCESOS EDITORIALES", value: 30},
-      {label: "REGIONALIZACION-ALIMENTACION", value: 31},
-      {label: "REGIONALIZACION-HOSPEDAJE", value: 32},
-      {label: "REGIONALIZACION-TRANSPORTE", value: 33},
-      {label: "SEGUROS Y POLIZAS", value: 34},
-      {label: "SEGURIDAD ALIMENTARIA", value: 35},
-      {label: "SERVICIO DE IMPRESORAS Y DE FOTOCOPIAS", value: 36},
-      {label: "SERVICIO DE MENSAJERIA", value: 37},
-      {label: "SERVICIOS DE AUDITORIA Y ACREDITACION", value: 38},
-      {label: "SERVICIOS PUBLICOS", value: 39},
-      {label: "SOFTWARE", value: 40},
-      {label: "SOPORTE", value: 41},
-      {label: "SOUVENIRS", value: 42},
-      {label: "SUBVENCION", value: 43},
-      {label: "SUMINISTRO DE COMIDAD Y REFRIGERIOS", value: 44},
-      {label: "TELEFONIACELULAR E INTERNET", value: 45},
-      {label: "VIATICOS", value: 46}
-    ],
-    vigencias_anteriores:[
-        {
-            'label': "Si",
-            'value': "Si"
-        },
-        {
-            'value': "No",
-            'label': "No",
-        }
-    ],
-    desabilitar_vigencias_anteriores:[false],
-    //resumen final
+  actividades: [
+    {value: 1, label: 'Realizar apoyo técnico o profesional'},
+    {value: 2, label: 'Realizar apoyo para administración software Investiga y Gestión de la información'},
+    {
+      value: 3,
+      label: 'Realizar apoyo a la gestión estrategíca de grupos de invetigación y el mejoramiento en la categorización de investigadores ante MinCiencias, dirigir el proceso editorial de la revista SINERGIA y apoyar los trámites de certificación de productos de investigació'
+    },
+    {
+      value: 4,
+      label: 'Realizar apoyo en temas de protección de la propiedad intelectual y la transferencia tecnológica y de conocimiento de la Institución '
+    },
+    {value: 5, label: 'Realizar el apoyo administrativo, técnico y logístico al  proceso de Investigación'},
+    {value: 6, label: 'Prestar servicios de apoyo educativo dentro del proceso de Investigación '},
+    {
+      value: 7,
+      label: 'Realizar apoyo y acompañamiento en la gestión de los programas del Centro de Emprendimiento, Innovación y trasnferencia tecnologica '
+    },
+    {
+      value: 8,
+      label: 'Realizar apoyo para desarrollar la evaluación de Proyectos de investigación, productos, artículos revista y escalafonamiento docente'
+    },
+    {value: 9, label: 'Apoyar la generacion de productos derivados de proyectos de investigacion '},
+    {value: 10, label: 'Prestar los servicios de preparación y presentación de impuestos y tasas para la protección de propiedad intelectual '},
+    {
+      value: 11,
+      label: 'Realizar salidas académicas para presentación de resultados de investigación y  Actividades de trabajo de campo para recolección de datos, toma de muestras, Movilidad aerea'
+    },
+    {
+      value: 12,
+      label: 'Realizar salidas académicas para presentación de resultados de investigación y  Actividades de trabajo de campo para recolección de datos, toma de muestras, Movilidad terrestre'
+    },
+    {
+      value: 13,
+      label: 'Prestar servicio de hospedaje para las salidas academicas  y  Actividades de trabajo de campo para recolección de datos, toma de muestras'
+    },
+    {value: 14, label: 'Realizar la compra de equipos requeridos en proyectos de investigación'},
+    {value: 15, label: 'Realizar compra de insumos para proyectos de investigación'},
+    {value: 16, label: 'Realizar afiliaciones a redes académicas e investigación y pagos de membresía'},
+    {value: 17, label: 'Realizar publicaciones y procesos editoriales.'},
+    {value: 18, label: 'Realizar  soporte tecnico de los sistemas academicos al proceso de  Admisiones , Registro y Control '},
+    {value: 19, label: 'Realizar  apoyo  y asesoria  a estudiantes en los procesos de de  Admisiones , Registro y Control '},
+    {value: 20, label: 'Realizar la compra de insumos como diplomas, actas, portadiplomas  para ceremonias de grado de la institución'},
+    {
+      value: 21,
+      label: 'Prestar servicios profesionales para apoyar el logro de las metas de programas e institucional, propuestas en el Proceso de Aseguramiento de la Calidad Académica'
+    },
+    {value: 22, label: 'Preservar los libros, revistas, colecciones , bases de datos de la biblioteca Institucinal '},
+    {value: 23, label: 'Actualizar programas y herramientas digitales de la Biblioteca '},
+    {value: 24, label: 'Realizar apoyo técnico y/o profesional al proceso Biblioteca '},
+    {value: 25, label: 'Realizar Mantenimiento de equipos (Antenas, Equipos RFID y TAG).'},
+    {value: 26, label: 'Desarrollar proyectos, organización y participación en eventos.'},
+    {value: 27, label: 'Realizar afiliaciones a redes académicas y pagos de membresía'},
+    {value: 28, label: 'Realizar apoyo tecnico, operativo y logistico al proceso de internacionalización'},
+    {value: 29, label: 'Realizar movilidad saliente y entrante para estudiantes  que  particpen en  eventos academicos '},
+    {value: 30, label: 'Realizar apoyo tecnico y/o profesional en educación artistica y cultural al proceso de Bienestar Institucional'},
+    {value: 31, label: 'Realizar apoyo tecnico y/o profesional en la línea de deportes ofertada desde el proceso de Bienestar Institucional'},
+    {
+      value: 32,
+      label: 'Brindar apoyo asistencial a los programas de promoción de la salud y y prevención desarrollados para la comunidad institucional'
+    },
+    {value: 33, label: 'Realizar apoyo tecnico y/o profesional en la parte administratova y logistica del proceso de Bienestar'},
+    {value: 34, label: 'Implementar Programa de seguridad alimentaria'},
+    {value: 35, label: 'Implementar servicios de bienestar institucional'},
+    {value: 36, label: 'Realizar afiliación anual ASCUN, fortalecimiento de las líneas de desarrollo humano, deporte y cultura.'},
+    {value: 37, label: 'Realizar mantenimiento a los implementos de las aulas de Bienestar Institucional'},
+    {value: 38, label: 'Realizar traslados de los grupos de deporte, cultura y otras activiades '},
+    {value: 39, label: 'Realizar Montaje, diseño y proyección de obras de arte'},
+    {value: 40, label: 'Realizar adquisición y mantenimiento de instrumentos musicales '},
+    {value: 41, label: 'Desarrollar actividades deportivas y recreativas '},
+    {
+      value: 42,
+      label: 'Realizar envío masivo de correos, sms, IVR y recolección de leads e interesados, usada para comunicación interna y externa con los públicos de interés'
+    },
+    {value: 43, label: 'Realizar apoyo en la planeación y desarrollo de estrategias en marketing e imagen en el proceso de Comunicaciones_Bienestar'},
+    {value: 44, label: 'Implementar el Plan de medios masivos y pauta digital, y fortalecimiento de la página web institucional'},
+    {value: 45, label: 'Realizar productos audiovisuales para campañas internas y externas de la Institución.'},
+    {value: 46, label: 'Realizar apoyo en diseño gráfico de material publicitario Institucional y diseño de campañas.'},
+    {value: 47, label: 'Realizar apoyo en el desarrollo de estrategias de comunicaciones y mercadeo de la Institución'},
+    {value: 48, label: 'Implementar la señalética que se debe actualizar en el campus institucional'},
+    {value: 49, label: 'Adquirir souvenirs para estretagias institucionales y de comunicaciones'},
+    {value: 50, label: 'Realizar compra de equipos para el fortalecimiento del material audiovisual del Proceso de Comunicación y Mercadeo'},
+    {
+      value: 51,
+      label: 'Relizar apoyo profesionales de comunicación y diseño gráfico de los programas y servicios de bienestar a la comunidad institucional. '
+    },
+    {value: 52, label: 'Implementar la carnetización en la comunidad Institucional'},
+    {value: 53, label: 'Realizar apoyo en el desarrollo de estrategias de comunicaciones y mercadeo de la Institución. Virtualidad - '},
+    {value: 54, label: 'Implementar las estrategias del Plan de Comunicaciones y Mercadeo Institucional'},
+    {
+      value: 55,
+      label: 'Realizar los  programas de promoción de la salud y y prevención desarrollados para la comunidad institucional por parte del proceso de Bienestar Institucional ( Universidades preventivas)'
+    },
+    {value: 56, label: 'Realizar apoyo al proceso de Vicerectoria Académica '},
+    {value: 57, label: 'Realizar apoyo técnico y/o profesional al Centro de graduados '},
+    {value: 58, label: 'Adquirir software para administración y gestión de la bolsa de empleo'},
+    {value: 59, label: 'Adquirir placas para los estudiantes de práctica de la institución'},
+    {value: 60, label: 'Realizar eventos académicos y de relacionamiento con graduados  y sector productivo '},
+    {value: 61, label: 'Realizar pasantias empresariales  para estudiantes y docentes '},
+    {value: 62, label: 'Realizar la gestión de la información del Observatorio de Permanencia y Calidad '},
+    {value: 63, label: 'Realizar apoyo educativo en el proceso  de ingreso, permanencia y graduación '},
+    {
+      value: 64,
+      label: 'Realizar  apoyo técnico y/o profesional en  producción audiovisual para la grabación, edición y posproduccion de videos y contenido audiovisual que acompañan los cursos '
+    },
+    {
+      value: 65,
+      label: 'Realizar apoyo técnico y/o profesional en  diseño gráfico, para la realización de piezas graficas y animaciones del  proceso de Virtualidad'
+    },
+    {value: 66, label: 'Realizar apoyo técnico y/o profesional al proceso de  Virtualidad de cara al ensamble y diseño instruccional '},
+    {value: 67, label: 'Realizar apoyo Profesional  con experiencia en instalación y migración de sistemas o plataformas tipo Moodle'},
+    {value: 68, label: 'Realizar apoyo logistico y administrativo en el Centro de Lenguas'},
+    {value: 69, label: 'Participar de membresias organizaciones nacionales e internacionales .  Fac. Administración.'},
+    {value: 70, label: 'Realizar acompañamiento al desarrollo de las estrategias académicas desarrolladas   de la Fac. Administación'},
+    {value: 71, label: 'Realizar apoyo logistico y administrativo en la Facultad de Administración.'},
+    {
+      value: 72,
+      label: 'Realizar la compra de materia prima como alimentos, granos, cereales, proteinas animales y vegetales y elementos de aseo para gastronomia.  Fac. Administración '
+    },
+    {
+      value: 73,
+      label: 'Realizar mantenimiento  (preventivo , correctivo)  de las aulas moviles, economato  y laboratorios de los programas de Gastronomia  Fac. Administración. '
+    },
+    {value: 74, label: 'Realizar salidas académicas regionales y nacionales. Facultad de Administración.'},
+    {
+      value: 75,
+      label: 'Prestar el servicio de acompañamiento a los procesos administrativos y logisticos de la Facultad de Arquitectura e Ingenieria. '
+    },
+    {value: 76, label: 'Participar de redes y   membresias   Fac. Arquitectura e ingenieria.'},
+    {value: 77, label: 'Realizar mantenimiento a los  laboratorios (preventivo , correctivo) , facultad de Arquitectura e Ingenieria'},
+    {
+      value: 78,
+      label: 'Realizar salidas académicas  asociadas a los curriculos de los programas y visitas de  practicas   de la facultad de Arquitectura e Ingenieria'
+    },
+    {value: 79, label: 'Participar en membresias  u organizaciones académicas . Fac Salud'},
+    {value: 80, label: 'Prestar los servicios como ingeniero biomédico para la Facultad de Ciencias de la Salud. '},
+    {value: 81, label: 'Prestar los servicios como químico para la Facultad de Ciencias de la Salud. '},
+    {
+      value: 82,
+      label: 'Realizar diagnóstico y asesoría en biotecnología, como parte de las actividades de extensión de la Facultad de  Ciencias de la Salud (biotecnología). '
+    },
+    {value: 83, label: 'Realizar apoyo operativo y administrativo en los laboratorios  en la  facultad de Ciencias de la Salud'},
+    {value: 84, label: 'Realizar calibración de equipos. '},
+    {value: 85, label: 'Realizar la compra de insumos, químicos, reactivos y kits de  diagnóstico'},
+    {value: 86, label: 'Realizar mantenimiento y reparación de equipos '},
+    {value: 87, label: 'Realizar salidas académicas regionales y nacionales. Facultad de Salud'},
+    {
+      value: 88,
+      label: 'Prestar servicio de hospedaje para las salidas academicas  y  Actividades de trabajo de campo para recolección de datos, toma de muestras. Fac sociales'
+    },
+    {value: 89, label: 'Realizar apoyo técnico y/o profesional a la facultad de Ciencias Sociales y de educación'},
+    {value: 90, label: 'Realizar afiliaciones a redes académicas. facultad de Ciencias Sociales y de educación '},
+    {
+      value: 91,
+      label: 'Realizar apoyo al desarrollo de estrategias que favorezcan a los  procesos academicos  de la Facultad de Ciencias Sociales y de Educación'
+    },
+    {
+      value: 92,
+      label: 'Realizar movilidad académicas hacia diferentes experiencias representativas para los programas. facultad de Ciencias Sociales y de educación'
+    },
+    {
+      value: 93,
+      label: 'Realizar apoyo al desarrollo de estrategias que favorezcan a los procesos académicos de la institución. Vicerrectoría Académica'
+    },
+    {value: 94, label: 'Realizar mantenimiento y reparación de equipos'},
+    {value: 95, label: 'Realizar calibración de equipos. LACMA'},
+    {value: 96, label: 'Prestar servicios de LACMA en el Valle de Aburra y municipios cercanos al departamento de Antioquia.'},
+    {value: 97, label: 'Participar en ensayos interlaboratorios de calidad externos'},
+    {value: 98, label: 'Prestar servicios profesionales en el laboratorio LACMA'},
+    {value: 99, label: 'Realizar el apoyo administrativo, técnico y logístico  en el proceso de Tecnologia y medios audiovisuales'},
+    {value: 100, label: 'Realizar la dotación de infraestructrua tecnologica requerida'},
+    {value: 101, label: 'Realizar mantenimiento de infraestructrua tecnologica requerida'},
+    {value: 102, label: 'Dotar y actualizar aplicativos de software de uso institucional'},
+    {value: 103, label: 'Realizar la Formulación del plan maestro integral de infraestructura física institucional'},
+    {value: 104, label: 'Mejorar Infraestructura física de la Institución Universitaria Colegio Mayor de Antioquia'},
+    {value: 105, label: 'Realizar mejoramiento  y adecuación de de las áreas de estudio de los bloques institucionales'},
+    {value: 106, label: 'Realizar mejoramiento y recuperación de las zonas verdes de la institución'},
+    {value: 107, label: 'Realizar el apoyo administrativo, técnico y logístico al  proceso de Infraestructura Fisica '},
+    {value: 108, label: 'Realizar el apoyo profesional al proceso de Infraestructura Fisica '},
+    {value: 109, label: 'Realizar la automatización de puertas principales.'},
+    {value: 110, label: 'Reserva Realizar la Formulación del plan maestro integral de infraestructura física intitucional'},
+    {value: 111, label: 'Realizar adecuaciones electricas para el fortalecimiento de la infraestructura'},
+    {value: 112, label: 'Realizar montajes, instalaciones y las adecuaciones  requeridas dentro de la infraestructura física de la institución'},
+  ],
+  //selects
+  categoria: [
+    {label: "Area Protegida", value: 1},
+    {label: "ARL", value: 2},
+    {label: "Bases de Datos", value: 3},
+    {label: "Calibraciones", value: 4},
+    {label: "Caja menor", value: 5},
+    {label: "Contratista", value: 6},
+    {label: "Cuota de fiscalizacion", value: 7},
+    {label: "Edictos", value: 8},
+    {label: "Equipos e intrumentos", value: 9},
+    {label: "Estimulos docentes", value: 10},
+    {label: "Eventos", value: 11},
+    {label: "Exemenes medicos", value: 12},
+    {label: "Gastos de viaje alimentacion", value: 13},
+    {label: "Gastos de viaje hospedaje", value: 14},
+    {label: "Gastos de viaje trasnporte", value: 15},
+    {label: "Gastos legales", value: 16},
+    {label: "GMF", value: 17},
+    {label: "Inscripciones,afiliaciones y renovaciones", value: 18},
+    {label: "Insumos", value: 19},
+    {label: "Instalaciones y reparaciones", value: 20},
+    {label: "Licencias y membresias", value: 21},
+    {label: "Mantenimiento", value: 22},
+    {label: "Mobiliario", value: 23},
+    {label: "Movilidad academica", value: 24},
+    {label: "Patentes", value: 25},
+    {label: "Plan de capacitacion", value: 26},
+    {label: "Plan de comunicación y mercado y plan de medios", value: 27},
+    {label: "Plataforma de envío masivo de correos, sms, ivr y recolección de leads e interesados", value: 28},
+    {label: "Practicante", value: 29},
+    {label: "Publicaciones y procesos editoriales", value: 30},
+    {label: "Regionalizacion alimentacion", value: 31},
+    {label: "Regionalizacion hospedaje", value: 32},
+    {label: "Regionalizacion transporte", value: 33},
+    {label: "Seguros y polizas", value: 34},
+    {label: "Seguridad alimentaria", value: 35},
+    {label: "Servicio de impresoras y de fotocopias", value: 36},
+    {label: "Servicio de mensajeria", value: 37},
+    {label: "Servicios de auditoria y acreditacion", value: 38},
+    {label: "Servicios publicos", value: 39},
+    {label: "Software", value: 40},
+    {label: "Soporte", value: 41},
+    {label: "Souvenirs", value: 42},
+    {label: "Subvencion", value: 43},
+    {label: "Suministro de comidad y refrigerios", value: 44},
+    {label: "Telefoniacelular e internet", value: 45},
+    {label: "Viaticos", value: 46}
+  ],
+  vigencias_anteriores: [
+    {
+      'label': "Si",
+      'value': "Si"
+    },
+    {
+      'value': "No",
+      'label': "No",
+    }
+  ],
+  desabilitar_vigencias_anteriores: [false],
+  //resumen final
 
-    ArrayNecesidad:[],
-    ArrayValorTotal:[],
-    ConteoCosas:1,
-    total_todo:0,
-    DataRecuperada:false,
-    valor_total_solicitatdo_por_necesidad:[],
-    Otras_unidad_de_medida:[false],
-    Otras_capacidad_instalada:[false],
-    showanexos:[],
-    
-  
-    //Way to present info
-    classOfTxtAreas:"min-w-[500px] max-h-[110px] p-4",
-    classOfText:"min-w-[200px] max-h-[110px] p-4",
-    classOfText2:"min-w-[320px] max-h-[110px] p-4",
-    classOfTextLG:"min-w-[400px] max-h-[110px] p-4",
-    classOfText_checkbox:"min-w-[380px] max-h-[250px] overflow-y-scroll p-4 ring-1 ring-zinc-400",
+  ArrayNecesidad: [],
+  ArrayValorTotal: [],
+  ConteoCosas: 1,
+  total_todo: 0,
+  DataRecuperada: false,
+  valor_total_solicitatdo_por_necesidad: [],
+  Otras_unidad_de_medida: [false],
+  Otras_capacidad_instalada: [false],
+
+  unidad_de_medida: [],
+  //showopciones
+  showanexos: [],
+
+  //Way to present info
+  classMini: "min-w-[100px] max-h-[110px] p-4",
+  classOfTxtAreas: "min-w-[500px] max-h-[110px] p-4",
+  classOfText: "min-w-[200px] max-h-[110px] p-4",
+  classOfText2: "min-w-[320px] max-h-[110px] p-4",
+  classOfTextLG: "min-w-[400px] max-h-[110px] p-4",
+  classOfText_checkbox: "min-w-[380px] max-h-[250px] overflow-y-scroll p-4 ring-1 ring-zinc-400",
 });
-
-function esLocalhost() {
-    var hostname = window.location.hostname;
-    return hostname === 'localhost' || hostname === '127.0.0.1';
-}
-if(esLocalhost()){
-    // data.classOfTxtAreas = "min-w-[20px] max-h-[110px] p-4";
-    // data.classOfText = "min-w-[110px] max-h-[110px] p-4";
-    // data.classOfText2 = "min-w-[120px] max-h-[110px] p-4";
-}
 
 // <!--<editor-fold desc="Toogle multipleselections">-->
 function toggleSelection1(value, conteoi) {
-    const selectedIndex = form.procesos_involucrados[conteoi].indexOf(value);
-    if (selectedIndex === -1) {
-        form.procesos_involucrados[conteoi].push(value);
-    } else {
-        form.procesos_involucrados[conteoi].splice(selectedIndex, 1);
-    }
-}
-function isSelected1(value) {return form.procesos_involucrados.includes(value);}
-
-function toggleSelection2(value, conteoi) {
-  let selectedIndex = form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].indexOf(value);
-  if (!form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)) {
-    if (selectedIndex === -1) {
-        form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].push(value);
-    } else {
-        form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
-    }
-  }else{
-    form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] = [0]
-    if(value == 0)
-      form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
+  const selectedIndex = form.procesos_involucrados[conteoi].indexOf(value);
+  if (selectedIndex === -1) {
+    form.procesos_involucrados[conteoi].push(value);
+  } else {
+    form.procesos_involucrados[conteoi].splice(selectedIndex, 1);
   }
 }
 
-function isSelected2(value,conteoi) {
-    if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] && 
-        form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)){
-        // return false;
-        return value === 0;
-      //elninguno
+function isSelected1(value) {
+  return form.procesos_involucrados.includes(value);
+}
+
+
+function toggleSelection2(value, conteoi) {
+
+  let selectedIndex = form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].indexOf(value);
+  let modoCero = false
+  let elcheckbox
+  if (value === 0 || form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)) {
+    modoCero = true
+  }
+  if (modoCero) {
+    pintarTodoCero(conteoi)
+
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] = [0]
+    if (selectedIndex !== -1) {
+      form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
     }
-    if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] && form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].length){
-        return form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(value);
+  } else {
+    elcheckbox = document.getElementById('0_b' + conteoi);
+    elcheckbox.checked = false;
+
+    if (selectedIndex === -1) {
+      form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].push(value);
+    } else {
+      form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
     }
-    return false;
+  }
+}
+
+function pintarTodoCero(conteoi) {
+  let elcheckbox
+  form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].forEach((element) => {
+    elcheckbox = document.getElementById(element + '_b' + conteoi);
+    if (element !== 0)
+      elcheckbox.checked = false;
+  });
+}
+
+
+function isSelected2(value, conteoi) {
+  setTimeout(() => {
+    if (form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi])
+      return form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(value)
+  }, 200)
 }
 
 function toggleSelection3(value, conteoi) {
-    const selectedIndex = form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].indexOf(value);
-    if (selectedIndex === -1) {
-        form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].push(value);
-    } else {
-        form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
-    }
+  const selectedIndex = form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].indexOf(value);
+  if (selectedIndex === -1) {
+    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].push(value);
+  } else {
+    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
+  }
 }
-function isSelected3(value) {return form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad.includes(value);}
+
+function isSelected3(value) {
+  return form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad.includes(value);
+}
+
 // <!--</editor-fold>-->
 
 
 // <!--<editor-fold desc="no important functions">-->
 const onContent = () => {
-    data.showContent = true
+  data.showContent = true
 }
 const offContent = () => {
-    data.showContent = false
-    form.identificacion_user = ''
-    data.identificacion_disbled = false
+  data.showContent = false
+  form.identificacion_user = ''
+  data.identificacion_disbled = false
 
 }
+
+function esLocalhost() {
+  var hostname = window.location.hostname;
+  return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
+// if (esLocalhost()) {
+//   data.classOfTxtAreas = "min-w-[20px] max-h-[110px] p-4";
+//   data.classOfText = "min-w-[110px] max-h-[110px] p-4";
+//   data.classOfText2 = "min-w-[120px] max-h-[110px] p-4";
+// }
+
 // <!--</editor-fold>-->
+
 function RecuperarInfoGuardada(Formulario) {
-    data.DataRecuperada = true
-    form.proceso_que_solicita_presupuesto = Formulario[0].proceso_que_solicita_presupuesto
-    // form.enviado = 0
-    form.valor_total_de_la_solicitud_actual = Formulario[0].valor_total_de_la_solicitud_actual
-    data.ConteoCosas = Formulario.length
-  
-    setTimeout(()=> recuperaform(Formulario), 200)
+  data.DataRecuperada = true
+  form.proceso_que_solicita_presupuesto = Formulario[0].proceso_que_solicita_presupuesto
+  // form.enviado = 0
+  form.valor_total_de_la_solicitud_actual = Formulario[0].valor_total_de_la_solicitud_actual
+  data.ConteoCosas = Formulario.length
+
+  setTimeout(() => recuperaform(Formulario), 200)
 }
 
-function recuperaform(Formulario){
+function recuperaform(Formulario) {
   Formulario.forEach((element, index) => {
     form.necesidad[index] = element.necesidad
     form.justificacion[index] = element.justificacion
@@ -464,123 +558,158 @@ function recuperaform(Formulario){
 }
 
 
+function borrarFila(conteoi) {
+  guardarAutomaticamente()
+  BorraFila(conteoi)
+  // data.ConteoCosas--
+}
+function BorraFila(index) {
+  
+    form.necesidad[index] = 'Elemento_Borrado'
+    form.justificacion[index] = null
+    form.actividad[index] = null
+    form.categoria[index] = null
+    form.unidad_de_medida[index] = null
+    form.cantidad[index] = null
+    form.valor_unitario[index] = null
+    form.valor_total_solicitatdo_por_necesidad[index] = null
+    form.periodo_de_inicio_de_ejecucion[index] = null
+    form.vigencias_anteriores[index] = null
+    form.valor_asignado_en_la_vigencia_anterior[index] = null
+
+    //aqui se complica
+    form.procesos_involucrados[index] = []
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index] = []
+    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index] = []
+  
+
+    form.frecuencia_de_uso[index] = null
+    form.mantenimientos_requeridos[index] = null
+    form.riesgo_de_la_inversion[index] = null
+
+    data.Otras_capacidad_instalada[index] = false
+    form.capacidad_instalada[index] = null
+    form.unidad_de_medida[index] = null
+    
+}
+
+
 // <!--<editor-fold desc="watches">-->
 watchEffect(() => {
-  if(data.ConteoCosas > 101) data.ConteoCosas = 100
-    //calcular la suma de los valores unitarios
-    if(form.cantidad && form.valor_unitario && form.cantidad.length > 0 && form.valor_unitario.length > 0){
-        data.total_todo = 0
-        form.cantidad.forEach(function (canti,index) {
-            try{
-                let INTvalunitario = parseInt(form.valor_unitario[index])
-                let INTcanti = parseInt(canti)
-                if(!isNaN(INTcanti) && !isNaN(INTvalunitario)){
-                    form.valor_total_solicitatdo_por_necesidad[index] = INTvalunitario * INTcanti
-                    data.valor_total_solicitatdo_por_necesidad[index] = number_format(form.valor_total_solicitatdo_por_necesidad[index],0,1)
-                }else{
-                    form.valor_total_solicitatdo_por_necesidad[index] = 0
-                    data.valor_total_solicitatdo_por_necesidad[index] = 0
-                }
-            }catch(exceptionVar){
-                form.valor_total_solicitatdo_por_necesidad[index] = 0
-                data.valor_total_solicitatdo_por_necesidad[index] = 0
-            }finally{
-                data.total_todo += form.valor_total_solicitatdo_por_necesidad[index]
-            }
-        });
+  if (data.ConteoCosas > 101) data.ConteoCosas = 100
+  //calcular la suma de los valores unitarios
+  if (form.valor_unitario) {
+
+    if (form.cantidad && form.cantidad.length > 0 && form.valor_unitario.length > 0) {
+      data.total_todo = 0
+      form.cantidad.forEach(function (canti, index) {
+        try {
+          let INTvalunitario = parseInt(form.valor_unitario[index].toString().replace(/\$|\./g, ''))
+          let INTcanti = parseInt(canti)
+          if (!isNaN(INTcanti) && !isNaN(INTvalunitario)) {
+            form.valor_total_solicitatdo_por_necesidad[index] = INTvalunitario * INTcanti
+            data.valor_total_solicitatdo_por_necesidad[index] = number_format(form.valor_total_solicitatdo_por_necesidad[index], 0, 1)
+
+          } else {
+            form.valor_total_solicitatdo_por_necesidad[index] = 0
+            data.valor_total_solicitatdo_por_necesidad[index] = 0
+          }
+        } catch (exceptionVar) {
+          form.valor_total_solicitatdo_por_necesidad[index] = 0
+          data.valor_total_solicitatdo_por_necesidad[index] = 0
+        } finally {
+          data.total_todo += form.valor_total_solicitatdo_por_necesidad[index]
+        }
+      });
     }
+  }
 })
 
-watch( ()=> form.vigencias_anteriores,(NuevaVig) =>{
+
+function handledinero(conteoi) {
+  form.valor_unitario[conteoi] = plata_format(form.valor_unitario[conteoi])
+}
+
+watch(() => form.vigencias_anteriores, (NuevaVig) => {
   NuevaVig.forEach((element, index) => {
-    if(element === 'No'){
+    if (element === 'No') {
       data.desabilitar_vigencias_anteriores[index] = true
       form.valor_asignado_en_la_vigencia_anterior[index] = 0
-    }else{
+    } else {
       data.desabilitar_vigencias_anteriores[index] = false
     }
   })
-}, {deep:true});
+}, {deep: true});
 
-watch(()=> form.plan_de_mejoramiento_al_que_apunta_la_necesidad,(nuevoVal) =>{
-  //elninguno
-  let ponerTodoCero = []
-    let checkboxNinguno
-    nuevoVal.forEach((element,index) => {
-      console.log("=>(Welcome.vue:508) element", element);
-        checkboxNinguno = document.getElementById('0_b' + index);
-        ponerTodoCero[index] = false
-      //TODO: uy parce hay que probar bien. porque tira el servidor
-        // if(checkboxNinguno && checkboxNinguno.checked) ponerTodoCero[index] = true
-        //
-        // if(element && element.length){
-        //   element.forEach((ele) => {
-        //       if(ele === 0){
-        //           form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index] = [0];
-        //       }
-        //     });
-        // }
-    });
-},{deep: true});
 
-function buscarEnProps(cedulaBuscada,elprops){
-    for (let cedula in elprops){
-        cedula = parseInt(cedula)
-        if(cedula === cedulaBuscada){
-            return true;
-        }
+function buscarEnProps(cedulaBuscada, elprops) {
+  for (let cedula in elprops) {
+    cedula = parseInt(cedula)
+    if (cedula === cedulaBuscada) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 watch(() => form.unidad_de_medida, (nuevaUnidaddeMedidad) => {
-    watchunidad(nuevaUnidaddeMedidad)
+  watchunidad(nuevaUnidaddeMedidad)
 }, {deep: true});
 
-const watchunidad = (nuevaUnidaddeMedidad)=>{
-    nuevaUnidaddeMedidad.forEach((element, index) => {
-        if (element === 'Otras') {
-            data.Otras_unidad_de_medida[index] = true
-            form.unidad_de_medida[index] = ''
-        }
-    });
+const watchunidad = (nuevaUnidaddeMedidad) => {
+  nuevaUnidaddeMedidad.forEach((element, index) => {
+    if (element === 'Otras') {
+      data.Otras_unidad_de_medida[index] = true
+      form.unidad_de_medida[index] = ''
+    }
+  });
 }
 
 watch(() => form.capacidad_instalada, (nuevx) => {
-    nuevx.forEach((element, index) => {
-        if(element === 'Si, ¿Cual?'){
-            data.Otras_capacidad_instalada[index] = true
-            form.capacidad_instalada[index] = ''
-        }
-    });
+  nuevx.forEach((element, index) => {
+    if (element === 'Si, ¿Cual?') {
+      data.Otras_capacidad_instalada[index] = true
+      form.capacidad_instalada[index] = ''
+    }
+  });
 }, {deep: true});
 
 watch(() => data.ConteoCosas, (nuev) => {
-
-    let tamanoActual = form.necesidad.length;
-
-    if (nuev > tamanoActual) {
-        for (let i = tamanoActual; i < nuev; i++) {
-            AumentarForm(form)
-        }
-    } else if (nuev < tamanoActual) {
-        DisminuirForm(form,nuev)
+  let tamanoActual = form.necesidad.length;
+  if (nuev > tamanoActual) {
+    for (let i = tamanoActual; i < nuev; i++) {
+      AumentarForm(form)
     }
-    //fin cambio de tamano
+  } else if (nuev < tamanoActual) {
+    DisminuirForm(form, nuev)
+  }
+  //fin cambio de tamano
 
 
-    for (let i = 0; i <= nuev;i++){
-        data.Otras_unidad_de_medida[i] = false;
-        data.Otras_capacidad_instalada[i] = false;
-        data.desabilitar_vigencias_anteriores[i] = false;
-    }
+  for (let i = tamanoActual; i <= nuev; i++) {
+    data.Otras_unidad_de_medida[i] = false;
+    data.Otras_capacidad_instalada[i] = false;
+    data.desabilitar_vigencias_anteriores[i] = false;
+  }
 });
+
+const AumentarMasUno = () => {
+  guardarAutomaticamente()
+  let tamanoActual = form.necesidad.length;
+  AumentarForm(form)
+  data.ConteoCosas++
+  data.Otras_unidad_de_medida[tamanoActual] = false;
+  data.Otras_capacidad_instalada[tamanoActual] = false;
+  data.desabilitar_vigencias_anteriores[tamanoActual] = false;
+}
+
+
 // <!--</editor-fold>-->
 
-const handleEnterCedula = ()=>{
+const handleEnterCedula = () => {
   if (!data.identificacion_disbled) {
     if (form.identificacion_user > 100) {
-      console.log("=>(Welcome.vue:583) buscarEnProps(form.identificacion_user, props.cedLideres)", buscarEnProps(form.identificacion_user, props.cedLideres));
+      // console.log("=>(Welcome.vue:583) buscarEnProps(form.identificacion_user, props.cedLideres)", buscarEnProps(form.identificacion_user, props.cedLideres));
       if (buscarEnProps(form.identificacion_user, props.cedLideres)) {
         data.nombreLider = props.cedLideres[form.identificacion_user]
         if (data.nombreLider) {
@@ -589,20 +718,20 @@ const handleEnterCedula = ()=>{
           data.colorDisabled = 'bg-zinc-400 text-white dark:bg-black'
         }
       } else {
-          console.log("=>(Welcome.vue:592) buscarEnProps(form.identificacion_user, props.cedLideresGuardados)", buscarEnProps(form.identificacion_user, props.cedLideresGuardados));
+        // console.log("=>(Welcome.vue:592) buscarEnProps(form.identificacion_user, props.cedLideresGuardados)", buscarEnProps(form.identificacion_user, props.cedLideresGuardados));
         if (buscarEnProps(form.identificacion_user, props.cedLideresGuardados)) {
           data.nombreLider = props.cedLideresGuardados[form.identificacion_user]
           data.identificacion_disbled = true
           onContent(); //emitir mensaje y mostrar demas del form
-          
+
           setTimeout(() => {
             RecuperarInfoGuardada(props.cedLideresGuardados[form.identificacion_user]['Formulario'])
           }, 400)
         } else {
-            console.log("=>(Welcome.vue:602) buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados)", buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados));
+          // console.log("=>(Welcome.vue:602) buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados)", buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados));
           if (buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados)) {
-            alert('Ya se ha diligenciado, lo esperamos el proximo semestre!')
             data.mensajeYaHaSidoGuardado = "Si requiere realizar algún tipo de modificación o corrección por favor comunicarse con el proceso de Presupuesto o Planeación."
+            alert(data.mensajeYaHaSidoGuardado)
             data.identificacion_disbled = true
           } else {
             offContent();
@@ -611,572 +740,662 @@ const handleEnterCedula = ()=>{
         }
       }
     }
-  } 
+  }
 }
 
-const create = (enviado) => {
-  form.enviado = enviado
-  var EstaSeguro = true
-  if(form.enviado === 1)
-    EstaSeguro = confirm('Esta seguro? ¡¡¡después de enviar no podrá hacer más ajustes!!!');
-  
-  form.valor_total_de_la_solicitud_actual = data.total_todo
-  if(EstaSeguro) {
-    if (data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0) {
+function convertirNumeros() {
 
-      form.post(route('formulario.store'), {
-        preserveScroll: true,
-        forceFormData: true,
-        onSuccess: () => {
-          form.reset()
-          offContent()
-          // setTimeout(location.reload(), 3_000);
-        },
-        onError: () => {
-          // alert(JSON.stringify(form.errors))
-          alert('Hay campos con faltantes!')
-        },
-        onFinish: () => null,
-      })
-    } else {
-      data.MensajeError = 'Hay un error inesperado'
-      alert('¡Faltan datos!');
-    }
+}
+
+const guardarAutomaticamente = () => {
+  form.enviado = 0
+  //convertirNumeros
+  form.valor_total_de_la_solicitud_actual = data.total_todo
+  if (data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0) {
+    form.post(route('formulario.store'), {
+      preserveScroll: true,
+      forceFormData: true,
+      onSuccess: () => null,
+      onError: () => {
+        alert('Hay campos faltantes!')
+      },
+      onFinish: () => null,
+    })
+  } else {
+    alert('¡Faltan datos!');
+  }
+}
+
+const guardar = () => {
+  form.enviado = 0
+  //convertirNumeros
+  form.valor_total_de_la_solicitud_actual = data.total_todo
+  if (data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0) {
+    form.post(route('formulario.store'), {
+      preserveScroll: true,
+      forceFormData: true,
+      onSuccess: () => {
+        form.reset()
+        offContent()
+      },
+      onError: () => {
+        alert('Hay campos faltantes!')
+      },
+      onFinish: () => null,
+    })
+  } else {
+    alert('¡Faltan datos!');
+  }
+}
+
+const create = (validator,second) => {
+  console.log("=>(Welcome.vue:770) validator", validator);
+  console.log("=>(Welcome.vue:770) second", second);
+  if(validator && second){
+    form.enviado = 1
+    var EstaSeguro = confirm('Esta seguro? ¡¡¡después de enviar no podrá hacer más ajustes!!!');
+  
+    form.valor_total_de_la_solicitud_actual = data.total_todo
+    if (EstaSeguro) {
+      if (data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0) {
+  
+        form.post(route('EnviarFormulario'), {
+          preserveScroll: true,
+          forceFormData: true,
+          onSuccess: () => {
+            form.reset()
+            offContent()
+          },
+          onError: () => {
+            alert('Hay campos con faltantes!')
+          },
+          onFinish: () => null,
+        })
+      } else {
+        data.MensajeError = 'Hay un error inesperado'
+        alert('¡Faltan datos!');
+      }
+    } 
   }
 }
 </script>
 
 <template>
-    <div>
-        <Head :title="lang().label.welcome"/>
-        <Toast :flash="$page.props.flash" class=""/>
+  <div>
+    <Head :title="lang().label.welcome"/>
+    <Toast :flash="$page.props.flash" class=""/>
 
-        <div class="relative flex justify-center min-h-screen bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-gray-100 items-center sm:pt-0">
-            <section class="items-center w-full m-10 lg:mx-20 xl:mx-40 sm:px-6 lg:px-8 2xl:px-auto">
-                <article class="flex pt-8 px-4 sm:px-0 sm:pt-0">
-                    <div class="flex mx-auto text-center items-center">
-                        <ApplicationLogo class="h-32 w-auto text-primary fill-current"/>
-                        <p class="text-3xl 2xl:text-4xl sm:text-3xl mx-auto text-[#499884] font-medium">Necesidades económicas anuales por dependencia {{ anioActual + 1 }}</p>
-                    </div>
-                    <div class="flex items-center">
-                        <!-- <SwitchLangNavbar /> -->
-                        <SwitchDarkMode/>
-                    </div>
-                </article>
+    <div class="relative flex justify-center min-h-screen bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-gray-100 items-center sm:pt-0">
+      <section class="items-center w-full m-10 lg:mx-20 xl:mx-40 sm:px-6 lg:px-8 2xl:px-auto">
+        <article class="flex pt-8 px-4 sm:px-0 sm:pt-0">
+          <div class="flex mx-auto text-center items-center">
+            <ApplicationLogo class="h-32 w-auto text-primary fill-current"/>
+            <p class="text-3xl 2xl:text-4xl sm:text-3xl mx-auto text-[#499884] font-medium">Necesidades económicas anuales por dependencia
+              {{ anioActual + 1 }}</p>
+          </div>
+          <div class="flex items-center">
+            <!-- <SwitchLangNavbar /> -->
+            <SwitchDarkMode/>
+          </div>
+        </article>
 
-                <!-- component -->
-                <form v-if="!TodosDiligenciados" @submit.prevent="create" method="POST" enctype="multipart/form-data"
-                      class="py-4">
-                    <div class="mx-auto container max-w-[2100px] rounded-2xl">
-                        <section class="bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-900 space-y-6 rounded-2xl">
-                            <div  class="md:inline-flex space-y-4 md:space-y-0 w-full p-4 text-gray-700 dark:text-gray-200 items-center">
-                                <h2 v-show="!data.showContent" class="md:w-1/2 max-w-sm mx-auto dark:text-gray-100 2xl:text-xl">Por favor, digite el numero de documento para empezar:
-                                </h2>
-                                <div class="md:w-2/3 max-w-lg mx-auto">
-                                    <label class="text-md text-gray-400"></label>
-                                    <div class="w-full inline-flex my-6">
-                                        <div class="pt-2 w-1/12 bg-gray-100 bg-opacity-50 rounded-l-lg">
-                                            <svg fill="none" class="w-6 text-gray-400 mx-auto dark:text-black" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                        </div>
-                                        <input v-model="form.identificacion_user" type="number" min="0"
-                                               max="999999999999"
-                                               :disabled="data.identificacion_disbled"
-                                               :class="data.colorDisabled"
-                                               @keyup.enter="handleEnterCedula"
-                                               class="dark:text-white w-11/12 focus:text-gray-600 p-2 border-0 dark:bg-gray-700 bg-gray-100 bg-opacity-50 rounded-r-lg
+        <!-- component -->
+        <form v-if="!TodosDiligenciados" @submit.prevent="create" method="POST" enctype="multipart/form-data"
+              class="py-4">
+          <div class="mx-auto container max-w-[2100px] rounded-2xl">
+            <section class="bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-900 space-y-6 rounded-2xl">
+              <div class="md:inline-flex space-y-4 md:space-y-0 w-full p-4 text-gray-700 dark:text-gray-200 items-center">
+                <h2 v-show="!data.showContent" class="md:w-1/2 max-w-sm mx-auto dark:text-gray-100 2xl:text-xl">Por favor, digite el numero de
+                  documento para empezar:
+                </h2>
+                <div class="md:w-2/3 max-w-lg mx-auto">
+                  <label class="text-md text-gray-400"></label>
+                  <div class="w-full inline-flex my-6">
+                    <div class="pt-2 w-1/12 bg-gray-100 bg-opacity-50 rounded-l-lg">
+                      <svg fill="none" class="w-6 text-gray-400 mx-auto dark:text-black" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                      </svg>
+                    </div>
+                    <input v-model="form.identificacion_user" type="number" min="0"
+                           max="999999999999"
+                           :disabled="data.identificacion_disbled"
+                           :class="data.colorDisabled"
+                           @keyup.enter="handleEnterCedula"
+                           @keydown.enter.prevent="create"
+                           class="dark:text-white w-11/12 focus:text-gray-600 p-2 border-0 dark:bg-gray-700 bg-gray-100 bg-opacity-50 rounded-r-lg
                                                        focus:border-blue-400 placeholder-gray-500 text-gray-700 focus:placeholder-gray-400 dark:focus:placeholder-gray-100
                                                        focus:bg-blue-50 focus:shadow-outline"
-                                               placeholder="Escriba aqui su identificacion"
-                                        />
-                                        <InputError class="mt-2" :message="form.errors.identificacion_user"/>
-                                    </div>
-                                    <div v-if="form.identificacion_user > 1000 && data.showContent" class="w-full grid grid-cols-3 gap-1 my-1 rounded-lg">
-                                        <div class="px-4 py-1 w-full rounded-x-lg">
-                                          <div class="px-4 py-2 w-full bg-transparent rounded-x-lg">
-                                              ¿Cuántas Necesidades?
-                                          </div>
-                                          <input v-model="data.ConteoCosas" type="number" min="0" max="100"
-                                                 class="dark:bg-black w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                 placeholder="Escriba aqui su identificacion"
-                                          />
-                                          <InputError class="mt-2" :message="form.errors.identificacion_user"/>
-                                        </div>
-                                      <div class="col-span-2 px-4 py-2 w-full bg-transparent rounded-x-lg mt-9">
-                                        <p class="ml-8">Proceso que solicita el Presupuesto</p>
-                                          <SelectInput v-model="form.proceso_que_solicita_presupuesto"
-                                                       :dataSet="data.proceso_que_solicita_presupuesto"
-                                                       class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                       autocomplete="off" placeholder="Especifique"/>
-                                          <InputError class="mt-2"
-                                                      :message="form.errors.proceso_que_solicita_presupuesto"/>
-                                      </div>
-                                    </div>
-                                </div>
-                            </div>
-                          
-                            <div v-if="data.showContent" class="mx-auto text-center">
-                                <div class="bg-my-auto mb-4 md:inline-flex max-w-md w-full space-y-2 py-4 px-8 text-gray-600 dark:text-white items-center">
-                                    <h2 class="max-w-md mx-auto uppercase font-bold">Nombre del líder</h2>
-                                    <div class="w-full md:pl-9 max-w-md mx-auto space-y-5 md:inline-flex pl-2">
-                                      <div class="w-full inline-flex border-sky-600 border-b-2">
-                                        <label> {{ data.nombreLider['name'] }} </label>
-                                      </div>
-                                    </div>
-                                </div>
-                                <div class="bg-my-auto mb-4 md:inline-flex max-w-md w-full space-y-2 py-4 px-8 text-gray-600 dark:text-white items-center">
-                                    <h2 class="max-w-md mx-auto uppercase font-bold">Cédula</h2>
-                                    <div class="w-full md:pl-9 max-w-md mx-auto space-y-5 md:inline-flex pl-2">
-                                      <div class="w-full inline-flex border-sky-600 border-b-2">
-                                        <label> {{ data.nombreLider['email'] }} </label>
-                                      </div>
-                                    </div>
-                                </div>
-                            </div>
-                          
-                            <hr class="mb-4"/>
-                            <div v-for="(indexFila,conteoi) in data.ConteoCosas" v-show="data.showContent" name="fade">
-                              <div>
-                                    <div class="md:inline-flex  space-y-4 md:space-y-0 w-full p-4 text-gray-700 items-center">
-                                        <div class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[190px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl">
-                                            <div :class="data.classOfTxtAreas">
-                                                <label class="text-md text-gray-900 capitalize"> necesidad {{conteoi+1}}</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500 mb-12">Relacione de manera específica la necesidad a solicitar</p>
-                                                <div class="w-full inline-flex">
+                           placeholder="Escriba aqui su identificacion"
+                    />
+                    <InputError class="mt-2" :message="form.errors.identificacion_user"/>
+                  </div>
+                  <div v-if="form.identificacion_user > 1000 && data.showContent" class="w-full grid grid-cols-3 gap-1 my-1 rounded-lg">
+                    <!--                                        <div class="px-4 py-1 w-full rounded-x-lg">-->
+                    <!--                                          <div class="px-4 py-2 w-full bg-transparent rounded-x-lg">-->
+                    <!--                                              ¿Cuántas Necesidades?-->
+                    <!--                                          </div>-->
+                    <!--                                          <input v-model="data.ConteoCosas" type="number" min="0" max="100"-->
+                    <!--                                                 class="dark:bg-black w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"-->
+                    <!--                                                 placeholder="Escriba aqui su identificacion"-->
+                    <!--                                          />-->
+                    <!--                                        </div>-->
+                    <div class="col-span-2 px-4 py-2 w-full bg-transparent rounded-x-lg mt-9">
+                      <p class="ml-8">Proceso que solicita el Presupuesto</p>
+                      <SelectInput v-model="form.proceso_que_solicita_presupuesto"
+                                   :dataSet="data.proceso_que_solicita_presupuesto"
+                                   class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                   autocomplete="off" placeholder="Especifique"/>
+                      <InputError class="mt-2"
+                                  :message="form.errors.proceso_que_solicita_presupuesto"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="data.showContent" class="mx-auto text-center">
+                <div class="bg-my-auto mb-4 md:inline-flex max-w-md w-full space-y-2 py-4 px-8 text-gray-600 dark:text-white items-center">
+                  <h2 class="w-full mx-auto font-bold">Nombre del líder</h2>
+                  <div class="w-full md:pl-9 max-w-md mx-auto space-y-5 md:inline-flex pl-2">
+                    <div class="w-full inline-flex border-sky-600 border-b-2">
+                      <label> {{ data.nombreLider['name'] }} </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-my-auto mb-4 md:inline-flex max-w-md w-full space-y-2 py-4 px-8 text-gray-600 dark:text-white items-center">
+                  <h2 class="max-w-lg mx-auto font-bold">Cédula</h2>
+                  <div class="w-full md:pl-9 max-w-md mx-auto space-y-5 md:inline-flex pl-2">
+                    <div class="w-full inline-flex border-sky-600 border-b-2">
+                      <label> {{ data.nombreLider['email'] }} </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+             
+              
+
+
+              <hr class="mb-4"/>
+              <div v-for="(indexFila,conteoi) in data.ConteoCosas" v-show="data.showContent" name="fade">
+                <div v-if="form.necesidad[conteoi] !== 'Elemento_Borrado'">
+                  <div class="md:inline-flex  space-y-4 md:space-y-0 w-full p-4 text-gray-700 items-center">
+                    <div class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[190px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl">
+
+                      <div :class="data.classMini">
+
+                      <button @click="borrarFila(conteoi)" type="button" class="group cursor-pointer outline-none hover:rotate-12 duration-700">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 24 24"
+                               class="stroke-slate-400 fill-none group-hover:fill-slate-800 group-active:stroke-slate-200 group-active:fill-slate-600 group-active:duration-0 duration-300">
+                            <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke-width="1.5"></path>
+                            <path d="M8 12H16" stroke-width="1.5"></path>
+                          </svg>
+                        </button>
+                        <button @click="AumentarMasUno()" type="button" class="group cursor-pointer outline-none hover:rotate-90 duration-300">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 24 24"
+                               class="stroke-slate-400 fill-none group-hover:fill-slate-800 group-active:stroke-slate-200 group-active:fill-slate-600 group-active:duration-0 duration-300">
+                            <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke-width="1.5"></path>
+                            <path d="M8 12H16" stroke-width="1.5"></path>
+                            <path d="M12 16V8" stroke-width="1.5"></path>
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      
+                      
+                    <div :class="data.classOfTxtAreas">
+                      <label class="text-md text-gray-900 capitalize"> necesidad {{ conteoi + 1 }}</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500 mb-12">Relacione de manera específica la necesidad a
+                        solicitar</p>
+                      <div class="w-full inline-flex">
                                                     <textarea cols="100" rows="7" v-model="form.necesidad[conteoi]"
                                                               type="text"
                                                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                               autocomplete="off"/>
-                                                </div>
-                                                <InputError class="mt-2" :message="form.errors.necesidad"/>
-                                            </div>
-                                            <div class="min-w-[660px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">justificación</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Qué impactos concretos tendrá esta adquisición? Que pasaría si no se hace la adquisición? Si es Talento Humano, especifique las actividades que desarrollará y qué entregables generará</p>
-                                                <div class="w-full inline-flex">
+                      </div>
+                      <InputError class="mt-2" :message="form.errors.necesidad"/>
+                    </div>
+                    <div :class="data.classOfTxtAreas">
+                      <label class="text-md text-gray-900 capitalize">justificación</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Qué impactos concretos tendrá esta adquisición? Que
+                        pasaría si no se hace la adquisición? Si es Talento Humano, especifique las actividades que desarrollará
+                        y qué entregables generará</p>
+                      <div class="w-full inline-flex">
                                                     <textarea cols="100" rows="7" v-model="form.justificacion[conteoi]"
                                                               type="text"
                                                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                               autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.justificacion"/>
-                                                </div>
-                                            </div>
-                                            <div :class="data.classOfTextLG">
-                                                <label class="text-md text-gray-900 capitalize">actividad</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione la actividad acorde a su necesidad. En caso de no encontrarla en el listado, seleccione la opción otra y descríbala de manera detallada</p>
-                                                <div class="w-full inline-flex">
-<!--                                                  <SelectInput v-model="form.actividad[conteoi]"-->
-<!--                                                           :dataSet="data.actividades"-->
-<!--                                                           class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"-->
-<!--                                                           />-->
-                                                  <input v-model="form.actividad[conteoi]"
-                                                         type="text"
-                                                         class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                         autocomplete="off"/>
-                                                  <InputError class="mt-2" :message="form.errors.actividad"/>
-                                                </div>
-                                            </div>
-                                            <div :class="data.classOfTextLG">
-                                                <label class="text-md text-gray-900 capitalize">categoría</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione la categoría acorde a la necesidad descrita en los pasos anteriores</p>
-                                                <div class="w-full inline-flex">
-                                                    <SelectInput v-model="form.categoria[conteoi]"
-                                                                 :dataSet="data.categoria"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                                 autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.categoria"/>
-                                                </div>
-                                            </div>
-                                            <div :class="data.classOfText">
-                                                <label class="text-md text-gray-900 capitalize">unidad de medida</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Describir la forma de cuantificar el recurso solicitado</p>
-                                                <div v-if="data.Otras_unidad_de_medida[conteoi] === false"
-                                                     class="w-full inline-flex">
-                                                    <SelectInput v-model="form.unidad_de_medida[conteoi]"
-                                                                 :dataSet="props.losSelect.unidad_de_medida"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                                 autocomplete="off"/>
-
-                                                    <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
-                                                </div>
-                                                <div v-else class="w-full inline-flex">
-                                                    <input v-model="form.unidad_de_medida[conteoi]" type="text"
-                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
-                                                </div>
-                                            </div>
-                                            <div :class="data.classOfText">
-                                                <label class="text-md text-gray-900 capitalize">cantidad</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Describir la forma de cuantificar el recurso solicitado</p>
-                                                <div class="w-full inline-flex">
-                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.cantidad[conteoi]"
-                                                           type="number"
-                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.cantidad"/>
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[360px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">valor unitario</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Cual es el valor estimado de cada unidad de medida En caso de ser en dólares, usar el valor proyectado de la TRM según la fecha estimada de compra</p>
-                                                <div class="w-full inline-flex">
-                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input v-model="form.valor_unitario[conteoi]" type="number" min="0"
-                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.valor_unitario"/>
-                                                </div>
-                                            </div>
-                                            <div :class="data.classOfText2">
-                                                <label class="text-md text-gray-900 capitalize">valor total</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Cantidad x valor unitario</p>
-                                                <label class="text-xs text-gray-400"> (solicitado por necesidad)</label>
-                                                <div class="w-full inline-flex">
-                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input disabled
-                                                           v-model="data.valor_total_solicitatdo_por_necesidad[conteoi]"
-                                                           class="w-full bg-zinc-400 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
-                                                </div>
-                                            </div>
-
-                                            <div :class="data.classOfText2">
-                                                <label class="text-md text-gray-900 capitalize">período de inicio de ejecución</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">En que trimestre iniciará la ejecución de los recursos solicitados	</p>
-                                                <div class="w-full inline-flex">
-                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput
-                                                        :dataSet="props.losSelect.periodo_de_inicio_de_ejecucion"
-                                                        v-model="form.periodo_de_inicio_de_ejecucion[conteoi]"
-                                                        type="text"
-                                                        class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                        autocomplete="off"/>
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.periodo_de_inicio_de_ejecucion"/>
-                                                </div>
-                                            </div>
-                                            <div :class="data.classOfText">
-                                                <label class="text-md text-gray-900 capitalize">vigencias anteriores</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Especifique el valor en pesos asignado en 2024 para esta misma necesidad	</p>
-                                                <div class="w-full inline-flex">
-                                                    <SelectInput :dataSet="data.vigencias_anteriores"
-                                                                 v-model="form.vigencias_anteriores[conteoi]"
-                                                                 type="text"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                    />
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.vigencias_anteriores"/>
-                                                </div>
-                                            </div>
-                                            <div :class="data.classOfText2">
-                                                <label class="text-md text-gray-400">Valor asignado en la vigencia anterior</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Especifique el valor en pesos asignado en 2024 para esta misma necesidad	</p>
-                                                <div class="w-full inline-flex">
-                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <input
-                                                        v-model="form.valor_asignado_en_la_vigencia_anterior[conteoi]"
-                                                        type="number" min="0"
-                                                        class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                        :disabled="data.desabilitar_vigencias_anteriores[conteoi]"/>
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.valor_asignado_en_la_vigencia_anterior"/>
-                                                </div>
-                                            </div>
-
-
-                                            <!--                                        selectmultipledos1-->
-                                            <div :class="data.classOfText_checkbox">
-                                                <label for="multi-select" class="mb-4 text-lg text-gray-400 ">Procesos involucrados</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Para esta inversión se requiere apoyo, información, asesoría, recursos o aprobaciones de las siguientes áreas:	</p>
-                                                <div v-for="(option,inde) in data.proceso_que_solicita_presupuesto"
-                                                     :key="inde" class="mt-3">
-                                                    <input type="checkbox" :id="option.value+'_a'+conteoi"
-                                                           :value="option.value"
-                                                           @change="toggleSelection1(option.value,conteoi)"
-                                                           :checked="isSelected1(option.value)"
-                                                           class="p-1 w-7 h-7 ring-1 ring-zinc-400"
-                                                    />
-                                                    <label :for="option.value" class="mx-2">{{ option.label }}</label>
-                                                </div>
-                                                <InputError class="mt-2" :message="form.errors.procesos_involucrados"/>
-                                            </div>
-                                            <div :class="data.classOfText_checkbox">
-                                                <label for="multi-select" class="mb-4 text-lg text-gray-400">Procesos seleccionados</label>
-                                                <p v-if="form.procesos_involucrados[conteoi]"
-                                                   v-for="itemsito in form.procesos_involucrados[conteoi]"
-                                                   class="font-bold mt-1">
-                                                    - {{ data.proceso_que_solicita_presupuesto.find((item) => item.value === itemsito)?.label }}
-                                                </p>
-                                            </div>
-
-
-                                            <!--                                            selectmultipledos2-->
-                                            <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
-                                                <label class="text-md text-gray-400">Plan de mejoramiento al que apunta la necesidad</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione el Plan de Mejoramiento  al cual  se articula 	</p>
-                                                <div v-for="option in data.planmejoramientonecesidad"
-                                                     :key="option.value" class="mt-3">
-                                                    <input type="checkbox" :id="option.value+'_b'+conteoi"
-                                                           :value="option.value"
-                                                           @change="toggleSelection2(option.value,conteoi)"
-                                                           :checked="isSelected2(option.value,conteoi)"
-                                                           class="p-1 w-7 h-7 ring-1 ring-zinc-400"
-                                                    />
-                                                    <label :for="option.value+'_'+conteoi" class="mx-1">{{ option.label }}</label>
-                                                </div>
-                                                <InputError class="mt-2"
-                                                            :message="form.errors.plan_de_mejoramiento_al_que_apunta_la_necesidad"/>
-                                            </div>
-                                            <div class="min-w-[250px] max-h-[250px] p-4 border-x-2 border-zinc-400">
-                                                <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Planes seleccionados</label>
-                                                <p v-if="form.plan_de_mejoramiento_al_que_apunta_la_necesidad"
-                                                   v-for="itemsito2 in form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi]"
-                                                   class="font-bold mt-1">
-                                                    - {{ data.planmejoramientonecesidad.find((item) => item.value === itemsito2)?.label }}</p>
-                                            </div>
-                                            <!--                                            selectmultipledos3-->
-                                            <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
-                                                <label class="text-md text-gray-400">Línea del plan desarrollo al que
-                                                    apunta la necesidad</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione una de las líneas	</p>
-                                                <div v-for="option in data.lineadelplan"
-                                                     :key="option.value" class="mt-3">
-                                                    <input type="checkbox" :id="option.value+'_c'+conteoi"
-                                                           :value="option.value"
-                                                           @change="toggleSelection3(option.value,conteoi)"
-                                                           :checked="isSelected3(option.value)"
-                                                           class="p-1 w-7 h-7 ring-1 ring-zinc-400"
-                                                    />
-                                                    <label :for="option.value" class="mx-1">{{ option.label }}</label>
-                                                </div>
-                                                <InputError class="mt-2"
-                                                            :message="form.errors.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"/>
-                                            </div>
-                                            <div class="min-w-[350px] max-h-[250px] p-4 border-x-2 border-zinc-400">
-                                                <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Líneas seleccionadas</label>
-                                                <p v-if="form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"
-                                                   v-for="itemsito3 in form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi]"
-                                                   class="font-bold mt-1"> - {{
-                                                        data.lineadelplan.find((item) => item.value === itemsito3)?.label
-                                                    }}</p>
-
-                                            </div>
-
-                                            <!-- fin selectmultipledo-->
-                                            <div class="min-w-[450px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">frecuencia de uso</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Relacionar la periodicidad de usos que se le darán a la adquisición</p>
-                                                <div class="w-full inline-flex">
-                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="props.losSelect.frecuencia_de_uso"
-                                                                 v-model="form.frecuencia_de_uso[conteoi]" type="text"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                                 autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.frecuencia_de_uso"/>
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[460px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">mantenimientos requeridos</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500"> Relacionar la cantidad y periodicidad de los mantenimientos requeridos después de hecha la adquisición.</p>
-                                                <div class="w-full inline-flex">
-                                                    <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
-                                                    <SelectInput :dataSet="props.losSelect.mantenimientos_requeridos"
-                                                                 v-model="form.mantenimientos_requeridos[conteoi]"
-                                                                 type="text"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                                 autocomplete="off"/>
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.mantenimientos_requeridos"/>
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[460px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">capacidad instalada</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">Disponibilidad actual de este bien o servicio en
-                                                la Institución. Si se trata de Talento Humano, explique con qué recursos se están desarrollando actualmente las actividades	</p>
-                                                <div v-if="data.Otras_capacidad_instalada[conteoi] === false"
-                                                     class="w-full inline-flex">
-                                                    <SelectInput :dataSet="props.losSelect.capacidad_instalada"
-                                                                 v-model="form.capacidad_instalada[conteoi]" type="text"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                                 autocomplete="off"/>
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.capacidad_instalada"/>
-                                                </div>
-                                                <div v-else class="w-full inline-flex">
-                                                    <input v-model="form.capacidad_instalada[conteoi]" type="text"
-                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.capacidad_instalada"/>
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[300px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900">Riesgo de la inversión</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500">
-                                                Valore el riesgo de que la necesidad no sea totalmente solucionada 1: Bajo riesgo   5: Alto riesgo</p>
-                                                <div class="w-full inline-flex">
-                                                    <SelectInput :dataSet="props.losSelect.riesgo_de_la_inversion"
-                                                                 v-model="form.riesgo_de_la_inversion[conteoi]"
-                                                                 type="text"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                                 autocomplete="off"/>
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.riesgo_de_la_inversion"/>
-                                                </div>
-                                            </div>
-                                            <div class="min-w-[500px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">anexos</label>
-                                              <p v-if="conteoi === 0" class="text-md text-gray-500 my-2">
-                                                Relacionar los anexos que hacen parte del ítem de la inversión, compra o reposición, donde se enuncien
-                                                las especificaciones técnicas.
-                                                Si la solicitud es una reposición, adjuntar el informe técnico con código de inventario para asegurar
-                                                la baja posterior por parte del solicitante. Formatos Permitidos: Word, Excel, PDF
-                                              </p>
-                                                <div class="w-full flex">
-                                                    <!--                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"-->
-                                                    <input id="anexos" type="file"
-                                                           @input="form.anexos[conteoi] = $event.target.files[0]"
-                                                           @change="handleFile" accept="application/pdf"
-                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
-                                                    <p v-if="form.anexos[conteoi]"
-                                                       class="w-full my-2 mx-6 text-green-700 underline">
-                                                        {{ form.anexos[conteoi].name }}
-                                                    </p>
-                                                    <p v-if="data.showanexos[conteoi]"
-                                                       class="w-full my-2 mx-6 text-green-700 underline">
-                                                        {{ data.showanexos[conteoi] }}
-                                                    </p>
-                                                </div>
-                                                <!--                                                <progress v-if="form.progress" :value="form.progress.percentage" max="100"-->
-                                                <!--                                                          class="bg-sky-200">-->
-                                                <!--                                                    {{ form.progress.percentage }}%-->
-                                                <!--                                                </progress>-->
-                                            </div>
-                                            <InputError class="mt-2" :message="form.errors.anexos"/>
-                                        </div>
-                                    </div>
-                                    <!--   elfin-->
-
-                                    <!-- total-->
-                                </div>
-                            </div>
-                          
-                          
-                          
-                            <section v-if="data.showContent">
-                                <div class="px-1 flex py-2 text-gray-500 items-center text-center bg-transparent p-0">
-                                    <div class="mx-auto relative overflow-x-auto shadow-md rounded-2xl">
-                                        <table class="w-full text-xl text-center rtl:text-right sm:rounded-lg text-gray-500 dark:text-gray-400">
-                                            <thead class="text-lg text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
-                                              <tr>
-                                                  <th scope="col" class="p-6">#</th>
-                                                  <th scope="col" class="col-span-2 p-6">Necesidad</th>
-                                                  <th scope="col" class="p-6">Categoria</th>
-                                                  <th scope="col" class="p-6">Unidad de medida</th>
-                                                  <th scope="col" class="p-6">Cantidad</th>
-                                                  <th scope="col" class="p-6">Valor unitario</th>
-                                                  <th scope="col" class="p-6">Subtotal</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody class="items-center">
-                                            <tr v-for="(element, indexNecesidad) in form.necesidad"
-                                                class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                                                <td class="w-full text-center py-2 -px-1">{{indexNecesidad+1}}</td>
-                                                <td v-if="element.length > 80" class="w-full text-center py-2 col-span-2">
-                                                    {{ element.slice(0, 80) }} ...
-                                                </td>
-                                                <td v-else class="w-full text-center py-2 col-span-2">{{ element }}</td>
-                                                <td v-if="!isNaN(form.categoria[indexNecesidad])" class="w-full text-center py-2">
-                                                  {{ data.categoria.find((item) => item.value == form.categoria[indexNecesidad])?.label }}
-                                                </td>
-                                                <td v-else class="w-full text-center py-2">{{ (form.categoria[indexNecesidad]) }}</td>
-                                                <td class="w-full text-center py-2">{{ (form.unidad_de_medida[indexNecesidad]) }}</td>
-                                                <td class="w-full text-center py-2">{{ (form.cantidad[indexNecesidad]) }}</td>
-                                                <td class="w-full text-center py-2">{{ number_format(form.valor_unitario[indexNecesidad], 0, 1) }}</td>
-                                                <td class="w-full text-center py-2">{{ number_format(form.valor_total_solicitatdo_por_necesidad[indexNecesidad], 0, 1) }}</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="w-full text-center md:pl-9 max-w-sm mx-auto my-5 pl-2">
-                                    <div class="w-full text-center mx-auto">
-                                        <label class="text-xl text-center"> Total final:<small class="px-3 font-bold text-2xl">{{ number_format(data.total_todo, 0, 1) }}</small> </label>
-                                    </div>
-                                </div>
-                                <hr/>
-                            </section>
-                            <!-- botones de guardado    -->
-                            <div v-if="data.showContent"
-                                 class="md:inline-flex w-full my-2 md:space-y-0 p-8 text-gray-500 items-center">
-                              <div v-if="Object.keys(form.errors).length">
-                                <p class="text-xl text-red-800">Por favor, Corrija los siguientes errores</p>
-                                <ul>
-                                  <li v-for="(error, field) in form.errors" :key="field"
-                                    class="text-lg text-red-800">
-                                     {{ error.replace(/_/g, " ").replace(/justificacion\.(\d+)/, (match, p1) => {
-                                          let nuevoNumero = parseInt(p1, 10) + 1;
-                                          return `justificacion.${nuevoNumero}`;
-                                        }) 
-                                    }}
-                                  </li>
-                                </ul>
-                              </div>
-                                <div class="grid grid-cols-2 gap-8 mx-auto text-center md:pl-6">
-                                  
-                                    <PrimaryButton
-                                        class="text-white w-full mx-auto max-w-sm rounded-md text-center bg-indigo-400 py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
-                                        :class="{ 'opacity-25': form.processing }"
-                                        :disabled="form.processing"
-                                        @click="create(0)"
-                                    >
-                                        <!--                                    <svg fill="none" class="w-4 text-white mr-2" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>-->
-                                        Guardar sin enviar
-                                    </PrimaryButton>
-                                    <PrimaryButton
-                                        class="text-white w-full mx-auto max-w-sm rounded-md text-center bg-black-400 py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
-                                        :class="{ 'opacity-25': form.processing }"
-                                        :disabled="form.processing"
-                                        @click="create(1)"
-                                    >
-                                        <svg fill="none" class="w-4 text-white mr-2" viewBox="0 0 24 24"
-                                             stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                        </svg>
-                                        Enviar Definitivamente
-                                    </PrimaryButton>
-                                </div>
-                            </div>
-                        </section>
+                        <InputError class="mt-2" :message="form.errors.justificacion"/>
+                      </div>
                     </div>
-                </form>
-              
-              
-              
-                <div class="sm:flex justify-between mt-4 text-md text-gray-500">
-                    <div v-if="data.mensajeYaHaSidoGuardado === ''" class="flex mx-4 sm:mx-0 flex-row justify-center text-center">
-                        <p class="text-lg text-black dark:text-white">{{ $page.props.app.name }} ©️</p>
+                    <div :class="data.classOfTextLG">
+                      <label class="text-md text-gray-900 capitalize">actividad</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione la actividad acorde a su necesidad. En
+                        caso de no encontrarla en el listado, seleccione la opción otra y descríbala de manera detallada</p>
+                      <div class="w-full inline-flex">
+                        <!--                                                  <SelectInput v-model="form.actividad[conteoi]"-->
+                        <!--                                                           :dataSet="data.actividades"-->
+                        <!--                                                           class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"-->
+                        <!--                                                           />-->
+                        <input v-model="form.actividad[conteoi]"
+                               type="text"
+                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                               autocomplete="off"/>
+                        <InputError class="mt-2" :message="form.errors.actividad"/>
+                      </div>
                     </div>
-                    <div v-else class="flex text-[#499884] font-medium text-lg mx-4 sm:mx-0 flex-row justify-center text-center">
-                        <p>{{data.mensajeYaHaSidoGuardado}}</p>
+                    <div :class="data.classOfTextLG">
+                      <label class="text-md text-gray-900 capitalize">categoría</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione la categoría acorde a la necesidad
+                        descrita en los pasos anteriores</p>
+                      <div class="w-full inline-flex">
+                        <SelectInput v-model="form.categoria[conteoi]"
+                                     :dataSet="data.categoria"
+                                     class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                     autocomplete="off"/>
+                        <InputError class="mt-2" :message="form.errors.categoria"/>
+                      </div>
                     </div>
+                    <div :class="data.classOfText">
+                      <label class="text-md text-gray-900 capitalize">unidad de medida</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Describir la forma de cuantificar el recurso
+                        solicitado</p>
+                      <div v-if="data.Otras_unidad_de_medida[conteoi] === false"
+                           class="w-full inline-flex">
+                        <SelectInput v-model="form.unidad_de_medida[conteoi]"
+                                     :dataSet="props.losSelect.unidad_de_medida"
+                                     class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                     autocomplete="off"/>
+
+                        <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
+                      </div>
+                      <div v-else class="w-full inline-flex">
+                        <input v-model="form.unidad_de_medida[conteoi]" type="text"
+                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                               autocomplete="off"/>
+                        <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
+                      </div>
+                    </div>
+                    <div :class="data.classOfText">
+                      <label class="text-md text-gray-900 capitalize">cantidad</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Describir la forma de cuantificar el recurso
+                        solicitado</p>
+                      <div class="w-full inline-flex">
+                        <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                        <input v-model="form.cantidad[conteoi]"
+                               type="number"
+                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                               autocomplete="off"/>
+                        <InputError class="mt-2" :message="form.errors.cantidad"/>
+                      </div>
+                    </div>
+                    <div class="min-w-[360px] max-h-[110px] p-4">
+                      <label class="text-md text-gray-900 capitalize">valor unitario</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Cual es el valor estimado de cada unidad de medida
+                        En caso de ser en dólares, usar el valor proyectado de la TRM según la fecha estimada de compra</p>
+                      <div class="w-full inline-flex">
+                        <input v-model="form.valor_unitario[conteoi]"
+                               @input="handledinero(conteoi)"
+                               type="text"
+                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                               autocomplete="off"
+                        />
+                        <InputError class="mt-2" :message="form.errors.valor_unitario"/>
+                      </div>
+                    </div>
+                    <div class="min-w-[360px] max-h-[110px] p-4">
+                      <label class="text-md text-gray-900 capitalize">valor total</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Cantidad X Valor unitario</p>
+                      <label class="text-xs text-gray-400"> (solicitado por necesidad)</label>
+                      <div class="w-full inline-flex">
+                        <input disabled
+                               v-model="data.valor_total_solicitatdo_por_necesidad[conteoi]"
+                               class="w-full bg-zinc-400 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                               autocomplete="off"/>
+                      </div>
+                    </div>
+
+                    <div :class="data.classOfText2">
+                      <label class="text-md text-gray-900 capitalize">período de inicio de ejecución</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">En que trimestre iniciará la ejecución de los
+                        recursos solicitados </p>
+                      <div class="w-full inline-flex">
+                        <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                        <SelectInput
+                            :dataSet="props.losSelect.periodo_de_inicio_de_ejecucion"
+                            v-model="form.periodo_de_inicio_de_ejecucion[conteoi]"
+                            type="text"
+                            class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                            autocomplete="off"/>
+                        <InputError class="mt-2"
+                                    :message="form.errors.periodo_de_inicio_de_ejecucion"/>
+                      </div>
+                    </div>
+                    <div :class="data.classOfText">
+                      <label class="text-md text-gray-900 capitalize">vigencias anteriores</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Especifique el valor en pesos asignado en 2024 para esta misma
+                        necesidad </p>
+                      <div class="w-full inline-flex">
+                        <SelectInput :dataSet="data.vigencias_anteriores"
+                                     v-model="form.vigencias_anteriores[conteoi]"
+                                     type="text"
+                                     class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                        />
+                        <InputError class="mt-2"
+                                    :message="form.errors.vigencias_anteriores"/>
+                      </div>
+                    </div>
+                    <div :class="data.classOfText2">
+                      <label class="text-md text-gray-400">Valor asignado en la vigencia anterior</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Especifique el valor en pesos asignado en 2024 para
+                        esta misma necesidad </p>
+                      <div class="w-full inline-flex">
+                        <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                        <input
+                            v-model="form.valor_asignado_en_la_vigencia_anterior[conteoi]"
+                            type="number" min="0"
+                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                            :disabled="data.desabilitar_vigencias_anteriores[conteoi]"/>
+                        <InputError class="mt-2"
+                                    :message="form.errors.valor_asignado_en_la_vigencia_anterior"/>
+                      </div>
+                    </div>
+
+                    <!--                                        selectmultipledos1-->
+                    <div :class="data.classOfText_checkbox">
+                      <label for="multi-select" class="mb-4 text-lg text-gray-400 ">Procesos involucrados</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Para esta inversión se requiere apoyo, información, asesoría, recursos o
+                        aprobaciones de las siguientes áreas: </p>
+                      <div v-for="(option,inde) in data.proceso_que_solicita_presupuesto"
+                           :key="inde" class="mt-3">
+                        <input type="checkbox" :id="option.value+'_a'+conteoi"
+                               :value="option.value"
+                               @change="toggleSelection1(option.value,conteoi)"
+                               :checked="isSelected1(option.value)"
+                               class="p-1 w-7 h-7 ring-1 ring-zinc-400"
+                        />
+                        <label :for="option.value" class="mx-2">{{ option.label }}</label>
+                      </div>
+                      <InputError class="mt-2" :message="form.errors.procesos_involucrados"/>
+                    </div>
+                    <div :class="data.classOfText_checkbox">
+                      <label for="multi-select" class="mb-4 text-lg text-gray-400">Procesos seleccionados</label>
+                      <p v-if="form.procesos_involucrados[conteoi]"
+                         v-for="itemsito in form.procesos_involucrados[conteoi]"
+                         class="font-bold mt-1">
+                        - {{ data.proceso_que_solicita_presupuesto.find((item) => item.value === itemsito)?.label }}
+                      </p>
+                    </div>
+
+
+                    <!--                                            selectmultipledos2-->
+                    <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
+                      <label class="text-md text-gray-400">Plan de mejoramiento al que apunta la necesidad</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione el Plan de Mejoramiento al cual se articula </p>
+                      <div v-for="option in data.planmejoramientonecesidad"
+                           :key="option.value" class="mt-3">
+                        <input type="checkbox" :id="option.value+'_b'+conteoi"
+                               :value="option.value"
+                               @change="toggleSelection2(option.value,conteoi)"
+                               :checked="isSelected2(option.value,conteoi)"
+                               class="p-1 w-7 h-7 ring-1 ring-zinc-400"
+                        />
+                        <label :for="option.value+'_'+conteoi" class="mx-1">{{ option.label }}</label>
+                      </div>
+                      <InputError class="mt-2" :message="form.errors.plan_de_mejoramiento_al_que_apunta_la_necesidad"/>
+                    </div>
+                    <div class="min-w-[250px] max-h-[250px] p-4 border-x-2 border-zinc-400">
+                      <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Planes seleccionados</label>
+                      <p v-if="form.plan_de_mejoramiento_al_que_apunta_la_necesidad"
+                         v-for="itemsito2 in form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi]"
+                         class="font-bold mt-1">
+                        - {{ data.planmejoramientonecesidad.find((item) => item.value === itemsito2)?.label }}</p>
+                    </div>
+                    <!--                                            selectmultipledos3-->
+                    <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
+                      <label class="text-md text-gray-400">Líneas del plan desarrollo al que apunta la necesidad</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Seleccione las líneas </p>
+                      <div v-for="option in data.lineadelplan"
+                           :key="option.value" class="mt-3">
+                        <input type="checkbox" :id="option.value+'_c'+conteoi"
+                               :value="option.value"
+                               @change="toggleSelection3(option.value,conteoi)"
+                               :checked="isSelected3(option.value)"
+                               class="p-1 w-7 h-7 ring-1 ring-zinc-400"
+                        />
+                        <label :for="option.value" class="mx-1">{{ option.label }}</label>
+                      </div>
+                      <InputError class="mt-2"
+                                  :message="form.errors.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"/>
+                    </div>
+                    <div class="min-w-[350px] max-h-[250px] p-4 border-x-2 border-zinc-400">
+                      <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Líneas seleccionadas</label>
+                      <p v-if="form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"
+                         v-for="itemsito3 in form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi]"
+                         class="font-bold mt-1"> - {{
+                          data.lineadelplan.find((item) => item.value === itemsito3)?.label
+                        }}</p>
+
+                    </div>
+
+                    <!-- fin selectmultipledo-->
+                    <div class="min-w-[450px] max-h-[110px] p-4">
+                      <label class="text-md text-gray-900 capitalize">frecuencia de uso</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Relacionar la periodicidad de usos que se le darán a la adquisición</p>
+                      <div class="w-full inline-flex">
+                        <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                        <SelectInput :dataSet="props.losSelect.frecuencia_de_uso"
+                                     v-model="form.frecuencia_de_uso[conteoi]" type="text"
+                                     class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                     autocomplete="off"/>
+                        <InputError class="mt-2" :message="form.errors.frecuencia_de_uso"/>
+                      </div>
+                    </div>
+                    <div class="min-w-[460px] max-h-[110px] p-4">
+                      <label class="text-md text-gray-900 capitalize">mantenimientos requeridos</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500"> Relacionar la cantidad y periodicidad de los mantenimientos requeridos
+                        después de hecha la adquisición.</p>
+                      <div class="w-full inline-flex">
+                        <!--                                                    <div class="w-1/12 pt-2 bg-white"><svg fill="none" class="w-6 text-gray-400 mx-auto" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>-->
+                        <SelectInput :dataSet="props.losSelect.mantenimientos_requeridos"
+                                     v-model="form.mantenimientos_requeridos[conteoi]"
+                                     type="text"
+                                     class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                     autocomplete="off"/>
+                        <InputError class="mt-2"
+                                    :message="form.errors.mantenimientos_requeridos"/>
+                      </div>
+                    </div>
+                    <div class="min-w-[460px] max-h-[110px] p-4">
+                      <label class="text-md text-gray-900 capitalize">capacidad instalada</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">Disponibilidad actual de este bien o servicio en
+                        la Institución. Si se trata de Talento Humano, explique con qué recursos se están desarrollando actualmente las
+                        actividades </p>
+                      <div v-if="data.Otras_capacidad_instalada[conteoi] === false"
+                           class="w-full inline-flex">
+                        <SelectInput :dataSet="props.losSelect.capacidad_instalada"
+                                     v-model="form.capacidad_instalada[conteoi]" type="text"
+                                     class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                     autocomplete="off"/>
+                        <InputError class="mt-2"
+                                    :message="form.errors.capacidad_instalada"/>
+                      </div>
+                      <div v-else class="w-full inline-flex">
+                        <input v-model="form.capacidad_instalada[conteoi]" type="text"
+                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                               autocomplete="off"/>
+                        <InputError class="mt-2"
+                                    :message="form.errors.capacidad_instalada"/>
+                      </div>
+                    </div>
+                    <div class="min-w-[300px] max-h-[110px] p-4">
+                      <label class="text-md text-gray-900">Riesgo de la inversión</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500">
+                        Valore el riesgo de que la necesidad no sea totalmente solucionada 1: Bajo riesgo 5: Alto riesgo</p>
+                      <div class="w-full inline-flex">
+                        <SelectInput :dataSet="props.losSelect.riesgo_de_la_inversion"
+                                     v-model="form.riesgo_de_la_inversion[conteoi]"
+                                     type="text"
+                                     class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                     autocomplete="off"/>
+                        <InputError class="mt-2"
+                                    :message="form.errors.riesgo_de_la_inversion"/>
+                      </div>
+                    </div>
+                    <div class="min-w-[500px] max-h-[110px] p-4">
+                      <label class="text-md text-gray-900 capitalize">anexos</label>
+                      <p v-if="conteoi === 0" class="text-md text-gray-500 my-2">
+                        Relacionar los anexos que hacen parte del ítem de la inversión, compra o reposición, donde se enuncien
+                        las especificaciones técnicas.
+                        Si la solicitud es una reposición, adjuntar el informe técnico con código de inventario para asegurar
+                        la baja posterior por parte del solicitante. Formatos Permitidos: Word, Excel, PDF
+                      </p>
+                      <div class="w-full flex">
+                        <!--                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"-->
+                        <input id="anexos" type="file"
+                               @input="form.anexos[conteoi] = $event.target.files[0]"
+                               @change="GuardarArchivo" accept="application/pdf"
+                               class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                               autocomplete="off"/>
+                        <p v-if="form.anexos[conteoi]"
+                           class="w-full my-2 mx-6 text-green-700 underline">
+                          {{ form.anexos[conteoi].name }}
+                        </p>
+                        <p v-if="data.showanexos[conteoi]"
+                           class="w-full my-2 mx-6 text-green-700 underline">
+                          {{ data.showanexos[conteoi] }}
+                        </p>
+                      </div>
+                      <!--                                                <progress v-if="form.progress" :value="form.progress.percentage" max="100"-->
+                      <!--                                                          class="bg-sky-200">-->
+                      <!--                                                    {{ form.progress.percentage }}%-->
+                      <!--                                                </progress>-->
+                    </div>
+                    <InputError class="mt-2" :message="form.errors.anexos"/>
+                  </div>
                 </div>
-            </section>
-        </div>
+                <!--   elfin-->
+
+                <!-- total-->
+              </div>
+          </div>
+
+
+          <section v-if="data.showContent">
+            <div class="px-1 flex py-2 text-gray-500 items-center text-center bg-transparent p-0">
+              <div class="mx-auto relative overflow-x-auto shadow-md rounded-2xl">
+                <table class="w-full text-xl text-center rtl:text-right sm:rounded-lg text-gray-500 dark:text-gray-400">
+                  <thead class="text-lg text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
+                  <tr>
+                    <th scope="col" class="p-6">#</th>
+                    <th scope="col" class="col-span-2 p-6">Necesidad</th>
+                    <th scope="col" class="p-6">Categoria</th>
+                    <th scope="col" class="p-6">Unidad de medida</th>
+                    <th scope="col" class="p-6">Cantidad</th>
+                    <th scope="col" class="p-6">Valor unitario</th>
+                    <th scope="col" class="p-6">Subtotal</th>
+                  </tr>
+                  </thead>
+                  <tbody class="items-center">
+                    <tr v-for="(element, indexNecesidad) in form.necesidad"
+                        class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                          <td v-if="element !== 'Elemento_Borrado'" class="w-8 text-center py-2 -px-2">{{ indexNecesidad + 1 }}</td>
+                          <td v-if="element !== 'Elemento_Borrado' && element && element.length > 100" class="w-full text-center py-2 col-span-2">
+                            {{ element.slice(0, 100) }} ...
+                          </td>
+                          <td v-else-if="element !== 'Elemento_Borrado'" class="w-full text-center py-2 col-span-2">{{ element }}</td>
+                          
+                        <td v-if="element !== 'Elemento_Borrado' && !isNaN(form.categoria[indexNecesidad])" class="w-full text-center py-2">
+                          {{ data.categoria.find((item) => item.value == form.categoria[indexNecesidad])?.label }}
+                        </td>
+                          <td v-else-if="element !== 'Elemento_Borrado'" class="w-full text-center py-2">{{ (form.categoria[indexNecesidad]) }}</td>
+    
+                          <td v-if="element !== 'Elemento_Borrado'" class="w-full text-center py-2">{{ (form.unidad_de_medida[indexNecesidad]) }}</td>
+                          <td v-if="element !== 'Elemento_Borrado'" class="w-full text-center py-2">{{ (form.cantidad[indexNecesidad]) }}</td>
+                          <td v-if="element !== 'Elemento_Borrado'" class="w-full text-center py-2">{{ form.valor_unitario[indexNecesidad] }}</td>
+                          <td v-if="element !== 'Elemento_Borrado'" class="w-full text-center py-2">{{ number_format(form.valor_total_solicitatdo_por_necesidad[indexNecesidad], 0, 1) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="w-full text-center md:pl-9 max-w-sm mx-auto my-5 pl-2">
+              <div class="w-full text-center mx-auto">
+                <label class="text-xl text-center"> Total final:<small class="px-3 font-bold text-2xl">{{ number_format(data.total_todo, 0, 1) }}</small> </label>
+              </div>
+            </div>
+            <hr/>
+          </section>
+          <!-- botones de guardado    -->
+          <div v-if="data.showContent"
+               class="md:inline-flex w-full my-2 md:space-y-0 p-8 text-gray-500 items-center">
+            <div v-if="Object.keys(form.errors).length">
+              <p class="text-xl text-red-800">Por favor, Corrija los siguientes errores</p>
+              <ul>
+                <li v-for="(error, field) in form.errors" :key="field"
+                    class="text-lg text-red-800">
+                  {{
+                    error.replace(/_/g, " ").replace(/justificacion\.(\d+)/, (match, p1) => {
+                      let nuevoNumero = parseInt(p1, 10) + 1;
+                      return `justificacion.${nuevoNumero}`;
+                    })
+                  }}
+                </li>
+              </ul>
+            </div>
+            <div class="grid grid-cols-2 gap-8 mx-auto text-center md:pl-6">
+              <PrimaryButton
+                  class="text-white w-full mx-auto max-w-sm rounded-md text-center bg-indigo-400 py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
+                  :class="{ 'opacity-25': form.processing }"
+                  :disabled="form.processing"
+                  @click="guardar()"
+              >
+                Guardar sin enviar
+              </PrimaryButton>
+              <PrimaryButton
+                  class="text-white w-full mx-auto max-w-sm rounded-md text-center 
+                                         py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
+                  :class="{ 'opacity-25': form.processing }"
+                  :disabled="form.processing"
+                  @click="create(true,true)"
+              >
+                <svg fill="none" class="w-4 text-white mr-2" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Enviar Definitivamente
+              </PrimaryButton>
+            </div>
+          </div>
+      </section>
     </div>
+    </form>
+
+
+    <div class="sm:flex justify-between mt-4 text-md text-gray-500">
+      <div v-if="data.mensajeYaHaSidoGuardado === ''" class="flex mx-4 sm:mx-0 flex-row justify-center text-center">
+        <p class="text-lg text-black dark:text-white">{{ $page.props.app.name }} ©️</p>
+      </div>
+      <div v-else class="flex text-[#499884] font-medium text-lg mx-4 sm:mx-0 flex-row justify-center text-center">
+        <p>{{ data.mensajeYaHaSidoGuardado }}</p>
+      </div>
+    </div>
+    </section>
+  </div>
+  </div>
 </template>
 <style>
 ::-webkit-scrollbar {
-    height: 14px; /* Altura del scrollbar vertical */
-    width: 4px; /* Ancho del scrollbar horizontal */
-    border-radius: 2px;
+  height: 14px; /* Altura del scrollbar vertical */
+  width: 4px; /* Ancho del scrollbar horizontal */
+  border-radius: 2px;
 }
+
 /* Estilo del thumb del scrollbar */
 ::-webkit-scrollbar-thumb {
-    background-color: #00004f; /* Color del thumb */
-    border-radius: 1px; /* Radio de borde del thumb */
+  background-color: #00004f; /* Color del thumb */
+  border-radius: 1px; /* Radio de borde del thumb */
 }
+
 </style>

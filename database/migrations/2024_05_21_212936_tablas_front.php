@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('lineadelplan', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
         Schema::create('proceso_que_solicita_presupuesto', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
         Schema::create('actividades', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
-        Schema::create('categoria', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
+        Schema::create('categorias', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
         Schema::create('vigencias_anteriores', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
     }
 
@@ -24,12 +24,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        
-        Schema::dropIfExists('planmejoramientonecesidad');
-        Schema::dropIfExists('lineadelplan');
-        Schema::dropIfExists('proceso_que_solicita_presupuesto');
         Schema::dropIfExists('actividades');
-        Schema::dropIfExists('categoria');
+        Schema::dropIfExists('categorias');
+        Schema::dropIfExists('lineadelplan');
+        Schema::dropIfExists('planmejoramientonecesidad');
+        Schema::dropIfExists('proceso_que_solicita_presupuesto');
         Schema::dropIfExists('vigencias_anteriores');
     }
 };

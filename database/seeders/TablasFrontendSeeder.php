@@ -15,11 +15,11 @@ class TablasFrontendSeeder extends Seeder
     public function run()
     {
         
-        //        planmejoramientonecesidad
+        //planmejoramientonecesidad
         //lineadelplan
         //proceso_que_solicita_presupuesto
         //actividades no pofavo
-        //categoria
+        //categorias
         //vigencias_anteriores
         DB::table('planmejoramientonecesidad')->insert(['value' => 1, 'label' => 'PM Institucional']);
         DB::table('planmejoramientonecesidad')->insert(['value' => 2, 'label' => 'PM Programas']);
@@ -189,52 +189,52 @@ class TablasFrontendSeeder extends Seeder
 
         }
 //selects
-        DB::table('categoria')->insert(['label' => "AREA PROTEGIDA", 'value' => 1]);
-        DB::table('categoria')->insert(['label' => "ARL", 'value' => 2]);
-        DB::table('categoria')->insert(['label' => "BASES DE DATOS", 'value' => 3]);
-        DB::table('categoria')->insert(['label' => "CALIBRACIONES", 'value' => 4]);
-        DB::table('categoria')->insert(['label' => "CAJA MENOR", 'value' => 5]);
-        DB::table('categoria')->insert(['label' => "CONTRATISTA", 'value' => 6]);
-        DB::table('categoria')->insert(['label' => "CUOTA DE FISCALIZACION", 'value' => 7]);
-        DB::table('categoria')->insert(['label' => "EDICTOS", 'value' => 8]);
-        DB::table('categoria')->insert(['label' => "EQUIPOS E INTRUMENTOS", 'value' => 9]);
-        DB::table('categoria')->insert(['label' => "ESTIMULOS DOCENTES", 'value' => 10]);
-        DB::table('categoria')->insert(['label' => "EVENTOS", 'value' => 11]);
-        DB::table('categoria')->insert(['label' => "EXEMENES MEDICOS", 'value' => 12]);
-        DB::table('categoria')->insert(['label' => "GASTOS DE VIAJE-ALIMENTACION", 'value' => 13]);
-        DB::table('categoria')->insert(['label' => "GASTOS DE VIAJE-HOSPEDAJE", 'value' => 14]);
-        DB::table('categoria')->insert(['label' => "GASTOS DE VIAJE-TRASNPORTE", 'value' => 15]);
-        DB::table('categoria')->insert(['label' => "GASTOS LEGALES", 'value' => 16]);
-        DB::table('categoria')->insert(['label' => "GMF", 'value' => 17]);
-        DB::table('categoria')->insert(['label' => "INSCRIPCIONES,AFILIACIONES Y RENOVACIONES", 'value' => 18]);
-        DB::table('categoria')->insert(['label' => "INSUMOS", 'value' => 19]);
-        DB::table('categoria')->insert(['label' => "INSTALACIONES Y REPARACIONES", 'value' => 20]);
-        DB::table('categoria')->insert(['label' => "LICENCIAS Y MEMBRESIAS", 'value' => 21]);
-        DB::table('categoria')->insert(['label' => "MANTENIMIENTO", 'value' => 22]);
-        DB::table('categoria')->insert(['label' => "MOBILIARIO", 'value' => 23]);
-        DB::table('categoria')->insert(['label' => "MOVILIDAD ACADEMICA", 'value' => 24]);
-        DB::table('categoria')->insert(['label' => "PATENTES", 'value' => 25]);
-        DB::table('categoria')->insert(['label' => "PLAN DE CAPACITACION", 'value' => 26]);
-        DB::table('categoria')->insert(['label' => "PLAN DE COMUNICACIÓN Y MERCADO Y PLAN DE MEDIOS", 'value' => 2]);
-        DB::table('categoria')->insert(['label' => "PLATAFORMA DE ENVÍO MASIVO DE CORREOS, SMS, IVR Y RECOLECCIÓN DE LEADS E INTERESADOS", 'value' => 2]);
-        DB::table('categoria')->insert(['label' => "PRACTICANTE", 'value' => 29]);
-        DB::table('categoria')->insert(['label' => "PUBLICACIONES Y PROCESOS EDITORIALES", 'value' => 30]);
-        DB::table('categoria')->insert(['label' => "REGIONALIZACION-ALIMENTACION", 'value' => 31]);
-        DB::table('categoria')->insert(['label' => "REGIONALIZACION-HOSPEDAJE", 'value' => 32]);
-        DB::table('categoria')->insert(['label' => "REGIONALIZACION-TRANSPORTE", 'value' => 33]);
-        DB::table('categoria')->insert(['label' => "SEGUROS Y POLIZAS", 'value' => 34]);
-        DB::table('categoria')->insert(['label' => "SEGURIDAD ALIMENTARIA", 'value' => 35]);
-        DB::table('categoria')->insert(['label' => "SERVICIO DE IMPRESORAS Y DE FOTOCOPIAS", 'value' => 36]);
-        DB::table('categoria')->insert(['label' => "SERVICIO DE MENSAJERIA", 'value' => 37]);
-        DB::table('categoria')->insert(['label' => "SERVICIOS DE AUDITORIA Y ACREDITACION", 'value' => 38]);
-        DB::table('categoria')->insert(['label' => "SERVICIOS PUBLICOS", 'value' => 39]);
-        DB::table('categoria')->insert(['label' => "SOFTWARE", 'value' => 40]);
-        DB::table('categoria')->insert(['label' => "SOPORTE", 'value' => 41]);
-        DB::table('categoria')->insert(['label' => "SOUVENIRS", 'value' => 42]);
-        DB::table('categoria')->insert(['label' => "SUBVENCION", 'value' => 43]);
-        DB::table('categoria')->insert(['label' => "SUMINISTRO DE COMIDAD Y REFRIGERIOS", 'value' => 44]);
-        DB::table('categoria')->insert(['label' => "TELEFONIACELULAR E INTERNET", 'value' => 45]);
-        DB::table('categoria')->insert(['label' => "VIATICOS", 'value' => 46]);
+        DB::table('categorias')->insert(['label' => "AREA PROTEGIDA", 'value' => 1]);
+        DB::table('categorias')->insert(['label' => "ARL", 'value' => 2]);
+        DB::table('categorias')->insert(['label' => "BASES DE DATOS", 'value' => 3]);
+        DB::table('categorias')->insert(['label' => "CALIBRACIONES", 'value' => 4]);
+        DB::table('categorias')->insert(['label' => "CAJA MENOR", 'value' => 5]);
+        DB::table('categorias')->insert(['label' => "CONTRATISTA", 'value' => 6]);
+        DB::table('categorias')->insert(['label' => "CUOTA DE FISCALIZACION", 'value' => 7]);
+        DB::table('categorias')->insert(['label' => "EDICTOS", 'value' => 8]);
+        DB::table('categorias')->insert(['label' => "EQUIPOS E INTRUMENTOS", 'value' => 9]);
+        DB::table('categorias')->insert(['label' => "ESTIMULOS DOCENTES", 'value' => 10]);
+        DB::table('categorias')->insert(['label' => "EVENTOS", 'value' => 11]);
+        DB::table('categorias')->insert(['label' => "EXEMENES MEDICOS", 'value' => 12]);
+        DB::table('categorias')->insert(['label' => "GASTOS DE VIAJE-ALIMENTACION", 'value' => 13]);
+        DB::table('categorias')->insert(['label' => "GASTOS DE VIAJE-HOSPEDAJE", 'value' => 14]);
+        DB::table('categorias')->insert(['label' => "GASTOS DE VIAJE-TRASNPORTE", 'value' => 15]);
+        DB::table('categorias')->insert(['label' => "GASTOS LEGALES", 'value' => 16]);
+        DB::table('categorias')->insert(['label' => "GMF", 'value' => 17]);
+        DB::table('categorias')->insert(['label' => "INSCRIPCIONES,AFILIACIONES Y RENOVACIONES", 'value' => 18]);
+        DB::table('categorias')->insert(['label' => "INSUMOS", 'value' => 19]);
+        DB::table('categorias')->insert(['label' => "INSTALACIONES Y REPARACIONES", 'value' => 20]);
+        DB::table('categorias')->insert(['label' => "LICENCIAS Y MEMBRESIAS", 'value' => 21]);
+        DB::table('categorias')->insert(['label' => "MANTENIMIENTO", 'value' => 22]);
+        DB::table('categorias')->insert(['label' => "MOBILIARIO", 'value' => 23]);
+        DB::table('categorias')->insert(['label' => "MOVILIDAD ACADEMICA", 'value' => 24]);
+        DB::table('categorias')->insert(['label' => "PATENTES", 'value' => 25]);
+        DB::table('categorias')->insert(['label' => "PLAN DE CAPACITACION", 'value' => 26]);
+        DB::table('categorias')->insert(['label' => "PLAN DE COMUNICACIÓN Y MERCADO Y PLAN DE MEDIOS", 'value' => 27]);
+        DB::table('categorias')->insert(['label' => "PLATAFORMA DE ENVÍO MASIVO DE CORREOS, SMS, IVR Y RECOLECCIÓN DE LEADS E INTERESADOS", 'value' => 28]);
+        DB::table('categorias')->insert(['label' => "PRACTICANTE", 'value' => 29]);
+        DB::table('categorias')->insert(['label' => "PUBLICACIONES Y PROCESOS EDITORIALES", 'value' => 30]);
+        DB::table('categorias')->insert(['label' => "REGIONALIZACION-ALIMENTACION", 'value' => 31]);
+        DB::table('categorias')->insert(['label' => "REGIONALIZACION-HOSPEDAJE", 'value' => 32]);
+        DB::table('categorias')->insert(['label' => "REGIONALIZACION-TRANSPORTE", 'value' => 33]);
+        DB::table('categorias')->insert(['label' => "SEGUROS Y POLIZAS", 'value' => 34]);
+        DB::table('categorias')->insert(['label' => "SEGURIDAD ALIMENTARIA", 'value' => 35]);
+        DB::table('categorias')->insert(['label' => "SERVICIO DE IMPRESORAS Y DE FOTOCOPIAS", 'value' => 36]);
+        DB::table('categorias')->insert(['label' => "SERVICIO DE MENSAJERIA", 'value' => 37]);
+        DB::table('categorias')->insert(['label' => "SERVICIOS DE AUDITORIA Y ACREDITACION", 'value' => 38]);
+        DB::table('categorias')->insert(['label' => "SERVICIOS PUBLICOS", 'value' => 39]);
+        DB::table('categorias')->insert(['label' => "SOFTWARE", 'value' => 40]);
+        DB::table('categorias')->insert(['label' => "SOPORTE", 'value' => 41]);
+        DB::table('categorias')->insert(['label' => "SOUVENIRS", 'value' => 42]);
+        DB::table('categorias')->insert(['label' => "SUBVENCION", 'value' => 43]);
+        DB::table('categorias')->insert(['label' => "SUMINISTRO DE COMIDAD Y REFRIGERIOS", 'value' => 44]);
+        DB::table('categorias')->insert(['label' => "TELEFONIACELULAR E INTERNET", 'value' => 45]);
+        DB::table('categorias')->insert(['label' => "VIATICOS", 'value' => 46]);
 
 
         DB::table('vigencias_anteriores')->insert(['label' => "Si", 'value' => "Si"]);
@@ -245,4 +245,10 @@ class TablasFrontendSeeder extends Seeder
 php artisan migrate --path=/database/migrations/nombre_de_la_migracion.php
 php artisan db:seed --class=TablasFrontendSeeder
 
+php artisan make:model planmejoramientonecesidad 
+php artisan make:model lineadelplan 
+php artisan make:model proceso_que_solicita_presupuesto 
+php artisan make:model actividades 
+php artisan make:model categorias 
+php artisan make:model vigencias_anteriores 
 */
