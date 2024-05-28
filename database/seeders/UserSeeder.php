@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         $superadmin = User::create([
             'name'              => 'Superadmin',
             'email'             => 'ajelof2+8@gmail.com',
-            'password'          => bcrypt($genPa.'~~'.$genPa),
+            'password'          => bcrypt($genPa.'~8~'),
             'email_verified_at' => date('Y-m-d H:i'),
             'sexo' => $genero,
             'identificacion' => '11232454',
@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
         $admin = User::create([
             'name'              => "$nombreAdmin $App",
             'email'             => "alejofg2+8@gmail.com",
-            'password'          => bcrypt($genPa.'uiu'.$genPa),
+            'password'          => bcrypt($genPa.'uiu'),
             'email_verified_at' => date('Y-m-d H:i'),
             'sexo' => $genero,
             'identificacion' => '11232411',
@@ -55,12 +55,12 @@ class UserSeeder extends Seeder
 
         // $genero = 'Femenino';
         foreach ($nombresGenericos as $key => $value) {
-            $yearRandom = (random_int(15, 39));
+            $yearRandom = (random_int(20, 40));
             $anios = Carbon::now()->subYears($yearRandom)->format('Y-m-d H:i');
             $unUsuario = User::create([
                 'name'              => $key,
                 'email'             => $key . '@' . $key . '.com',
-                'password'          => bcrypt($genPa.'123+'),//
+                'password'          => bcrypt($genPa.'123'),//
                 'email_verified_at' => date('Y-m-d H:i'),
                 'identificacion' => $value,
                 'celular' => '123456',

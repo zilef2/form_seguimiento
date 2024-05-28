@@ -1181,13 +1181,13 @@ const create = (validator, second) => {
                       </div>
                       <div class="min-w-[350px] max-h-[250px] p-4 border-x-2 border-zinc-400">
                         <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Líneas seleccionadas</label>
-                        <p v-if="form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"
+                        <div v-if="form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"
                            v-for="itemsito3 in form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi]"
                            class="font-bold mt-1"> 
-                          <small v-if="data.lineadelplan.find((item) => item.value === itemsito3)">
+                          <p v-if="data.lineadelplan.find((item) => item.value === itemsito3)" class="text-md">
                             - {{ data.lineadelplan.find((item) => item.value === itemsito3)?.label }}
-                          </small>
-                        </p>
+                          </p>
+                        </div>
 
                       </div>
 
