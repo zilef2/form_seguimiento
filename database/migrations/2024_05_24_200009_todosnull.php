@@ -34,7 +34,7 @@ php artisan migrate --path=/database/migrations/2024_05_24_200009_todosnull.php
             $table->string('capacidad_instalada')->nullable()->change();//sel unica
             $table->string('riesgo_de_la_inversion')->nullable()->change(); //sel unica
         });
-        $this->info('La migración todosnull se ha completado.');
+//        $this->info('La migración todosnull se ha completado.');
 
     }
 

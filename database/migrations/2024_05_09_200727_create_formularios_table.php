@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('valor_total_de_la_solicitud_actual', 10, 2);
             $table->decimal('valor_total_asignado_en_vigencia_anterior', 10, 2);
 
-            $table->string('proceso_que_solicita_presupuesto');//1. sel unica
+            $table->string('proceso_que_solicita_presupuesto')->nullable();//1. sel unica
             $table->text('necesidad');//2
             $table->text('justificacion');
             $table->string('actividad');// sel unica
@@ -47,7 +47,6 @@ return new class extends Migration
                 ->on('users')
                 ->onDelete('restrict'); //cascade | set null
             $table->timestamps();
-
         });
     }
 

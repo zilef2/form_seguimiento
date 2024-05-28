@@ -21,10 +21,9 @@ class selectsSeeder extends Seeder
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Unidades', 'tipo' => 'unidad_de_medida',]);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Otras', 'tipo' => 'unidad_de_medida',]);
 
-
-        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Enero a marzo 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
-        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Abril a junio 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
-        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Julio a septiembre 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
+        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Enero a abril 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
+        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Mayo a agosto 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
+        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Septiembre a diciembre 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
 //        DB::table('selecsForm')->$this->insertOrIgnore([ 'nombre'=>'Septiembre a octubre', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
 
 
@@ -34,7 +33,7 @@ class selectsSeeder extends Seeder
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez al mes', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Varias veces al mes', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez por semestre', 'tipo' => 'frecuencia_de_uso']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Varias veces al semestre', 'tipo' => 'frecuencia_de_uso']);
+//        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Varias veces al semestre', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Eventos específicos del año', 'tipo' => 'frecuencia_de_uso']);
 
 
@@ -51,11 +50,11 @@ class selectsSeeder extends Seeder
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'No', 'tipo' => 'capacidad_instalada']);
 
 
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'1', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'2', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'3', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'4', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'5', 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'1 La adquisición soluciona el 100% de la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'2 Soluciona la mayor parte de la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'3 Soluciona medianamente la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'4 Soluciona una parte de la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'5 Es muy probable que la necesidad no sea solucionada a pesar de la adquisición', 'tipo' => 'riesgo_de_la_inversion']);
 
     }
 }

@@ -184,7 +184,6 @@ class FormularioController extends Controller
             $user = User::Where('identificacion', $request->identificacion_user)->first();
             $nuevo = 0;
             $formulario = Formulario::Where('user_id', $user->id)->get();
-
             if ($formulario->count() > 0) {
                 foreach ($request['necesidad'] as $index => $item) {
                     if (isset($formulario[$index])) {
@@ -214,88 +213,122 @@ class FormularioController extends Controller
     
     public function store(Request $request){ //guardar
         try {
-            Myhelp::EscribirEnLog($this, ' Begin Guardar:formularios');
+            Myhelp::EscribirEnLog($this, ' Begin store(Guardar):formularios');
             DB::beginTransaction();
             $user = User::Where('identificacion', $request->identificacion_user)->first();
-            $nuevo = 0;
+            $numeroTotal = count($request['necesidad']);
             $formulario = Formulario::Where('user_id', $user->id)->get();
             
-            if ($formulario->count() > 0) {
+            if ($formulario){
                 foreach ($request['necesidad'] as $index => $item) {
-                    if (isset($formulario[$index])) {
-                        $arrayForm = $this->arrayFormulario($request, $index, $user);
-                        $formulario[$index]->update($arrayForm);
-                    }else{
-                        $arrayForm = $this->arrayFormulario($request, $index, $user);
-                        Formulario::create($arrayForm);
-                        $nuevo++;
+                    if (isset($request['justificacion'][$index]) && $request['justificacion'][$index] == 'Elemento_Borrado') {
+                        $numeroTotal--;
+                        $formBorrar = Formulario::Where('user_id', $user->id)
+                            ->Where('necesidad', $item)->get();//TODO: buscar por necesidad (unica)
+                        if($formBorrar && $formBorrar->first()){
+                            $formBorrar->first()->delete();
+                        }
+                    }else{ //no es un elemento borrado
+                        
+                        if (isset($formulario[$index])) {
+                            $arrayForm = $this->arrayFormulario($request, $index, $user);
+                            if($arrayForm){
+                                $formulario[$index]->update($arrayForm);
+                                //updateOrCreate
+                            }
+                        }else{
+                            $arrayForm = $this->arrayFormulario($request, $index, $user);
+                            if($arrayForm){
+                                Formulario::create($arrayForm);
+                            }
+                        }
                     }
                 }
             } else {
                 foreach ($request['necesidad'] as $index => $item) {
-                    $arrayForm = $this->arrayFormulario($request, $index, $user);
-                    Formulario::create($arrayForm);
-                    $nuevo++;
+                    if ($request['justificacion'][$index] === 'Elemento_Borrado') {
+                        $numeroTotal--;
+                    }else{
+                        $arrayForm = $this->arrayFormulario($request, $index, $user);
+                        if($arrayForm){
+                            Formulario::create($arrayForm);
+                        }
+                    }
                 }
             }
             DB::commit();
-            return back()->with('success', __('app.label.formulario_created_successfully', ['number' => $formulario->count() + $nuevo]));
+//            dd(
+//                $request['necesidad'],
+//                $numeroTotal,
+//            );
+            return back()->with('success', __('app.label.formulario_created_successfully', ['number' => $numeroTotal]));
         } catch (\Throwable $th) {
             DB::rollback();
-            $mensajeErrorCompleto = $th->getMessage() . ' L:' . ' Ubi: ' . $th->getFile() . $th->getLine();
-            return back()->with('error', __('app.label.created_error', ['name' => 'Razón: ']) . $mensajeErrorCompleto);
+            $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine(). ' | Ubi: ' . $th->getFile();
+            return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         }
     }
 
     private function arrayFormulario($request,$index,$user){
-        if(isset($request['procesos_involucrados'][$index])){
-            $procesosInvol = implode(',', $request['procesos_involucrados'][$index]);
-        } else $procesosInvol = null;
-        
-        if(isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])){
-            $planmejor = implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]);
-        } else $planmejor = null;
-        
-        if(isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])){
-            $lineadelplan = implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]);
-        } else $lineadelplan = null;
 
-        $anexou = '';
-        if(isset($request['anexos']))
-            $anexou = $request['anexos'][$index] ?? '';
+        if($request['justificacion'][$index] !== 'Elemento_Borrado'){
 
-        $categori = $request['categoria'][$index] ?? '';
-        return [
-            'numero_necesidad' => $index,
-            'identificacion_user' => $request['identificacion_user'],
-            'proceso_que_solicita_presupuesto' => $request['proceso_que_solicita_presupuesto'],
-            'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'] ?? '',
-            'valor_total_asignado_en_vigencia_anterior' => 0,
+            if(isset($request['procesos_involucrados'][$index])){
+                $procesosInvol = implode(',', $request['procesos_involucrados'][$index]);
+            } else $procesosInvol = null;
+            
+            if(isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])){
+                $planmejor = implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]);
+            } else $planmejor = null;
+            
+            if(isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])){
+                $lineadelplan = implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]);
+            } else $lineadelplan = null;
+    
+            $anexou = '';
+            if(isset($request['anexos']))
+                $anexou = $request['anexos'][$index] ?? '';
+    
+            $categori = $request['categoria'][$index] ?? '';
 
-            'necesidad' => $request['necesidad'][$index] ?? '',
-            'justificacion' => $request['justificacion'][$index] ?? '',
-            'actividad' => $request['actividad'][$index] ?? '',
-            'categoria' => $categori,
-            'unidad_de_medida' => $request['unidad_de_medida'][$index] ?? '',
-            'cantidad' => $request['cantidad'][$index] ?? '',
-            'valor_unitario' => str_replace(['.','$'],'',$request['valor_unitario'][$index]) ?? '',
-            'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index] ?? '',
-            'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index] ?? '',
-            'vigencias_anteriores' => $request['vigencias_anteriores'][$index] ?? '',
-            'valor_asignado_en_la_vigencia_anterior' => $request['valor_asignado_en_la_vigencia_anterior'][$index] ?? '',
-
-            'procesos_involucrados' => $procesosInvol,
-            'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $planmejor,
-            'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $lineadelplan,
-
-            'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index] ?? '',
-            'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index] ?? '',
-            'capacidad_instalada' => $request['capacidad_instalada'][$index] ?? '',
-            'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index] ?? '',
-            'anexos' => $this->guardarAnexo($anexou),
-            'enviado' => $request['enviado'],
-            'user_id' => $user->id,
-        ];
+            //valores de dinero
+            $valoruni = 0;
+            if(isset($request['valor_unitario'][$index])) $valoruni = str_replace(['.', '$'], '', $request['valor_unitario'][$index]);
+            $valorAsigAnterior = 0;
+            if(isset($request['valor_asignado_en_la_vigencia_anterior'][$index])) $valorAsigAnterior = str_replace(['.', '$'], '', $request['valor_asignado_en_la_vigencia_anterior'][$index]);
+            return [
+                'numero_necesidad' => $index,
+                'identificacion_user' => $request['identificacion_user'],
+                'proceso_que_solicita_presupuesto' => $request['proceso_que_solicita_presupuesto'],
+                'valor_total_de_la_solicitud_actual' => $request['valor_total_de_la_solicitud_actual'] ?? '',
+                'valor_total_asignado_en_vigencia_anterior' => 0, //TODO: hay que consultar el año pasado
+    
+                'necesidad' => $request['necesidad'][$index] ?? '',
+                'justificacion' => $request['justificacion'][$index] ?? '',
+                'actividad' => $request['actividad'][$index] ?? '',
+                'categoria' => $categori ?? '',
+                'unidad_de_medida' => $request['unidad_de_medida'][$index] ?? '',
+                'cantidad' => $request['cantidad'][$index] ?? 0,
+                'valor_unitario' => $valoruni,
+                'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index] ?? 0,
+                'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index] ?? '',
+                'vigencias_anteriores' => $request['vigencias_anteriores'][$index] ?? '',
+                'valor_asignado_en_la_vigencia_anterior' => $valorAsigAnterior,
+    
+                'procesos_involucrados' => $procesosInvol,
+                'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $planmejor,
+                'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $lineadelplan,
+    
+                'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index] ?? '',
+                'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index] ?? '',
+                'capacidad_instalada' => $request['capacidad_instalada'][$index] ?? '',
+                'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index] ?? '',
+                'anexos' => $this->guardarAnexo($anexou),
+                'enviado' => $request['enviado'],
+                'user_id' => $user->id,
+            ];
+        }
+        return null;
     }
 
     private function guardarAnexo($anexo){ //TODO: avisar que el nombre, no se guarda si no se puede obtener getClientOriginalName
