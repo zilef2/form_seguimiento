@@ -707,7 +707,6 @@ function buscarEnProps(cedulaBuscada, elprops) {
             return true;
         }
     }
-    console.log("=>(Welcome.vue:708) false", false);
     return false;
 }
 
@@ -762,8 +761,6 @@ function llamarString() {
             onSuccess: () => {
                 setTimeout(() => {
                     handleEnterCedula2()
-                    console.log("=>(Wen_user", props.cedLideres);
-                    console.log("=>(Wen_user", form.identificacion_user);
                 }, 600)
             },
             onError: (error) => {
@@ -778,9 +775,7 @@ const handleEnterCedula = () => {
 }
 const handleEnterCedula2 = () => {
     if (!data.identificacion_disbled) {
-        console.log("2 form.identificacion_user", form.identificacion_user);
         if (buscarEnProps(form.identificacion_user, props.cedLideres)) {
-            console.log("3 form.identificacion_user", form.identificacion_user);
             data.nombreLider = props.cedLideres[form.identificacion_user]
             if (data.nombreLider) {
                 onContent(); //emitir mensaje y mostrar demas del form
@@ -788,11 +783,8 @@ const handleEnterCedula2 = () => {
                 data.colorDisabled = 'bg-zinc-400 text-white dark:bg-black'
             }
         } else {
-            console.log("=>(111Welcome.vue:790) form.identificacion_user", form.identificacion_user);
-            console.log("=>(112Welcome.vue:790) props.cedLideresGuardados", props.cedLideresGuardados);
 
             if (buscarEnProps(form.identificacion_user, props.cedLideresGuardados)) {
-                console.log("4 form.identificacion_user", form.identificacion_user);
                 data.nombreLider = props.cedLideresGuardados[form.identificacion_user]
                 data.identificacion_disbled = true
                 onContent(); //emitir mensaje y mostrar demas del form
