@@ -17,24 +17,40 @@ class selectsSeeder extends Seeder
      */
     public function run(){
         //falta actividad, esta pendiente por definir
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Meses', 'tipo' => 'unidad_de_medida',]);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Unidades', 'tipo' => 'unidad_de_medida',]);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Otras', 'tipo' => 'unidad_de_medida',]);
+//        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Meses', 'tipo' => 'unidad_de_medida',]);
+//        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Unidades', 'tipo' => 'unidad_de_medida',]);
 
-        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Enero a abril 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
-        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Mayo a agosto 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
-        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Septiembre a diciembre 2025', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
+
+        //has changed
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Días', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Docenas', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Horas', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Kilogramos', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Litros', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Meses', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Metros', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Metros cuadrados', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Paquetes', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Semanas', 'tipo' => 'unidad_de_medida',]);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' => 'Unidades', 'tipo' => 'unidad_de_medida',]);
+//        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Otras', 'tipo' => 'unidad_de_medida',]);
+
+        //has changed
+        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Entre enero y abril', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
+        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Entre mayo y agosto', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
+        DB::table('selecsForm')->insertOrIgnore([ 'nombre'=>'Entre septiembre y diciembre', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
+        
 //        DB::table('selecsForm')->$this->insertOrIgnore([ 'nombre'=>'Septiembre a octubre', 'tipo' => 'periodo_de_inicio_de_ejecucion']);
 
 
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'24/7 (permanentemente)', 'tipo' => 'frecuencia_de_uso']);
+        //has changed
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'7 / 24 (permanentemente)', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Días estipulados en el contrato', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Todos los días hábiles del año', 'tipo' => 'frecuencia_de_uso']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una única vez', 'tipo' => 'frecuencia_de_uso']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez a la semana', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez al mes', 'tipo' => 'frecuencia_de_uso']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Varias veces al mes', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez por semestre', 'tipo' => 'frecuencia_de_uso']);
-//        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Varias veces al semestre', 'tipo' => 'frecuencia_de_uso']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Eventos específicos del año', 'tipo' => 'frecuencia_de_uso']);
 
 
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Diario', 'tipo' => 'mantenimientos_requeridos']);

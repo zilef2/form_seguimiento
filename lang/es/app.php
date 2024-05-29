@@ -124,7 +124,7 @@ return [
 
         'op_successfully' => 'Operacion finalizada satisfactoriamente.',
         'op_not_successfully' => 'Operacion errada. ',
-        'formulario_created_successfully' => '<b>:number</b> Necesidades registradas satisfactoriamente.',
+        'formulario_created_successfully' => '<b>:number</b> Necesidad(es) registrada(s) satisfactoriamente.',
         'created_successfully' => '<b>:name</b> creado satisfactoriamente.',
         'created_successfully2' => '<b>:nombre</b> creado satisfactoriamente.',
         'created_success' => 'operacion finalizada satisfactoriamente.',

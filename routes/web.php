@@ -41,6 +41,7 @@ Route::middleware('auth', 'verified')->group(function () {
 });
 Route::resource('/formulario', FormularioController::class)->except('create', 'show', 'edit');
 Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
+Route::get('/get-string', [FormularioController::class, 'getString'])->name('seguridad');
 
 // ultimo comit 25sept
 

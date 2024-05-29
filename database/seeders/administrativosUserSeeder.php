@@ -8,21 +8,20 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class administrativosUserSeeder extends Seeder
-{
+class administrativosUserSeeder extends Seeder{
     /**
      * Run the database seeds.
      *
      * @return void
      */
-    public function run()
-    {
+    public function run(){
         $users = [
             [
                 'name' => 'JORGE WILLIAM ARREDONDO ARANGO',
                 'identificacion' => '123',
                 'area' => 'VICERRECTOR FINANCIERO',
                 'agregado' => '',
+                'sexo' => 'Masculino',
                 'email' => 'viceadministrativa@colmayor.edu.co'
             ],
             [
@@ -30,6 +29,7 @@ class administrativosUserSeeder extends Seeder
                 'identificacion' => '124',
                 'area' => 'Sin cargo',
                 'agregado' => '',
+                'sexo' => 'Femenino',
                 'email' => 'manuela.sepulveda@colmayor.edu.co'
             ],
             [
@@ -37,6 +37,7 @@ class administrativosUserSeeder extends Seeder
                 'identificacion' => '125',
                 'area' => 'DIRECTOR PLANEACIÓN',
                 'agregado' => '',
+                'sexo' => 'Masculino',
                 'email' => 'direccion.planeacion@colmayor.edu.co'
             ],
             [
@@ -44,6 +45,7 @@ class administrativosUserSeeder extends Seeder
                 'identificacion' => '32180511',
                 'area' => 'PROFESIONAL PLANEACIÓN',
                 'agregado' => '126',
+                'sexo' => 'Femenino',
                 'email' => 'lina.mejia@colmayor.edu.co'
             ],
             [
@@ -51,6 +53,7 @@ class administrativosUserSeeder extends Seeder
                 'identificacion' => '127',
                 'area' => 'PROFESIONAL PLANEACIÓN',
                 'agregado' => '',
+                'sexo' => 'Femenino',
                 'email' => 'jackeline.cuello@colmayor.edu.co'
             ],
         ];
@@ -65,13 +68,13 @@ class administrativosUserSeeder extends Seeder
                 $nuevoUsuario = User::create([
                     'name' => $user['name'],
 //                'email' => strtolower(str_replace(' ', '', $user['name'])) . '@colmayor.edu.co',
-                    'email' => $cedula,
+                    'email' => $user['email'],
                     'identificacion' => $cedula,
                     'password' => bcrypt($nombre . '+Presupuesto'),
                     'area' => $user['area'],
                     'agregado' => $user['agregado'],
+                    'sexo' => $user['sexo'],
 
-                    'sexo' => 'Masculino',
                     'fecha_nacimiento' => '1990-01-01',
                     'celular' => '1',
                     'esLider' => 0,

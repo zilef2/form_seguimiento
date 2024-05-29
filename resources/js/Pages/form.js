@@ -3,8 +3,8 @@ import { useForm } from '@inertiajs/vue3';
 export const form = useForm({
 identificacion_user: '',
 necesidad: [''],
-proceso_que_solicita_presupuesto: '',
 justificacion: [''],
+proceso_que_solicita_presupuesto: '',
 actividad: [''],
 categoria: [''], //Otras
 unidad_de_medida: [''],

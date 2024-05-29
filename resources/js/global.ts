@@ -25,6 +25,7 @@
  PrimerosCaracteres
  PrimerasPalabras
  textoSinEspaciosLargos
+ generarTextoAleatorio
 
  --ARRAY
 
@@ -297,6 +298,15 @@ import {toInteger} from "lodash";
     export function textoSinEspaciosLargos(texto){
         return texto.replace(/\s+/g, ' ');
     }
+
+    export function generarTextoAleatorio (longitud:number = 5):string{
+        const caracteres:string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let resultado = '';
+        for (let i = 0; i < longitud; i++) {
+            resultado += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+        }
+        return resultado
+    };
 
 
 //array functions

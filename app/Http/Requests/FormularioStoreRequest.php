@@ -55,4 +55,17 @@ class FormularioStoreRequest extends FormRequest
             'anexos.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx'
         ];
     }
+
+    protected function prepareForValidation()
+    {
+        $justificaciones = $this->input('justificacion', []);
+        foreach ($justificaciones as $index => $justificacion) {
+            if ($justificacion === 'Elemento_Borrado') {
+                // Si es "Elemento_Borrado", eliminamos las reglas de validación para ese índice
+                $this->merge([
+                    'justificacion.' . $index => null,
+                ]);
+            }
+        }
+    }
 }
