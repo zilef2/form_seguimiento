@@ -1,6 +1,8 @@
 <template>
     <transition name="slide-fade">
-        <div v-if="flash.success && isVisible" class="sticky top-4 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
+        <div
+        v-if="flash.success && isVisible"
+            class="sticky top-6 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-green-600 rounded-lg">
                 <div>
                     <CheckCircleIcon class="h-8 w-8 text-white" fill="currentColor" />
@@ -119,16 +121,16 @@ export default {
     durations and timing functions.
     */
 .slide-fade-enter-active {
-    transition: all 0.6s ease-out;
+    transition: all 0.3s ease-out;
 }
 
 .slide-fade-leave-active {
-    transition: all 1.8s cubic-bezier(1, 0.5, 0.8, 1);
+    transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
 }
 
 .slide-fade-enter-from,
 .slide-fade-leave-to {
-    transform: translateX(15px);
+    transform: translateX(10px);
     opacity: 0;
 }
 </style>

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('identificacion_user');
             $table->string('numero_necesidad');
-            $table->decimal('valor_total_de_la_solicitud_actual', 10, 2);
-            $table->decimal('valor_total_asignado_en_vigencia_anterior', 10, 2);
+            $table->decimal('valor_total_de_la_solicitud_actual', 20, 2);
+            $table->decimal('valor_total_asignado_en_vigencia_anterior', 20, 2);
 
             $table->string('proceso_que_solicita_presupuesto')->nullable();//1. sel unica
             $table->text('necesidad');//2
@@ -24,12 +24,12 @@ return new class extends Migration
             $table->string('actividad');// sel unica
             $table->string('categoria');// sel unica
             $table->string('unidad_de_medida');// sel unica
-            $table->decimal('cantidad', 10, 2);
-            $table->decimal('valor_unitario', 10, 2);
-            $table->decimal('valor_total_solicitatdo_por_necesidad', 10, 2);// 8.5 automatico
+            $table->decimal('cantidad', 20, 2);
+            $table->decimal('valor_unitario', 20, 2);
+            $table->decimal('valor_total_solicitatdo_por_necesidad', 20, 2);// 8.5 automatico
             $table->string('periodo_de_inicio_de_ejecucion');//sel unica
             $table->string('vigencias_anteriores');//10 //sel unica
-            $table->decimal('valor_asignado_en_la_vigencia_anterior', 10, 2);
+            $table->decimal('valor_asignado_en_la_vigencia_anterior', 20, 2);
             $table->string('procesos_involucrados'); //sel multiple
             $table->string('plan_de_mejoramiento_al_que_apunta_la_necesidad'); //sel multiple
             $table->string('linea_del_plan_desarrollo_al_que_apunta_la_necesidad'); //sel multiple

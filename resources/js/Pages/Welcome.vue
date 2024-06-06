@@ -2,12 +2,12 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import SwitchDarkMode from '@/Components/SwitchDarkMode.vue';
 import {Head, router} from '@inertiajs/vue3'; //Link
-import {reactive, watch, watchEffect} from "vue";
+import {ref, reactive, watch, watchEffect} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {form} from './form';
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
-import {number_format, plata_format} from "@/global";
+import {number_format, plata_format, separador_ceros} from "@/global";
 import Toast from "@/Components/Toast.vue";
 import {AumentarForm, DisminuirForm} from "@/Pages/formFunctions";
 import {throttle} from 'lodash';
@@ -23,27 +23,9 @@ const props = defineProps({
 
 let anioActual = new Date().getFullYear();
 
-const GuardarArchivo = (() => {
-    if (form.anexos) {
-        // form.type = form.anexos.type
-        // if (form.type === "application/pdf") {
-        var formpeso = (Math.round(form.anexos.size / (1024 * 1024)))
-        if (formpeso < data.TamanoMAX) {
-            // form.archivoAux = event.target.files;
-            form.nombre = form.anexos.name.slice(0, -4)
-            data.tamanin = "El archivo pesa aproximadamente " + formpeso + " MB";
-        } else {
-            data.mensajes = 'El peso del archivo supera los 5MB'
-        }
-        // } else {
-        //     data.mensajes = 'El archivo debe ser un PDF'
-        // }
-    }
-})
-
 const data = reactive({
     // modoCero:false,
-    TamanoMAX: (1024 * 1024) * 5, //5MB
+    TamanoMAX: 10, //10MB
     mensajeYaHaSidoGuardado: '',
     tamanin: '',
     mensajes: '',
@@ -382,6 +364,44 @@ const data = reactive({
     classOfText_checkbox: "min-w-[380px] max-h-[250px] overflow-y-scroll p-4 ring-1 ring-zinc-400",
 });
 
+function borrarARchivo(n){
+    setTimeout(() => {
+        form.anexos[n] = ''
+        data.showanexos[n] = ''
+        document.getElementById('anexs' + n).value = ""
+    }, 350)
+}
+
+const GuardarArchivo = ((n) => {
+    if (form.anexos[n]) {
+        // form.type = form.anexos.type
+        console.log("=>(Welcome.vue:377) form.anexos[n].type", form.anexos[n].type);
+        console.log(form.anexos[n].type === "application / vnd.openxmlformats - officedocument.spreadsheetml.sheet");
+        if (form.anexos[n].type == "application/pdf"
+            ||form.anexos[n].type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            || form.anexos[n].type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            || form.anexos[n].type == "officedocument.wordprocessingml.document"
+            || form.anexos[n].type == "officedocument.spreadsheetml.sheet"
+        ) {
+            var formpeso = (Math.round(form.anexos[n].size / (1024 * 1024))) //MB
+            console.log("=>(Welcome.vue:31) formpeso", formpeso);
+            if (formpeso > data.TamanoMAX) {
+                alert('El peso del archivo supera los 2MB')
+                borrarARchivo(n)
+            }
+        } else {
+            borrarARchivo(n)
+            alert('El archivo debe ser un WORD O EXCEL O PDF')
+        }
+    }else{
+        // borrarARchivo(n)
+    }
+})
+
+
+let container = ref(null);
+
+
 // <!--<editor-fold desc="Toogle multipleselections">-->
 function toggleSelection1(value, conteoi) {
     const selectedIndex = form.procesos_involucrados[conteoi].indexOf(value);
@@ -507,7 +527,8 @@ function recuperaform(Formulario) {
         form.valor_unitario[index] = plata_format(parseInt(element.valor_unitario))
         form.valor_asignado_en_la_vigencia_anterior[index] = plata_format(parseInt(element.valor_asignado_en_la_vigencia_anterior))
 
-        let mento;
+        // <!--<editor-fold desc="multiples">-->
+                let mento;
         let eleInteger;
         let checkboxNinguno
         // form.procesos_involucrados = []
@@ -554,6 +575,7 @@ function recuperaform(Formulario) {
                 //form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index].filter(item => item !== null);
             });
         }
+                // <!--</editor-fold>-->
 
 
         form.frecuencia_de_uso[index] = element.frecuencia_de_uso
@@ -564,6 +586,7 @@ function recuperaform(Formulario) {
             data.Otras_capacidad_instalada[index] = true
         }
         form.capacidad_instalada[index] = element.capacidad_instalada
+        
         if (element.unidad_de_medida !== 'Meses' && element.unidad_de_medida !== 'Unidades') {
             data.Otras_unidad_de_medida[index] = true
         }
@@ -574,32 +597,57 @@ function recuperaform(Formulario) {
 
 const metodoConThrottle = throttle(() => {
     guardarAutomaticamente();
-}, 11500);
+}, 20000);//el throttle
 
 const AumentarMasUno = () => {
     let tamanoActual = form.necesidad.length;
-    //TODO: contar las que no sean Elemento_Borrado
-    if (
-        form.necesidad[tamanoActual - 1] &&
-        form.justificacion[tamanoActual - 1] &&
-        form.actividad[tamanoActual - 1] &&
-        form.unidad_de_medida[tamanoActual - 1] &&
-        form.valor_total_solicitatdo_por_necesidad[tamanoActual - 1] &&
-        form.valor_asignado_en_la_vigencia_anterior[tamanoActual - 1] &&
-        form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[tamanoActual - 1] &&
-        form.frecuencia_de_uso[tamanoActual - 1] &&
-        form.capacidad_instalada[tamanoActual - 1] &&
-        form.riesgo_de_la_inversion[tamanoActual - 1]
-        || form.justificacion[tamanoActual - 1] === 'Elemento_Borrado'
-    ) {
+    let ene = tamanoActual - 1;
+
+    let variables = {
+        'necesidad': !!(form.necesidad[ene]),
+        'justificacion': !!(form.justificacion[ene]),
+        'actividad': !!(form.actividad[ene]),
+        'categoria': !!(form.categoria[ene]),
+        'unidad de medida': !!(form.unidad_de_medida[ene]),
+        'cantidad': !!(form.cantidad[ene]),
+        'valor_unitario': !!(form.valor_unitario[ene]) && form.valor_unitario[ene] != "0" && form.valor_unitario[ene] != "$0",
+        'periodo de inicio de ejecucion': !!(form.periodo_de_inicio_de_ejecucion[ene]),
+        'linea del plan desarrollo al que apunta la necesidad': !!(form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[ene]),
+        'frecuencia de uso': !!(form.frecuencia_de_uso[ene]),
+        'capacidad instalada': !!(form.capacidad_instalada[ene]),
+        'riesgo de la inversion':!!(form.riesgo_de_la_inversion[ene]),
+    }
+    let Bandera = false
+    for (let nombre in variables) {
+        console.log("variables[nombre]", nombre+' :::', variables[nombre]);
+        if (!variables[nombre]) {
+            alert('Antes de agregar una fila, complete el siguiente campo: '+ nombre)
+            Bandera = true
+            break;
+        }
+    }
+    
+    if(Bandera) return 
+
+    let valCombi;
+    if (!!form.vigencias_anteriores[ene]) {
+        if (form.vigencias_anteriores[ene] === 'No') {
+            valCombi = true
+        } else {
+            valCombi = !!(form.valor_asignado_en_la_vigencia_anterior[ene])
+        }
+    }
+    
+    if(valCombi){
         metodoConThrottle();
         AumentarForm(form)
         data.ConteoCosas++
         data.Otras_unidad_de_medida[tamanoActual] = false;
         data.Otras_capacidad_instalada[tamanoActual] = false;
         data.desabilitar_vigencias_anteriores[tamanoActual] = false;
-    } else {
-        alert('Antes de agregar una fila, complete la actual')
+    }else{
+        alert('Falta el valor asignado en la vigencia anterior')
+
     }
 }
 
@@ -610,6 +658,7 @@ function borrarFila(conteoi) {
         let EstaSegurBorrar = false
         EstaSegurBorrar = confirm('¿Esta seguro?');
         if (EstaSegurBorrar) {
+            console.log("=>(Welcome.vue:617) conteoi", conteoi);
             BorraFila(conteoi)
         }
     } else {
@@ -618,33 +667,29 @@ function borrarFila(conteoi) {
 }
 
 function BorraFila(index) {
+    form.necesidad.splice(index,1)
+    form.justificacion.splice(index,1)
+    form.actividad.splice(index,1)
+    form.categoria.splice(index,1)
+    form.unidad_de_medida.splice(index,1)
+    form.cantidad.splice(index,1)
+    form.valor_unitario.splice(index,1)
+    form.valor_total_solicitatdo_por_necesidad.splice(index,1)
+    form.periodo_de_inicio_de_ejecucion.splice(index,1)
+    form.vigencias_anteriores.splice(index,1)
+    form.valor_asignado_en_la_vigencia_anterior.splice(index,1)
+    //valoresmultiples
+    form.procesos_involucrados.splice(index,1)
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad.splice(index,1)
+    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad.splice(index,1)
+    form.frecuencia_de_uso.splice(index,1)
+    form.mantenimientos_requeridos.splice(index,1)
+    form.riesgo_de_la_inversion.splice(index,1)
+    data.Otras_capacidad_instalada.splice(index,1)
+    form.capacidad_instalada.splice(index,1)
+    form.unidad_de_medida.splice(index,1)
 
-    // form.necesidad[index] = 'Elemento_Borrado'
-    form.justificacion[index] = 'Elemento_Borrado'
-    form.actividad[index] = null
-    form.categoria[index] = null
-    form.unidad_de_medida[index] = null
-    form.cantidad[index] = null
-    form.valor_unitario[index] = null
-    form.valor_total_solicitatdo_por_necesidad[index] = null
-    form.periodo_de_inicio_de_ejecucion[index] = null
-    form.vigencias_anteriores[index] = null
-    form.valor_asignado_en_la_vigencia_anterior[index] = null
-
-    //aqui se complica
-    form.procesos_involucrados[index] = []
-    form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index] = []
-    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index] = []
-
-
-    form.frecuencia_de_uso[index] = null
-    form.mantenimientos_requeridos[index] = null
-    form.riesgo_de_la_inversion[index] = null
-
-    data.Otras_capacidad_instalada[index] = false
-    form.capacidad_instalada[index] = null
-    form.unidad_de_medida[index] = null
-
+    data.ConteoCosas--
 }
 
 
@@ -680,11 +725,25 @@ watchEffect(() => {
 })
 
 
+function handleCantidad(conteoi) {
+    let canti = parseFloat(form.cantidad[conteoi].replace(/[$,]/g, '')) 
+    if(isNaN(canti) && (canti > 9000000 || canti < 0)) form.cantidad[conteoi] = 0
+    // form.cantidad[conteoi] = separador_ceros(form.cantidad[conteoi])
+
+}
 function handledinero(conteoi) {
+    let value = form.valor_unitario[conteoi].toString().replace(/[$,.]/g, '');
+    let dinerou = parseInt(value)
+    if (dinerou > 9_999_999_999_999 || dinerou < 0) form.valor_unitario[conteoi] = 0
+    
     form.valor_unitario[conteoi] = plata_format(form.valor_unitario[conteoi])
 }
 
 function handledinerVigAnt(conteoi) {
+    let value = form.valor_asignado_en_la_vigencia_anterior[conteoi].toString().replace(/\$|\./g, '');
+    let dinerou = parseInt(value)
+    if (dinerou > 9_999_999_999_999 || dinerou < 0) form.valor_asignado_en_la_vigencia_anterior[conteoi] = 0
+    
     form.valor_asignado_en_la_vigencia_anterior[conteoi] = plata_format(form.valor_asignado_en_la_vigencia_anterior[conteoi])
 }
 
@@ -725,9 +784,13 @@ const watchunidad = (nuevaUnidaddeMedidad) => {
 
 watch(() => form.capacidad_instalada, (nuevx) => {
     nuevx.forEach((element, index) => {
+            console.log("=>(Welcome.vue:788) element", element);
         if (element === 'Si, ¿Cual?') {
             data.Otras_capacidad_instalada[index] = true
             form.capacidad_instalada[index] = ''
+        }else{
+            if(element === 'No')
+                data.Otras_capacidad_instalada[index] = false
         }
     });
 }, {deep: true});
@@ -773,6 +836,7 @@ function llamarString() {
 const handleEnterCedula = () => {
     llamarString()
 }
+
 const handleEnterCedula2 = () => {
     if (!data.identificacion_disbled) {
         if (buscarEnProps(form.identificacion_user, props.cedLideres)) {
@@ -853,7 +917,7 @@ const guardar = () => {
 const create = (validator, second) => {
     if (validator && second) {
         form.enviado = 1
-        var EstaSeguro = false
+        var EstaSeguro
         EstaSeguro = confirm('¿Esta seguro? Después de enviar no podrá hacer más ajustes');
 
         form.necesidad.forEach((element, indice) => {
@@ -891,10 +955,10 @@ const create = (validator, second) => {
 <template>
     <div>
         <Head :title="lang().label.welcome"/>
-        <Toast :flash="$page.props.flash" class="sticky"/>
 
         <div class="relative flex justify-center min-h-screen bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-gray-100 items-center sm:pt-0">
             <section class="items-center w-full m-10 lg:mx-20 xl:mx-40 sm:px-6 lg:px-8 2xl:px-auto">
+        <Toast :flash="$page.props.flash" class=""/>
                 <article class="flex pt-8 px-4 sm:px-0 sm:pt-0">
                     <div class="flex mx-auto text-center items-center">
                         <ApplicationLogo class="h-32 w-auto text-primary fill-current"/>
@@ -986,13 +1050,18 @@ const create = (validator, second) => {
 
                             <hr class="mb-4"/>
                             <div v-for="(indexFila,conteoi) in data.ConteoCosas" v-show="data.showContent" name="fade">
-                                <div v-if="form.justificacion[conteoi] !== 'Elemento_Borrado'">
+                                <div>
                                     <div class="md:inline-flex  space-y-4 md:space-y-0 w-full p-4 text-gray-700 items-center">
-                                        <div
+                                        <div ref="container"
                                             class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[190px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl">
 
+<!--                                            <div class="min-w-[260px] max-h-[110px] p-4">-->
+<!--                                                <button @click="scrollToEnd" class="bg-blue-400">Desplazar a la derecha</button>-->
+<!--                                            </div>-->
+                                            
                                             <div :class="data.classOfTxtAreas">
-                                                <label class="text-md text-gray-900"> Necesidad
+                                                
+                                                 <label class="text-md text-gray-900 font-extrabold"> Necesidad
                                                     <!--                          {{ conteoi + 1 }}-->
                                                 </label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700 mb-12">
@@ -1000,29 +1069,29 @@ const create = (validator, second) => {
                                                     Ejemplo: Se requiere contratista de apoyo con experiencia en atención al cliente
                                                 </p>
                                                 <div class="w-full inline-flex">
-                            <textarea cols="100" rows="7" v-model="form.necesidad[conteoi]" @blur="metodoConThrottle"
-                                      type="text" @keydown.enter.prevent="create"
-                                      class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                      autocomplete="off"/>
+                                                    <textarea cols="100" rows="7" v-model="form.necesidad[conteoi]" @blur="metodoConThrottle"
+                                                              type="text" @keydown.enter.prevent="create"
+                                                              class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                              autocomplete="off"/>
                                                 </div>
                                                 <InputError class="mt-2" :message="form.errors.necesidad"/>
                                             </div>
                                             <div :class="data.classOfTxtAreas">
-                                                <label class="text-md text-gray-900">Justificación especificar de manera concreta la respuesta</label>
+                                                 <label class="text-md text-gray-900 font-bold">Justificación (especificar de manera concreta la respuesta)</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
                                                     Tener en cuenta: ¿Qué impactos concretos tendrá? y ¿Qué pasaría si no se hace?.<br>
-                                                    Si es talento humano, detallar sus funciones
+                                                    Si es talento humano, detallar sus actividades contractuales
                                                 </p>
                                                 <div class="w-full inline-flex">
-                          <textarea cols="100" rows="7" v-model="form.justificacion[conteoi]" @blur="metodoConThrottle"
-                                    type="text" @keydown.enter.prevent="create"
-                                    class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                    autocomplete="off"/>
+                                          <textarea cols="100" rows="7" v-model="form.justificacion[conteoi]" @blur="metodoConThrottle"
+                                                    type="text" @keydown.enter.prevent="create"
+                                                    class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                    autocomplete="off"/>
                                                     <InputError class="mt-2" :message="form.errors.justificacion"/>
                                                 </div>
                                             </div>
                                             <div :class="data.classOfTextXL">
-                                                <label class="text-md text-gray-900">Actividad</label>
+                                                 <label class="text-md text-gray-900 font-bold">Actividad</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
                                                     Relacionar en este campo la actividad a desarrollar.<br>
                                                     Tener en cuenta el <b>archivo adjunto</b> donde encontrará el listado de las actividades de
@@ -1044,9 +1113,11 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div :class="data.classOfTextLG">
-                                                <label class="text-md text-gray-900 capitalize">categoría</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">Seleccionar la categoría acorde a la
-                                                    necesidad</p>
+                                                 <label class="text-md text-gray-900 font-bold capitalize">categoría</label>
+                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                    Seleccionar la categoría acorde a la
+                                                    necesidad
+                                                </p>
                                                 <div class="w-full inline-flex">
                                                     <SelectInput v-model="form.categoria[conteoi]" @keydown.enter.prevent="create"
                                                                  :dataSet="data.categoria"
@@ -1056,12 +1127,11 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div :class="data.classOfText">
-                                                <label class="text-md text-gray-900 capitalize">unidad de medida</label>
+                                                 <label class="text-md text-gray-900 font-bold capitalize">unidad de medida</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
                                                     Seleccionar la forma de cuantificar el recurso solicitado
                                                 </p>
-                                                <div v-if="data.Otras_unidad_de_medida[conteoi] === false"
-                                                     class="w-full inline-flex">
+                                                <div class="w-full inline-flex">
                                                     <SelectInput v-model="form.unidad_de_medida[conteoi]" @keydown.enter.prevent="create"
                                                                  @blur="metodoConThrottle"
                                                                  :dataSet="props.losSelect.unidad_de_medida"
@@ -1070,29 +1140,23 @@ const create = (validator, second) => {
 
                                                     <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
                                                 </div>
-                                                <div v-else class="w-full inline-flex">
-                                                    <input v-model="form.unidad_de_medida[conteoi]" type="text" @keydown.enter.prevent="create"
-                                                           @blur="metodoConThrottle"
-                                                           class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
-                                                </div>
                                             </div>
                                             <div :class="data.classOfText">
-                                                <label class="text-md text-gray-900 capitalize">cantidad</label>
+                                                 <label class="text-md text-gray-900 font-bold capitalize">cantidad</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">Registrar la cantidad en coherencia con la
                                                     unidad de medida
                                                     seleccionada</p>
                                                 <div class="w-full inline-flex">
                                                     <input v-model="form.cantidad[conteoi]" @keydown.enter.prevent="create" @blur="metodoConThrottle"
                                                            type="number" step="0.1"
+                                                           @input="handleCantidad(conteoi)"
                                                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                            autocomplete="off"/>
                                                     <InputError class="mt-2" :message="form.errors.cantidad"/>
                                                 </div>
                                             </div>
                                             <div class="min-w-[360px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">valor unitario</label>
+                                                 <label class="text-md text-gray-900 font-bold capitalize">valor unitario</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
                                                     Registrar el valor unitario.<br>
                                                     En caso de ser en dólares, usar el valor proyectado de la TRM según la fecha estimada de
@@ -1110,7 +1174,7 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div class="min-w-[360px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">valor total</label>
+                                                 <label class="text-md text-gray-900 font-bold capitalize">valor total</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">Valor generado automáticamente</p>
                                                 <div class="w-full inline-flex">
                                                     <input disabled @keydown.enter.prevent="create" @blur="metodoConThrottle"
@@ -1121,7 +1185,7 @@ const create = (validator, second) => {
                                             </div>
 
                                             <div :class="data.classOfText2">
-                                                <label class="text-md text-gray-900">Período de inicio de ejecución</label>
+                                                 <label class="text-md text-gray-900 font-bold">Período de inicio de ejecución</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">Seleccionar el cuatrimestre en el que iniciará
                                                     la ejecución</p>
                                                 <div class="w-full inline-flex">
@@ -1136,7 +1200,7 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div :class="data.classOfText">
-                                                <label class="text-md text-gray-900 capitalize">vigencia anterior</label>
+                                                 <label class="text-md text-gray-900 font-bold capitalize">vigencia anterior</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">Seleccionar si esta necesidad fue financiada en
                                                     la vigencia anterior</p>
                                                 <div class="w-full inline-flex">
@@ -1150,7 +1214,7 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div :class="data.classOfText2">
-                                                <label class="text-md text-gray-900">Valor asignado en la vigencia anterior</label>
+                                                 <label class="text-md text-gray-900 font-bold">Valor asignado en la vigencia anterior</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">Si la necesidad fue financiada en la vigencia
                                                     anterior, especificar el
                                                     valor en pesos que le fue asignado</p>
@@ -1169,7 +1233,7 @@ const create = (validator, second) => {
 
                                             <!--                                        selectmultipledos1-->
                                             <div :class="data.classOfText_checkbox">
-                                                <label for="multi-select" class="mb-4 text-md text-gray-900 ">Procesos articulados</label>
+                                                <label for="multi-select" class="mb-4 text-md text-gray-900 font-bold">Procesos articulados</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">Seleccionar el(los) proceso(s) de los cuales se
                                                     requiere apoyo,
                                                     información, asesoría,
@@ -1188,7 +1252,7 @@ const create = (validator, second) => {
                                                 <InputError class="mt-2" :message="form.errors.procesos_involucrados"/>
                                             </div>
                                             <div :class="data.classOfText_checkbox">
-                                                <label for="multi-select" class="mb-4 text-lg text-gray-900">Procesos seleccionados</label>
+                                                <label for="multi-select" class="mb-4  text-md text-blue-900 font-bold">Procesos seleccionados</label>
                                                 <p v-if="form.procesos_involucrados[conteoi]"
                                                    v-for="itemsito in form.procesos_involucrados[conteoi]"
                                                    class="font-bold mt-1">
@@ -1199,10 +1263,10 @@ const create = (validator, second) => {
 
                                             <!--                                            selectmultipledos2-->
                                             <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
-                                                <label class="text-md text-gray-900">Plan de Mejoramiento y Mantenimiento -PMM- al que apunta la
+                                                 <label class="text-md text-gray-900 font-bold">Plan de Mejoramiento y Mantenimiento -PMM- al que apunta la
                                                     necesidad</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
-                                                    Seleccione el PMM al cual apunta la necesidad
+                                                    Seleccionar el PMM
                                                 </p>
                                                 <div v-for="option in data.planmejoramientonecesidad"
                                                      :key="option.value" class="mt-3">
@@ -1218,19 +1282,19 @@ const create = (validator, second) => {
                                                 <InputError class="mt-2" :message="form.errors.plan_de_mejoramiento_al_que_apunta_la_necesidad"/>
                                             </div>
                                             <div class="min-w-[250px] max-h-[250px] p-4 border-x-2 border-zinc-400">
-                                                <label for="multi-select" class="mb-4 text-md text-gray-900 capitalize">Planes seleccionados</label>
+                                                <label for="multi-select" class="mb-4  text-md text-blue-900 font-bold">Planes seleccionados</label>
                                                 <p v-if="form.plan_de_mejoramiento_al_que_apunta_la_necesidad"
                                                    v-for="itemsito2 in form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi]"
                                                    class="font-bold mt-1">
                                                     - {{ data.planmejoramientonecesidad.find((item) => item.value === itemsito2)?.label }}</p>
                                             </div>
                                             <!--                                            selectmultipledos3-->
-                                            <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
-                                                <label class="text-md text-gray-900">
+                                            <div class="min-w-[450px] max-h-[250px] p-4 ring-0 ring-zinc-100">
+                                                 <label class="text-md text-gray-900 font-bold">
                                                     Líneas del Plan de Desarrollo Institucional 2024-2028 al que apunta la necesidad
                                                 </label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
-                                                    Seleccione la(s) línea(s) a la(s) que apunta la necesidad
+                                                    Seleccionar la(s) línea(s) con que se vincula la necesidad
                                                 </p>
                                                 <div v-for="option in data.lineadelplan"
                                                      :key="option.value" class="mt-3">
@@ -1246,7 +1310,7 @@ const create = (validator, second) => {
                                                 <InputError class="mt-2" :message="form.errors.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"/>
                                             </div>
                                             <div class="min-w-[350px] max-h-[250px] p-4 border-x-2 border-zinc-400">
-                                                <label for="multi-select" class="mb-4 text-md text-gray-900">Líneas seleccionadas</label>
+                                                <label for="multi-select" class="mb-4 text-md text-blue-900 font-bold">Líneas seleccionadas</label>
                                                 <div v-if="form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"
                                                      v-for="itemsito3 in form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi]"
                                                      class="font-bold mt-1">
@@ -1258,7 +1322,7 @@ const create = (validator, second) => {
 
                                             <!-- fin selectmultipledo-->
                                             <div class="min-w-[450px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900">Frecuencia de uso</label>
+                                                 <label class="text-md text-gray-900 font-bold">Frecuencia de uso</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
                                                     Relacionar la periodicidad de uso
                                                 </p>
@@ -1271,7 +1335,7 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div class="min-w-[460px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900">Mantenimientos Requeridos</label>
+                                                 <label class="text-md text-gray-900 font-bold">Mantenimientos Requeridos</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
                                                     Relacionar la periodicidad de los mantenimientos requeridos
                                                 </p>
@@ -1286,7 +1350,7 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div class="min-w-[460px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900">Capacidad Instalada</label>
+                                                 <label class="text-md text-gray-900 font-bold">Capacidad Instalada</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700">
                                                     Describir si en la actualidad la institución cuenta con el bien o servicio solicitado o algo
                                                     similar que cubra la necesidad y posiblemente requiera algún ajuste
@@ -1298,8 +1362,7 @@ const create = (validator, second) => {
                                                                  @keydown.enter.prevent="create"
                                                                  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                                  autocomplete="off"/>
-                                                    <InputError class="mt-2"
-                                                                :message="form.errors.capacidad_instalada"/>
+                                                    <InputError class="mt-2" :message="form.errors.capacidad_instalada"/>
                                                 </div>
                                                 <div v-else class="w-full inline-flex">
                                                     <input v-model="form.capacidad_instalada[conteoi]" type="text" @keydown.enter.prevent="create"
@@ -1310,21 +1373,23 @@ const create = (validator, second) => {
                                                 </div>
                                             </div>
                                             <div class="min-w-[300px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900">Riesgo</label>
-                                                <!--                        <p v-if="conteoi === 0" class="text-md text-gray-700">-->
-                                                <!--                          Valore el riesgo de que la necesidad no sea totalmente solucionada 1: Bajo riesgo 5: Alto riesgo-->
-                                                <!--                        </p>-->
+                                                 <label class="text-md text-gray-900 font-bold">Riesgo</label>
+                                                    <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                        Seleccionar ¿Cuáles son los posibles riesgos involucrados en actividad?
+                                                    </p>
                                                 <div class="w-full inline-flex">
                                                     <SelectInput :dataSet="props.losSelect.riesgo_de_la_inversion" @keydown.enter.prevent="create"
-                                                                 v-model="form.riesgo_de_la_inversion[conteoi]" @blur="metodoConThrottle"
+                                                                 v-model="form.riesgo_de_la_inversion[conteoi]"
                                                                  type="text"
                                                                  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                                  autocomplete="off"/>
                                                     <InputError class="mt-2" :message="form.errors.riesgo_de_la_inversion"/>
                                                 </div>
                                             </div>
+
+
                                             <div class="min-w-[500px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 capitalize">anexos</label>
+                                                <label class="text-md text-gray-900 font-bold capitalize">anexos</label>
                                                 <p v-if="conteoi === 0" class="text-md text-gray-700 my-2">
                                                     Relacionar los anexos que hacen parte del ítem de la inversión, compra o reposición, donde
                                                     se enuncien las especificaciones técnicas. Si la solicitud es una reposición, adjuntar el
@@ -1332,26 +1397,26 @@ const create = (validator, second) => {
                                                     solicitante. Formatos Permitidos: Word, Excel, PDF
                                                 </p>
                                                 <div class="w-full flex">
-                                                    <!--                                        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"-->
-                                                    <input id="anexos" type="file" @keydown.enter.prevent="create"
+                                                    <input :id="'anexs'+conteoi" type="file"
+                                                           @keydown.enter.prevent="create"
                                                            @input="form.anexos[conteoi] = $event.target.files[0]"
-                                                           @change="GuardarArchivo" accept="application/pdf"
+                                                           @change="GuardarArchivo(conteoi)"
+                                                           accept="application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                           autocomplete="off"/>
+                                                    />
                                                     <p v-if="form.anexos[conteoi]"
                                                        class="w-full my-2 mx-6 text-green-700 underline">
-                                                        {{ form.anexos[conteoi].name }}
+                                                        {{ form.anexos[conteoi].name }} achu
                                                     </p>
                                                     <p v-if="data.showanexos[conteoi]"
                                                        class="w-full my-2 mx-6 text-green-700 underline">
-                                                        {{ data.showanexos[conteoi] }}
+                                                        {{ data.showanexos[conteoi] }} achu2
                                                     </p>
                                                 </div>
                                             </div>
                                             <InputError class="mt-2" :message="form.errors.anexos"/>
                                             <MasyMenos :conteoi="conteoi" @aumentar="AumentarMasUno" @disminuir="borrarFila"/>
                                         </div>
-
                                     </div>
                                     <!--   elfin-->
 
@@ -1441,9 +1506,9 @@ const create = (validator, second) => {
                                         <li v-for="(error, field) in form.errors" :key="field"
                                             class="text-lg text-red-800">
                                             {{
-                                                error.replace(/_/g, " ").replace(/justificacion\.(\d+)/, (match, p1) => {
-                                                    let nuevoNumero = parseInt(p1, 10) + 1;
-                                                    return `justificacion.${nuevoNumero}`;
+                                                error.replace(/_/g, " ").replace(/(\w+\.)(\d+)/g, (match, p1, p2) => {
+                                                    let nuevoNumero = parseInt(p2, 10) + 1;
+                                                    return `${p1}${nuevoNumero}`;
                                                 })
                                             }}
                                         </li>
@@ -1479,11 +1544,12 @@ const create = (validator, second) => {
                 </form>
 
 
-                <div class="sm:flex justify-between mt-4 text-md text-gray-700">
-                    <div v-if="data.mensajeYaHaSidoGuardado === ''" class="flex mx-4 sm:mx-0 flex-row justify-center text-center">
+                <div class="grid mx-auto mt-12 text-gray-700 text-center">
+                    <div v-if="data.mensajeYaHaSidoGuardado === ''" 
+                         class="grid mx-auto sm:mx-0 text-center">
                         <p class="text-lg text-black dark:text-white">{{ $page.props.app.name }} ©️</p>
                     </div>
-                    <div v-else class="flex text-[#499884] font-medium text-xl mx-auto flex-row justify-center text-center">
+                    <div v-else class="grid text-[#499884] font-medium text-xl mx-auto flex-row justify-center text-center">
                         <p class="mx-auto text-center">{{ data.mensajeYaHaSidoGuardado }}</p>
                     </div>
                 </div>

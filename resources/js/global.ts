@@ -239,10 +239,20 @@ import {toInteger} from "lodash";
     }
 
 
-    export function plata_format(value) {
+    export function plata_format(value,noMoney:boolean = true):string {
         // Eliminar el símbolo de dólar y cualquier punto existente
-        value = value.toString().replace(/\$|\./g, '');
-        return '$' + value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        // value = value.toString().replace(/\$,|\./g, '');
+        value = value.toString().replace(/[$,.]/g, '');
+
+        let result = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        if(noMoney) return '$' + result;  
+        return result
+    }
+    
+    export function separador_ceros(value):string {
+        value = value.toString().replace(/\$,|\./g, '');
+        let result = value.replace(/(?<!\.\d*)(?<=\d)(?=(\d{3})+(?!\d|,))/g, '.');
+        return result
     }
 
     export function CalcularEdad(nacimiento){

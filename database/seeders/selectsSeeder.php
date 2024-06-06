@@ -51,8 +51,7 @@ class selectsSeeder extends Seeder
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez a la semana', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez al mes', 'tipo' => 'frecuencia_de_uso']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Una vez por semestre', 'tipo' => 'frecuencia_de_uso']);
-
-
+        
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Diario', 'tipo' => 'mantenimientos_requeridos']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Semanal', 'tipo' => 'mantenimientos_requeridos']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Mensual', 'tipo' => 'mantenimientos_requeridos']);
@@ -60,18 +59,13 @@ class selectsSeeder extends Seeder
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Anual', 'tipo' => 'mantenimientos_requeridos']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Sólo si se presenta un incidente', 'tipo' => 'mantenimientos_requeridos']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'No requiere mantenimiento', 'tipo' => 'mantenimientos_requeridos']);
-
-
+        
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'Si, ¿Cual?', 'tipo' => 'capacidad_instalada']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>'No', 'tipo' => 'capacidad_instalada']);
-
-
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'1 La adquisición soluciona el 100% de la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'2 Soluciona la mayor parte de la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'3 Soluciona medianamente la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'4 Soluciona una parte de la necesidad', 'tipo' => 'riesgo_de_la_inversion']);
-        DB::table('selecsForm')->insertOrIgnore(['nombre' =>'5 Es muy probable que la necesidad no sea solucionada a pesar de la adquisición', 'tipo' => 'riesgo_de_la_inversion']);
-
+        
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>"Riesgos Fiscal", 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>"Riesgos de Gestión", 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>"Riesgos de Corrupción", 'tipo' => 'riesgo_de_la_inversion']);
     }
 }
 /*

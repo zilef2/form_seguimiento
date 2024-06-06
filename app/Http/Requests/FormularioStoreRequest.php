@@ -58,12 +58,26 @@ class FormularioStoreRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        $justificaciones = $this->input('justificacion', []);
+//        $justificaciones = $this->input('justificacion', []);
+        $justificaciones = $this->justificacion;
         foreach ($justificaciones as $index => $justificacion) {
             if ($justificacion === 'Elemento_Borrado') {
                 // Si es "Elemento_Borrado", eliminamos las reglas de validación para ese índice
                 $this->merge([
-                    'justificacion.' . $index => null,
+//                    'justificacion' => [],
+                    'justificacion.' . $index => 'nullable',
+                    'actividad.' . $index => 'nullable',
+                    'categoria.' . $index => 'nullable',
+                    'unidad.' . $index => 'nullable',
+                    'cantidad.' . $index => 'nullable',
+                    'valor_unitario.' . $index => 'nullable',
+                    'periodo.' . $index => 'nullable',
+                    'vigencias.' . $index => 'nullable',
+                    'valor_asignado.' . $index => 'nullable',
+                    'frecuencia.' . $index => 'nullable',
+                    'mantenimientos.' . $index => 'nullable',
+                    'capacidad.' . $index => 'nullable',
+                    'riesgo.' . $index => 'nullable',
                 ]);
             }
         }

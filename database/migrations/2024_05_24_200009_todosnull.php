@@ -12,20 +12,20 @@ php artisan migrate --path=/database/migrations/2024_05_24_200009_todosnull.php
     public function up(): void
     {
         Schema::table('formularios', function (Blueprint $table) {
-            $table->decimal('valor_total_de_la_solicitud_actual', 10, 2)->nullable()->change();
-            $table->decimal('valor_total_asignado_en_vigencia_anterior', 10, 2)->nullable()->change();
+            $table->decimal('valor_total_de_la_solicitud_actual', 20, 2)->nullable()->change();
+            $table->decimal('valor_total_asignado_en_vigencia_anterior', 20, 2)->nullable()->change();
             $table->string('proceso_que_solicita_presupuesto')->nullable()->change();//1. sel unica
             $table->text('necesidad')->nullable()->change();//2
             $table->text('justificacion')->nullable()->change();
             $table->string('actividad')->nullable()->change();// sel unica
             $table->string('categoria')->nullable()->change();// sel unica
             $table->string('unidad_de_medida')->nullable()->change();// sel unica
-            $table->decimal('cantidad', 10, 2)->nullable()->change();
-            $table->decimal('valor_unitario', 10, 2)->nullable()->change();
-            $table->decimal('valor_total_solicitatdo_por_necesidad', 10, 2)->nullable()->change();// 8.5 automatico
+            $table->decimal('cantidad', 20, 2)->nullable()->change();
+            $table->decimal('valor_unitario', 20, 2)->nullable()->change();
+            $table->decimal('valor_total_solicitatdo_por_necesidad', 20, 2)->nullable()->change();// 8.5 automatico
             $table->string('periodo_de_inicio_de_ejecucion')->nullable()->change();//sel unica
-            $table->string('vigencias_anteriores')->nullable()->change();//10 //sel unica
-            $table->decimal('valor_asignado_en_la_vigencia_anterior', 10, 2)->nullable()->change();
+            $table->string('vigencias_anteriores')->nullable()->change();
+            $table->decimal('valor_asignado_en_la_vigencia_anterior', 20, 2)->nullable()->change();
             $table->string('procesos_involucrados')->nullable()->change(); //sel multiple
             $table->string('plan_de_mejoramiento_al_que_apunta_la_necesidad')->nullable()->change(); //sel multiple
             $table->string('linea_del_plan_desarrollo_al_que_apunta_la_necesidad')->nullable()->change(); //sel multiple
@@ -33,6 +33,10 @@ php artisan migrate --path=/database/migrations/2024_05_24_200009_todosnull.php
             $table->string('mantenimientos_requeridos')->nullable()->change();//sel unica
             $table->string('capacidad_instalada')->nullable()->change();//sel unica
             $table->string('riesgo_de_la_inversion')->nullable()->change(); //sel unica
+        });
+        
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('proceso_que_solicita_presupuesto')->default(null);
         });
 //        $this->info('La migración todosnull se ha completado.');
 

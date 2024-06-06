@@ -196,9 +196,8 @@ class FormularioController extends Controller
         $this->Filtros($formularios, $request);
         $losSelect = $this->Dependencias();
         //TODO: las dependencias multiples estan hardcode en el welcome
-
-
-//        $perPage = $request->has('perPage') ? $request->perPage : 10;
+        
+        $perPage = $request->has('perPage') ? $request->perPage : 10;
 
         return Inertia::render($this->FromController . '/Index', [
             'fromController' => $formularios->paginate($perPage),
@@ -209,7 +208,6 @@ class FormularioController extends Controller
             'perPage' => (int)$perPage,
             'numberPermissions' => $numberPermissions,
             'losSelect' => $losSelect,
-
         ]);
     }
 
@@ -221,18 +219,60 @@ class FormularioController extends Controller
 //        return response()->json(['string' => $string]);
 //    }
 
-    public function EnviarFormulario(FormularioStoreRequest $request)
+    public function EnviarFormulario(Request $request) // FormularioStoreRequest
     {
+        foreach ($request->justificacion as $index => $item) {
+            if ($item === 'Elemento_Borrado') {
+                $fillableFields = (new \App\Models\Formulario)->getFillable();
+                foreach ($fillableFields as $field) {
+                    $request->request->remove($field);
+                }
+            }
+        }
+        $validatedData = $request->validate([
+            'numero_necesidad' => 'nullable',
+            'identificacion_user' => 'required',
+            'proceso_que_solicita_presupuesto' => 'required',
+            'valor_total_de_la_solicitud_actual' => 'required',
+            'valor_total_asignado_en_vigencia_anterior' => 'nullable',
+
+            'necesidad.*' => 'required',
+            'justificacion.*' => 'required',
+            'actividad.*' => 'required',
+            'categoria.*' => 'required',
+            'unidad_de_medida.*' => 'required',
+            'cantidad.*' => 'required',
+            'valor_unitario.*' => 'required',
+            'valor_total_solicitatdo_por_necesidad.*' => 'required',
+            'periodo_de_inicio_de_ejecucion.*' => 'required',
+            'vigencias_anteriores.*' => 'required',
+            'valor_asignado_en_la_vigencia_anterior.*' => 'required',
+
+            'procesos_involucrados.*' => 'nullable',
+            'plan_de_mejoramiento_al_que_apunta_la_necesidad.*' => 'required',
+            'linea_del_plan_desarrollo_al_que_apunta_la_necesidad.*' => 'required',
+
+            'frecuencia_de_uso.*' => 'required',
+            'mantenimientos_requeridos.*' => 'required',
+            'capacidad_instalada.*' => 'required',
+            'riesgo_de_la_inversion.*' => 'required',
+            'anexos.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx'
+        ]);
+        
         $this->store($request);
 
     }
 
-    public function store(Request $request)
-    { //guardar
+    public function store(Request $request){ //guardar
         try {
             Myhelp::EscribirEnLog($this, ' Begin store(Guardar):formularios');
-            DB::beginTransaction();
             $user = User::Where('identificacion', $request->identificacion_user)->first();
+            if(!$user){
+                return back();
+//                return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . 'Hay un error de red');
+            }
+            
+            DB::beginTransaction();
             $numeroTotal = count($request['necesidad']);
             $formulario = Formulario::Where('user_id', $user->id)->get();
 
