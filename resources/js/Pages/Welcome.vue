@@ -90,7 +90,18 @@ const data = reactive({
         {label: "Vicerrectoría Académica", value: 40},
         {label: "Vicerrectoría de Investigación y Extensión", value: 41},
         {label: "Virtualidad", value: 42},
-
+    ],
+    
+    //lista pendiente por integrar
+    lista_pros_presupuestp: [
+        {value:1,label:"Bienestar"},
+        {value:2,label:"Bienes y Servicios"},
+        {value:3,label:"Comunicaciones y Mercadeo"},
+        {value:4,label:"Gestión Ambiental Seguridad y Salud en el Trabajo"},
+        {value:5,label:"Infraestructura Física"},
+        {value:6,label:"Sistema de Gestión Integral - SGI -"},
+        {value:7,label:"Tecnología y Medios Audiovisuales"},
+        {value:8,label:"Talento Humano"}
     ],
 
     actividades: [
@@ -602,7 +613,10 @@ const metodoConThrottle = throttle(() => {
 const AumentarMasUno = () => {
     let tamanoActual = form.necesidad.length;
     let ene = tamanoActual - 1;
+    console.log("=>(Welcome.vue:616) tamanoActual", tamanoActual);
 
+    console.log("=>(Welcome.vue:619) !!(form.necesidad[ene])", !!(form.necesidad[ene]));
+    console.log("=>(Welcome.vue:619) (form.necesidad[ene])", (form.necesidad[ene]));
     let variables = {
         'necesidad': !!(form.necesidad[ene]),
         'justificacion': !!(form.justificacion[ene]),
@@ -612,8 +626,13 @@ const AumentarMasUno = () => {
         'cantidad': !!(form.cantidad[ene]),
         'valor_unitario': !!(form.valor_unitario[ene]) && form.valor_unitario[ene] != "0" && form.valor_unitario[ene] != "$0",
         'periodo de inicio de ejecucion': !!(form.periodo_de_inicio_de_ejecucion[ene]),
-        'linea del plan desarrollo al que apunta la necesidad': !!(form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[ene]),
+
+        "procesos involucrados" : !!(form.procesos_involucrados[ene]),
+        "plan de mejoramiento" : !!(form.plan_de_mejoramiento_al_que_apunta_la_necesidad[ene]),
+        "linea del plan desarrollo" : !!(form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[ene]),
+        
         'frecuencia de uso': !!(form.frecuencia_de_uso[ene]),
+        'mantenimientos requeridos': !!(form.mantenimientos_requeridos[ene]),
         'capacidad instalada': !!(form.capacidad_instalada[ene]),
         'riesgo de la inversion':!!(form.riesgo_de_la_inversion[ene]),
     }
@@ -1015,7 +1034,7 @@ const create = (validator, second) => {
                                         <!--                                          />-->
                                         <!--                                        </div>-->
                                         <div class="col-span-2 px-4 py-2 w-full bg-transparent rounded-x-lg mt-9">
-                                            <p class="ml-8 my-2 text-lg">Proceso que solicita el Presupuesto</p>
+                                            <p class="ml-8 font-bold my-2 text-lg">Proceso que solicita el Presupuesto</p>
                                             <SelectInput v-model="form.proceso_que_solicita_presupuesto"
                                                          :dataSet="data.proceso_que_solicita_presupuesto"
                                                          class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"

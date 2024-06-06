@@ -6,6 +6,7 @@ necesidad: [''],
 justificacion: [''], //listorri
 proceso_que_solicita_presupuesto: '',
 actividad: [''], //listorri
+    
 categoria: [''], //Otras
 unidad_de_medida: [''], //listorri
 cantidad: [0],
