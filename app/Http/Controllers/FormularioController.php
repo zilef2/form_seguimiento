@@ -221,8 +221,9 @@ class FormularioController extends Controller
 
     public function EnviarFormulario(Request $request) // FormularioStoreRequest
     {
+        Myhelp::EscribirEnLog($this, ' Beginning EnviarFormulario(Enviar):formularios');
         foreach ($request->justificacion as $index => $item) {
-            if ($item === 'Elemento_Borrado') {
+            if (($request['necesidad'][$index] === '' || $request['necesidad'][$index] === '') && ($request['justificacion'][$index] === '' || $request['justificacion'][$index] === '')) {
                 $fillableFields = (new \App\Models\Formulario)->getFillable();
                 foreach ($fillableFields as $field) {
                     $request->request->remove($field);
@@ -259,15 +260,25 @@ class FormularioController extends Controller
             'anexos.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx'
         ]);
         
-        $this->store($request);
+        
+        $user = User::Where('identificacion', $request->identificacion_user)->first();
+        if (!$user) {return back();}
+        
+        $formularioGuardados = Formulario::Where('user_id', $user->id)
+            ->Where('enviado',0)
+            ->get();
+        foreach ($formularioGuardados as $formulario) {
+            $formulario->delete();
+        }
 
+        $this->store($request);
     }
 
     public function store(Request $request){ //guardar
         try {
-            Myhelp::EscribirEnLog($this, ' Begin store(Guardar):formularios');
+            Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formularios');
             $user = User::Where('identificacion', $request->identificacion_user)->first();
-            if(!$user){
+            if(!$user){ // error de autoguardado
                 return back();
 //                return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . 'Hay un error de red');
             }
@@ -278,13 +289,9 @@ class FormularioController extends Controller
 
             if ($formulario) {
                 foreach ($request['necesidad'] as $index => $item) {
-                    if (isset($request['justificacion'][$index]) && $request['justificacion'][$index] == 'Elemento_Borrado') {
+                    if (($request['necesidad'][$index] === '' || $request['necesidad'][$index] === '') && ($request['justificacion'][$index] === '' || $request['justificacion'][$index] === '')) {
                         $numeroTotal--;
-                        $formBorrar = Formulario::Where('user_id', $user->id)
-                            ->Where('necesidad', $item)->get();//TODO: buscar por necesidad (unica)
-                        if ($formBorrar && $formBorrar->first()) {
-                            $formBorrar->first()->delete();
-                        }
+                        
                     } else { //no es un elemento borrado
 
                         if (isset($formulario[$index])) {
@@ -303,7 +310,7 @@ class FormularioController extends Controller
                 }
             } else {
                 foreach ($request['necesidad'] as $index => $item) {
-                    if ($request['justificacion'][$index] === 'Elemento_Borrado') {
+                    if (($request['necesidad'][$index] === '' || $request['necesidad'][$index] === '') && ($request['justificacion'][$index] === '' || $request['justificacion'][$index] === '')) {
                         $numeroTotal--;
                     } else {
                         $arrayForm = $this->arrayFormulario($request, $index, $user);
@@ -313,6 +320,20 @@ class FormularioController extends Controller
                     }
                 }
             }
+            $formulariosBorrar = Formulario::Where('user_id', $user->id)
+                ->where(function ($query) {
+                    $query->where('necesidad', '')
+                        ->orWhere('necesidad', ' ');
+                })
+                ->where(function ($query) {
+                    $query->where('justificacion', '')
+                        ->orWhere('justificacion', ' ');
+                })
+                ->get();
+            foreach ($formulariosBorrar as $formulario) {
+                $formulario->delete();
+            }
+            
             DB::commit();
             return back()->with('success', __('app.label.formulario_created_successfully', ['number' => $numeroTotal]));
         } catch (\Throwable $th) {
@@ -322,8 +343,7 @@ class FormularioController extends Controller
         }
     }
 
-    private function arrayFormulario($request, $index, $user)
-    {
+    private function arrayFormulario($request, $index, $user){
 
         if ($request['justificacion'][$index] !== 'Elemento_Borrado') {
 

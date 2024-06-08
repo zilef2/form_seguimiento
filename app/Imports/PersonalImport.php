@@ -62,13 +62,6 @@ class PersonalImport implements ToModel
             }
             //# fin validaciones
 
-            //todo: si encuentra otro email, que actualize la info
-            //todo: si encuentra con la misma identificacion, que actualize la info
-            //todo: Primaria, bachillerato, tecnologia, profesional,especializacion,maestría,doctorado
-            // if(strtolower($row[3]) != 'femenino' && strtolower($row[3]) != 'masculino' && strtolower($row[3]) != 'otro'){
-            //     session(['contar4' => $contar4++]);
-            //     return null;
-            // }
             session(['CountFilas' => $countfilas + 1]);
             $fechaNacimiento = HelpExcel::getFechaExcel($row[4])->format('Y-m-d H:i');
 
@@ -86,7 +79,6 @@ class PersonalImport implements ToModel
             // dd($fechaNacimiento,$row[7], strtolower(trim($row[0])) === 'nombre');
             $user->assignRole($row[7]);
 
-            //todo: enviar correo a cada trabajador, que ha sido registrado
 
             return $user;
         } catch (\Throwable $th) {
@@ -107,5 +99,3 @@ class PersonalImport implements ToModel
     }
 }
 
-
-//todo: Operacion errada. Nombre del error: alejou error en la fila 0 SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '1152194566' for key 'users_identificacion_unique' (SQL: insert into `users` (`name`, `email`, `identificacion`, `sexo`, `fecha_nacimiento`, `semestre`, `pgrado`, `password`, `updated_at`, `created_at`) values (alejou, emaildesde@excel.com, 1152194566, masculino, 2023-06-20 16:37, 10, universitario,

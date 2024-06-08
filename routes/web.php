@@ -4,6 +4,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\EjemploController;
 use App\Http\Controllers\FormularioController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/ejemplo', [EjemploController::class, 'ejemplo'])->name('ejemplo');
 
     //# user
     Route::resource('/user', UserController::class)->except('create', 'show', 'edit');
@@ -38,6 +40,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::resource('/parametro', ParametrosController::class);
 
     Route::get('/DB_info', [UserController::class,'todaBD']);
+    Route::get('/downloadAnexos', [UserController::class,'downloadAnexos'])->name('downloadAnexos');
 });
 Route::resource('/formulario', FormularioController::class)->except('create', 'show', 'edit');
 Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');

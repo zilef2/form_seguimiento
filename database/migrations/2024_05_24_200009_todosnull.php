@@ -36,7 +36,7 @@ php artisan migrate --path=/database/migrations/2024_05_24_200009_todosnull.php
         });
         
         Schema::table('users', function (Blueprint $table) {
-            $table->string('proceso_que_solicita_presupuesto')->default(null);
+            $table->string('proceso_que_solicita_presupuesto')->nullable();
         });
 //        $this->info('La migración todosnull se ha completado.');
 

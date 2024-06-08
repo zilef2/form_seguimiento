@@ -6,12 +6,13 @@ import { Head, Link } from '@inertiajs/vue3';
 import { watchEffect } from 'vue';
 
 
+    // roles: Number,
 const props = defineProps({
     users: Number,
-    roles: Number,
     formulariosEnviados: Number,
     formulariosGuardados: Number,
     permissions: Number,
+    nanexos: Number,
 })
 
 const dashboard =[
@@ -35,6 +36,9 @@ const laImg =[
     'KeyIcon',
     // 'KeyIcon',
 ];
+const downloadAnexos = () => {
+    window.open('downloadAnexos', '_blank')
+}
 
 </script>
 
@@ -67,25 +71,31 @@ const laImg =[
 <!--                        </Link>-->
                     </div>
                 </div>
-                <!-- <div>
+                
+                
+                
+                
+                <div>
                     <div
                         class="rounded-t-none sm:rounded-t-lg px-4 py-6 flex justify-between bg-green-600/70 dark:bg-green-500/80 items-center overflow-hidden">
                         <div class="flex flex-col">
-                            <p class="text-4xl font-bold">{{ props.roles }}</p>
-                            <p class="text-md md:text-lg uppercase">{{ lang().label.role }}</p>
+                            <p class="text-4xl font-bold">{{props.nanexos}}</p>
+                            <p class="text-md md:text-lg uppercase">Anexos</p>
                         </div>
                         <div>
                             <KeyIcon class="w-16 h-auto" />
                         </div>
                     </div>
-                    <div
+                    <div @click="downloadAnexos"
                         class="bg-green-600 dark:bg-green-600/80 rounded-b-none sm:rounded-b-lg p-2 overflow-hidden hover:bg-green-600/90 dark:hover:bg-green-600/70">
-                        <Link :href="route('role.index')" class="flex justify-between items-center">
-                        <p>{{ lang().label.more }}</p>
+<!--                            :href="route('downloadAnexos')"-->
+                        <a
+                              class="flex justify-between items-center">
+                        <p>Descargar Adjuntos 2</p>
                         <ChevronRightIcon class="w-5 h-5" />
-                        </Link>
+                        </a>
                     </div>
-                </div> -->
+                </div>
 
 
                 <div v-if="can(['isSuper'])">

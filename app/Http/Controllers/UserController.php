@@ -20,9 +20,11 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
+use ZipArchive;
 
 class UserController extends Controller {
     public $thisAtributos;
@@ -39,19 +41,49 @@ class UserController extends Controller {
     public function Dashboard() {
 //        $numberPermissions = CargosModelos::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' Dashboard'));
 //        if($numberPermissions > 1){
+        $sourcePath = storage_path('app/public/anexosPrimerForm');
+        $files = File::files($sourcePath);
 
-            return Inertia::render('Dashboard', [
+        return Inertia::render('Dashboard', [
                 'users' => (int) User::count(),
-                'roles' => (int) Role::count(),
+//                'roles' => (int) Role::count(),
                 'formulariosEnviados'  => (int) Formulario::Where('enviado',1)->count(),
                 'formulariosGuardados' =>(int) Formulario::Where('enviado',0)->count(),
                 'permissions'   => (int) Permission::count(),
+                'nanexos'   => count($files),
             ]);
 //        }else{
 //            return redirect()->route('Dashboard.index');
 //        }
 
     }
+
+    public function downloadAnexos()
+    {
+        $zip = new ZipArchive;
+        $fileName = 'anexos.zip';
+        $filePath = storage_path('app/public/' . $fileName);
+        $sourcePath = storage_path('app/public/anexosPrimerForm');
+
+        if ($zip->open($filePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+            $files = File::files($sourcePath);
+
+            foreach ($files as $file) {
+                $relativeName = basename($file);
+                if (!preg_match('/\.git$|\.gitconfig$/', $relativeName)) {
+                    $zip->addFile($file, $relativeName);
+                }
+//                $zip->addFile($file, $relativeName);
+            }
+            $zip->close();
+        }
+
+        session()->flash('message', ' Archivos descargados.');
+//        return back()->download($filePath)->deleteFileAfterSend(true);
+        
+        return response()->download($filePath)->deleteFileAfterSend(true);
+    }
+    
     public function SelectsMasivos($numberPermissions) {
 //        $empresatemp = new empresa();
 //        $modelInstance = resolve('App\\Models\\' . ucfirst('empresa'));

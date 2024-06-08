@@ -13,6 +13,7 @@ import {AumentarForm, DisminuirForm} from "@/Pages/formFunctions";
 import {throttle} from 'lodash';
 import MasyMenos from "@/Pages/MasyMenos.vue";
 
+
 const props = defineProps({
     cedLideres: Object,
     losSelect: Object,
@@ -372,7 +373,10 @@ const data = reactive({
     classOfText2: "min-w-[320px] max-h-[110px] p-4",
     classOfTextLG: "min-w-[400px] max-h-[110px] p-4",
     classOfTextXL: "min-w-[600px] max-h-[110px] p-4",
-    classOfText_checkbox: "min-w-[380px] max-h-[250px] overflow-y-scroll p-4 ring-1 ring-zinc-400",
+    classOfText_checkbox: "min-w-[380px] max-h-[250px] overflow-y-scroll p-4",
+    
+    //el checkbox de ninguno
+    checkdisabled:[[false,false,false,false]]
 });
 
 function borrarARchivo(n){
@@ -386,8 +390,6 @@ function borrarARchivo(n){
 const GuardarArchivo = ((n) => {
     if (form.anexos[n]) {
         // form.type = form.anexos.type
-        console.log("=>(Welcome.vue:377) form.anexos[n].type", form.anexos[n].type);
-        console.log(form.anexos[n].type === "application / vnd.openxmlformats - officedocument.spreadsheetml.sheet");
         if (form.anexos[n].type == "application/pdf"
             ||form.anexos[n].type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             || form.anexos[n].type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -395,7 +397,6 @@ const GuardarArchivo = ((n) => {
             || form.anexos[n].type == "officedocument.spreadsheetml.sheet"
         ) {
             var formpeso = (Math.round(form.anexos[n].size / (1024 * 1024))) //MB
-            console.log("=>(Welcome.vue:31) formpeso", formpeso);
             if (formpeso > data.TamanoMAX) {
                 alert('El peso del archivo supera los 2MB')
                 borrarARchivo(n)
@@ -427,18 +428,28 @@ function isSelected1(value) {
     return form.procesos_involucrados.includes(value);
 }
 
+function modoNinguno(conteoi,desabilitar = true){
+    data.checkdisabled[conteoi][0] = desabilitar
+    data.checkdisabled[conteoi][1] = desabilitar
+    data.checkdisabled[conteoi][2] = desabilitar
+    data.checkdisabled[conteoi][3] = false
+}
 
 function toggleSelection2(value, conteoi) {
-
     let selectedIndex = form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].indexOf(value);
     let modoCero = false
     let elcheckbox
+    
+    //validar que tenga ceros
     if (value === 0 || form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)) {
         modoCero = true
+        modoNinguno(conteoi)
     }
+    
+    //pintar los checkboxes
     if (modoCero) {
         pintarTodoCero(conteoi)
-
+    
         form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] = [0]
         if (selectedIndex !== -1) {
             form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
@@ -446,12 +457,17 @@ function toggleSelection2(value, conteoi) {
     } else {
         elcheckbox = document.getElementById('0_b' + conteoi);
         elcheckbox.checked = false;
-
+    
         if (selectedIndex === -1) {
             form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].push(value);
         } else {
             form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
         }
+    }
+    
+    //3) desabilitar los otros
+    if(!form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)){
+        modoNinguno(conteoi,false) //habilitar
     }
 }
 
@@ -466,10 +482,12 @@ function pintarTodoCero(conteoi) {
 
 
 function isSelected2(value, conteoi) {
-    setTimeout(() => {
-        if (form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi])
+    // return setTimeout(() => {
+    //     if (form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi])
+    //         return form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(value)
+    // }, 200)
+    if (form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi])
             return form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(value)
-    }, 200)
 }
 
 function toggleSelection3(value, conteoi) {
@@ -519,6 +537,13 @@ function RecuperarInfoGuardada(Formulario) {
     form.valor_total_de_la_solicitud_actual = Formulario[0].valor_total_de_la_solicitud_actual
     data.ConteoCosas = Formulario.length
 
+    Formulario.forEach((element, index) => {
+
+        if (!data.checkdisabled[index]) {
+            data.checkdisabled[index] = [false, false, false, false];
+        }
+    })
+    
     setTimeout(() => recuperaform(Formulario), 200)
 }
 
@@ -548,7 +573,7 @@ function recuperaform(Formulario) {
             form.procesos_involucrados[index] = []
             element.procesos_involucrados.forEach(proceso => {
                 eleInteger = parseInt(proceso)
-                data.proceso_que_solicita_presupuesto.forEach((item, i) => {
+                data.lista_pros_presupuestp.forEach((item, i) => {
                     if (item.value && item.value === eleInteger) {
                         form.procesos_involucrados[index].push(item.value)
                         checkboxNinguno = document.getElementById(item.value + '_a' + index);
@@ -556,6 +581,11 @@ function recuperaform(Formulario) {
                     }
                 });
             });
+        }
+
+        
+        if (!data.checkdisabled[index]) {
+            data.checkdisabled[index] = [false,false,false,false];
         }
 
         if (element.plan_de_mejoramiento_al_que_apunta_la_necesidad.length) {
@@ -613,10 +643,7 @@ const metodoConThrottle = throttle(() => {
 const AumentarMasUno = () => {
     let tamanoActual = form.necesidad.length;
     let ene = tamanoActual - 1;
-    console.log("=>(Welcome.vue:616) tamanoActual", tamanoActual);
 
-    console.log("=>(Welcome.vue:619) !!(form.necesidad[ene])", !!(form.necesidad[ene]));
-    console.log("=>(Welcome.vue:619) (form.necesidad[ene])", (form.necesidad[ene]));
     let variables = {
         'necesidad': !!(form.necesidad[ene]),
         'justificacion': !!(form.justificacion[ene]),
@@ -627,9 +654,9 @@ const AumentarMasUno = () => {
         'valor_unitario': !!(form.valor_unitario[ene]) && form.valor_unitario[ene] != "0" && form.valor_unitario[ene] != "$0",
         'periodo de inicio de ejecucion': !!(form.periodo_de_inicio_de_ejecucion[ene]),
 
-        "procesos involucrados" : !!(form.procesos_involucrados[ene]),
-        "plan de mejoramiento" : !!(form.plan_de_mejoramiento_al_que_apunta_la_necesidad[ene]),
-        "linea del plan desarrollo" : !!(form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[ene]),
+        "procesos involucrados" : form.procesos_involucrados[ene].length > 0,
+        "plan de mejoramiento" : form.plan_de_mejoramiento_al_que_apunta_la_necesidad[ene].length > 0,
+        "linea del plan desarrollo" : form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[ene].length > 0,
         
         'frecuencia de uso': !!(form.frecuencia_de_uso[ene]),
         'mantenimientos requeridos': !!(form.mantenimientos_requeridos[ene]),
@@ -638,7 +665,6 @@ const AumentarMasUno = () => {
     }
     let Bandera = false
     for (let nombre in variables) {
-        console.log("variables[nombre]", nombre+' :::', variables[nombre]);
         if (!variables[nombre]) {
             alert('Antes de agregar una fila, complete el siguiente campo: '+ nombre)
             Bandera = true
@@ -659,14 +685,22 @@ const AumentarMasUno = () => {
     
     if(valCombi){
         metodoConThrottle();
+        if (!data.checkdisabled[tamanoActual]) {
+            data.checkdisabled[tamanoActual] = [];
+        }
+        modoNinguno(tamanoActual,false)//habilitar
+        // data.checkdisabled[conteoi]
+        console.log("=>(Welcome.vue:684) tamanoActual", tamanoActual);
+        console.log("=>(Welcome.vue:683) data.checkdisabled[tamanoActual]", data.checkdisabled[tamanoActual]);
+
         AumentarForm(form)
         data.ConteoCosas++
         data.Otras_unidad_de_medida[tamanoActual] = false;
         data.Otras_capacidad_instalada[tamanoActual] = false;
         data.desabilitar_vigencias_anteriores[tamanoActual] = false;
+
     }else{
         alert('Falta el valor asignado en la vigencia anterior')
-
     }
 }
 
@@ -677,7 +711,6 @@ function borrarFila(conteoi) {
         let EstaSegurBorrar = false
         EstaSegurBorrar = confirm('¿Esta seguro?');
         if (EstaSegurBorrar) {
-            console.log("=>(Welcome.vue:617) conteoi", conteoi);
             BorraFila(conteoi)
         }
     } else {
@@ -707,6 +740,9 @@ function BorraFila(index) {
     data.Otras_capacidad_instalada.splice(index,1)
     form.capacidad_instalada.splice(index,1)
     form.unidad_de_medida.splice(index,1)
+
+    data.checkdisabled.splice(index,1)
+    
 
     data.ConteoCosas--
 }
@@ -745,12 +781,32 @@ watchEffect(() => {
 
 
 function handleCantidad(conteoi) {
-    let canti = parseFloat(form.cantidad[conteoi].replace(/[$,]/g, '')) 
+    let conteoString = form.cantidad[conteoi]+''
+    let canti = (conteoString.replace(/[$,]/g, ''))
+    if((canti.match(/\./g) || []).length > 1){
+        form.cantidad[conteoi] = 0
+    }
+    canti = parseFloat(canti)
+    
+    if (canti > 9_999_999 || canti < 0) form.cantidad[conteoi] = 0
     if(isNaN(canti) && (canti > 9000000 || canti < 0)) form.cantidad[conteoi] = 0
-    // form.cantidad[conteoi] = separador_ceros(form.cantidad[conteoi])
 
 }
+
+function tieneCaracteresNoNumericos(valor) {
+    const regex = /^[0-9.$]+$/;
+    return !regex.test(valor);
+}
+
+function tieneCerosIzq(valor) {
+    const regex = /^\$?([1-9][0-9]*|[1-9][0-9]*(\.[0-9]+)*)$/;
+    return !regex.test(valor);
+}
+
 function handledinero(conteoi) {
+    if (tieneCaracteresNoNumericos(form.valor_unitario[conteoi])) form.valor_unitario[conteoi] = 0;
+    // if (tieneCerosIzq(form.valor_unitario[conteoi])) form.valor_unitario[conteoi].replace(/^$0+/, '$');
+
     let value = form.valor_unitario[conteoi].toString().replace(/[$,.]/g, '');
     let dinerou = parseInt(value)
     if (dinerou > 9_999_999_999_999 || dinerou < 0) form.valor_unitario[conteoi] = 0
@@ -768,7 +824,8 @@ function handledinerVigAnt(conteoi) {
 
 watch(() => form.vigencias_anteriores, (NuevaVig) => {
     NuevaVig.forEach((element, index) => {
-        if (element === 'No') {
+        if (element === 'No' || element === 'no') {
+            
             data.desabilitar_vigencias_anteriores[index] = true
             form.valor_asignado_en_la_vigencia_anterior[index] = 0
         } else {
@@ -803,13 +860,14 @@ const watchunidad = (nuevaUnidaddeMedidad) => {
 
 watch(() => form.capacidad_instalada, (nuevx) => {
     nuevx.forEach((element, index) => {
-            console.log("=>(Welcome.vue:788) element", element);
         if (element === 'Si, ¿Cual?') {
             data.Otras_capacidad_instalada[index] = true
             form.capacidad_instalada[index] = ''
         }else{
-            if(element === 'No')
+            if(element === 'No' || element === 'no'){
+                form.capacidad_instalada[index] = 'No'
                 data.Otras_capacidad_instalada[index] = false
+            }
         }
     });
 }, {deep: true});
@@ -846,7 +904,7 @@ function llamarString() {
                 }, 600)
             },
             onError: (error) => {
-                console.log('%cError en la coneccion al servidor:' + error, 'color: red; font-size: 29px; font-weight: bold;');
+                console.log('%cError en la coneccion al servidor:' + error, 'color: red; font-size: 33px; font-weight: bold;');
             }
         });
     }
@@ -922,6 +980,9 @@ const guardar = () => {
             onSuccess: () => {
                 form.reset()
                 offContent()
+                setTimeout(() => {
+                    window.location.reload()
+                }, 2000)
             },
             onError: () => {
                 alert('Hay campos faltantes!')
@@ -936,33 +997,39 @@ const guardar = () => {
 const create = (validator, second) => {
     if (validator && second) {
         form.enviado = 1
-        var EstaSeguro
+        let EstaSeguro, HayElementosVacios = true
         EstaSeguro = confirm('¿Esta seguro? Después de enviar no podrá hacer más ajustes');
 
-        form.necesidad.forEach((element, indice) => {
-            if (!element || element === '') {
-                BorraFila(indice)
+        form.necesidad.forEach((element) => {
+            if (!element || element === '' || element === ' ') {
+                HayElementosVacios = false
             }
         });
+        
         form.valor_total_de_la_solicitud_actual = data.total_todo
         if (EstaSeguro) {
-            if (data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0) {
-
-                form.post(route('EnviarFormulario'), {
-                    preserveScroll: true,
-                    forceFormData: true,
-                    onSuccess: () => {
-                        form.reset()
-                        offContent()
-                    },
-                    onError: () => {
-                        alert('¡Hay campos faltantes!')
-                    },
-                    onFinish: () => null,
-                })
-            } else {
-                data.MensajeError = 'Hay un error inesperado'
-                alert('¡Faltan datos!');
+            if (HayElementosVacios) {
+                if (data.ConteoCosas > 0 && form.valor_total_de_la_solicitud_actual > 0) {
+                    form.post(route('EnviarFormulario'), {
+                        preserveScroll: true,
+                        forceFormData: true,
+                        onSuccess: () => {
+                            form.reset()
+                            offContent()
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 2000)
+                        },
+                        onError: () => {
+                            alert('¡Hay campos faltantes!')
+                        },
+                        onFinish: () => null,
+                    })
+                } else {
+                    alert('¡Faltan datos!');
+                }
+            }else{
+                alert('¡Hay muchos elementos vacios!');
             }
         }
     }
@@ -1072,18 +1139,23 @@ const create = (validator, second) => {
                                 <div>
                                     <div class="md:inline-flex  space-y-4 md:space-y-0 w-full p-4 text-gray-700 items-center">
                                         <div ref="container"
-                                            class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[190px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl">
+                                            class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[190px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl"
+                                            :class="{'border-t border-red-600' : indexFila === data.ConteoCosas}"
+                                        >
 
 <!--                                            <div class="min-w-[260px] max-h-[110px] p-4">-->
 <!--                                                <button @click="scrollToEnd" class="bg-blue-400">Desplazar a la derecha</button>-->
 <!--                                            </div>-->
+
+                                            
+                                            
                                             
                                             <div :class="data.classOfTxtAreas">
                                                 
                                                  <label class="text-md text-gray-900 font-extrabold"> Necesidad
                                                     <!--                          {{ conteoi + 1 }}-->
                                                 </label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700 mb-12">
+                                                <p class="text-md text-gray-700 mb-12">
                                                     Describir de manera detallada la necesidad a solicitar<br>
                                                     Ejemplo: Se requiere contratista de apoyo con experiencia en atención al cliente
                                                 </p>
@@ -1097,7 +1169,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div :class="data.classOfTxtAreas">
                                                  <label class="text-md text-gray-900 font-bold">Justificación (especificar de manera concreta la respuesta)</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Tener en cuenta: ¿Qué impactos concretos tendrá? y ¿Qué pasaría si no se hace?.<br>
                                                     Si es talento humano, detallar sus actividades contractuales
                                                 </p>
@@ -1111,7 +1183,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div :class="data.classOfTextXL">
                                                  <label class="text-md text-gray-900 font-bold">Actividad</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Relacionar en este campo la actividad a desarrollar.<br>
                                                     Tener en cuenta el <b>archivo adjunto</b> donde encontrará el listado de las actividades de
                                                     inversión y funcionamiento con su código; copiar y pegar en este campo la actividad
@@ -1133,7 +1205,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div :class="data.classOfTextLG">
                                                  <label class="text-md text-gray-900 font-bold capitalize">categoría</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Seleccionar la categoría acorde a la
                                                     necesidad
                                                 </p>
@@ -1147,7 +1219,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div :class="data.classOfText">
                                                  <label class="text-md text-gray-900 font-bold capitalize">unidad de medida</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Seleccionar la forma de cuantificar el recurso solicitado
                                                 </p>
                                                 <div class="w-full inline-flex">
@@ -1162,12 +1234,15 @@ const create = (validator, second) => {
                                             </div>
                                             <div :class="data.classOfText">
                                                  <label class="text-md text-gray-900 font-bold capitalize">cantidad</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">Registrar la cantidad en coherencia con la
+                                                <p class="text-md text-gray-700">Registrar la cantidad en coherencia con la
                                                     unidad de medida
-                                                    seleccionada</p>
+                                                    seleccionada (utilize punto para cifras decimales)</p>
                                                 <div class="w-full inline-flex">
-                                                    <input v-model="form.cantidad[conteoi]" @keydown.enter.prevent="create" @blur="metodoConThrottle"
-                                                           type="number" step="0.1"
+                                                    <input v-model="form.cantidad[conteoi]"
+                                                           @keydown.enter.prevent="create" @blur="metodoConThrottle"
+                                                           type="text" 
+                                                           onkeypress="return (event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46)"
+                                                           step="0.1"
                                                            @input="handleCantidad(conteoi)"
                                                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                            autocomplete="off"/>
@@ -1176,7 +1251,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div class="min-w-[360px] max-h-[110px] p-4">
                                                  <label class="text-md text-gray-900 font-bold capitalize">valor unitario</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Registrar el valor unitario.<br>
                                                     En caso de ser en dólares, usar el valor proyectado de la TRM según la fecha estimada de
                                                     compra
@@ -1185,6 +1260,7 @@ const create = (validator, second) => {
                                                     <input v-model="form.valor_unitario[conteoi]" @keydown.enter.prevent="create"
                                                            @blur="metodoConThrottle"
                                                            @input="handledinero(conteoi)"
+                                                           onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
                                                            type="text"
                                                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                            autocomplete="off"
@@ -1194,7 +1270,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div class="min-w-[360px] max-h-[110px] p-4">
                                                  <label class="text-md text-gray-900 font-bold capitalize">valor total</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">Valor generado automáticamente</p>
+                                                <p class="text-md text-gray-700">Valor generado automáticamente</p>
                                                 <div class="w-full inline-flex">
                                                     <input disabled @keydown.enter.prevent="create" @blur="metodoConThrottle"
                                                            v-model="data.valor_total_solicitatdo_por_necesidad[conteoi]"
@@ -1205,7 +1281,7 @@ const create = (validator, second) => {
 
                                             <div :class="data.classOfText2">
                                                  <label class="text-md text-gray-900 font-bold">Período de inicio de ejecución</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">Seleccionar el cuatrimestre en el que iniciará
+                                                <p class="text-md text-gray-700">Seleccionar el cuatrimestre en el que iniciará
                                                     la ejecución</p>
                                                 <div class="w-full inline-flex">
                                                     <SelectInput @keydown.enter.prevent="create"
@@ -1220,7 +1296,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div :class="data.classOfText">
                                                  <label class="text-md text-gray-900 font-bold capitalize">vigencia anterior</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">Seleccionar si esta necesidad fue financiada en
+                                                <p class="text-md text-gray-700">Seleccionar si esta necesidad fue financiada en
                                                     la vigencia anterior</p>
                                                 <div class="w-full inline-flex">
                                                     <SelectInput :dataSet="data.vigencias_anteriores" @blur="metodoConThrottle"
@@ -1234,7 +1310,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div :class="data.classOfText2">
                                                  <label class="text-md text-gray-900 font-bold">Valor asignado en la vigencia anterior</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">Si la necesidad fue financiada en la vigencia
+                                                <p class="text-md text-gray-700">Si la necesidad fue financiada en la vigencia
                                                     anterior, especificar el
                                                     valor en pesos que le fue asignado</p>
                                                 <div class="w-full inline-flex">
@@ -1253,11 +1329,11 @@ const create = (validator, second) => {
                                             <!--                                        selectmultipledos1-->
                                             <div :class="data.classOfText_checkbox">
                                                 <label for="multi-select" class="mb-4 text-md text-gray-900 font-bold">Procesos articulados</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">Seleccionar el(los) proceso(s) de los cuales se
+                                                <p class="text-md text-gray-700">Seleccionar el(los) proceso(s) de los cuales se
                                                     requiere apoyo,
                                                     información, asesoría,
                                                     recursos o aprobaciones para la asignación de recursos</p>
-                                                <div v-for="(option,inde) in data.proceso_que_solicita_presupuesto"
+                                                <div v-for="(option,inde) in data.lista_pros_presupuestp"
                                                      :key="inde" class="mt-3">
                                                     <input type="checkbox" :id="option.value+'_a'+conteoi"
                                                            :value="option.value" @keydown.enter.prevent="create"
@@ -1270,30 +1346,34 @@ const create = (validator, second) => {
                                                 </div>
                                                 <InputError class="mt-2" :message="form.errors.procesos_involucrados"/>
                                             </div>
-                                            <div :class="data.classOfText_checkbox">
+                                            <div class="min-w-[450px] max-h-[250px] p-4 border-x-2 border-zinc-400">
                                                 <label for="multi-select" class="mb-4  text-md text-blue-900 font-bold">Procesos seleccionados</label>
                                                 <p v-if="form.procesos_involucrados[conteoi]"
                                                    v-for="itemsito in form.procesos_involucrados[conteoi]"
                                                    class="font-bold mt-1">
-                                                    - {{ data.proceso_que_solicita_presupuesto.find((item) => item.value === itemsito)?.label }}
+                                                    - {{ data.lista_pros_presupuestp.find((item) => item.value === itemsito)?.label }}
                                                 </p>
                                             </div>
 
 
                                             <!--                                            selectmultipledos2-->
-                                            <div class="min-w-[450px] max-h-[250px] p-4 ring-1 ring-zinc-400">
-                                                 <label class="text-md text-gray-900 font-bold">Plan de Mejoramiento y Mantenimiento -PMM- al que apunta la
+
+
+                                            <div class="min-w-[450px] max-h-[250px] p-4">
+                                                <label class="text-md text-gray-900 font-bold">Plan de Mejoramiento y Mantenimiento -PMM- al que
+                                                    apunta la
                                                     necesidad</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Seleccionar el PMM
                                                 </p>
-                                                <div v-for="option in data.planmejoramientonecesidad"
+                                                <div v-for="(option,inde) in data.planmejoramientonecesidad"
                                                      :key="option.value" class="mt-3">
                                                     <input type="checkbox" :id="option.value+'_b'+conteoi"
                                                            :value="option.value"
                                                            @blur="metodoConThrottle" @keydown.enter.prevent="create"
                                                            @change="toggleSelection2(option.value,conteoi)"
                                                            :checked="isSelected2(option.value,conteoi)"
+                                                           :disabled="data.checkdisabled[conteoi][inde]"
                                                            class="p-1 w-7 h-7 ring-1 ring-zinc-400"
                                                     />
                                                     <label :for="option.value+'_'+conteoi" class="mx-1">{{ option.label }}</label>
@@ -1307,12 +1387,14 @@ const create = (validator, second) => {
                                                    class="font-bold mt-1">
                                                     - {{ data.planmejoramientonecesidad.find((item) => item.value === itemsito2)?.label }}</p>
                                             </div>
+
+
                                             <!--                                            selectmultipledos3-->
                                             <div class="min-w-[450px] max-h-[250px] p-4 ring-0 ring-zinc-100">
                                                  <label class="text-md text-gray-900 font-bold">
                                                     Líneas del Plan de Desarrollo Institucional 2024-2028 al que apunta la necesidad
                                                 </label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Seleccionar la(s) línea(s) con que se vincula la necesidad
                                                 </p>
                                                 <div v-for="option in data.lineadelplan"
@@ -1342,7 +1424,7 @@ const create = (validator, second) => {
                                             <!-- fin selectmultipledo-->
                                             <div class="min-w-[450px] max-h-[110px] p-4">
                                                  <label class="text-md text-gray-900 font-bold">Frecuencia de uso</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Relacionar la periodicidad de uso
                                                 </p>
                                                 <div class="w-full inline-flex">
@@ -1355,7 +1437,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div class="min-w-[460px] max-h-[110px] p-4">
                                                  <label class="text-md text-gray-900 font-bold">Mantenimientos Requeridos</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Relacionar la periodicidad de los mantenimientos requeridos
                                                 </p>
                                                 <div class="w-full inline-flex">
@@ -1370,7 +1452,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div class="min-w-[460px] max-h-[110px] p-4">
                                                  <label class="text-md text-gray-900 font-bold">Capacidad Instalada</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                <p class="text-md text-gray-700">
                                                     Describir si en la actualidad la institución cuenta con el bien o servicio solicitado o algo
                                                     similar que cubra la necesidad y posiblemente requiera algún ajuste
                                                 </p>
@@ -1393,7 +1475,7 @@ const create = (validator, second) => {
                                             </div>
                                             <div class="min-w-[300px] max-h-[110px] p-4">
                                                  <label class="text-md text-gray-900 font-bold">Riesgo</label>
-                                                    <p v-if="conteoi === 0" class="text-md text-gray-700">
+                                                    <p class="text-md text-gray-700">
                                                         Seleccionar ¿Cuáles son los posibles riesgos involucrados en actividad?
                                                     </p>
                                                 <div class="w-full inline-flex">
@@ -1409,7 +1491,7 @@ const create = (validator, second) => {
 
                                             <div class="min-w-[500px] max-h-[110px] p-4">
                                                 <label class="text-md text-gray-900 font-bold capitalize">anexos</label>
-                                                <p v-if="conteoi === 0" class="text-md text-gray-700 my-2">
+                                                <p class="text-md text-gray-700 my-2">
                                                     Relacionar los anexos que hacen parte del ítem de la inversión, compra o reposición, donde
                                                     se enuncien las especificaciones técnicas. Si la solicitud es una reposición, adjuntar el
                                                     informe técnico con código de inventario para asegurar la baja posterior por parte del
@@ -1427,7 +1509,7 @@ const create = (validator, second) => {
                                                        class="w-full my-2 mx-6 text-green-700 underline">
                                                         {{ form.anexos[conteoi].name }} achu
                                                     </p>
-                                                    <p v-if="data.showanexos[conteoi]"
+                                                    <p v-else-if="data.showanexos[conteoi]"
                                                        class="w-full my-2 mx-6 text-green-700 underline">
                                                         {{ data.showanexos[conteoi] }} achu2
                                                     </p>
@@ -1509,9 +1591,7 @@ const create = (validator, second) => {
                                 </div>
                                 <div class="w-full text-center md:pl-9 max-w-sm mx-auto my-5 pl-2">
                                     <div class="w-full text-center mx-auto">
-                                        <label class="text-xl text-center"> Total final:<small class="px-3 font-bold text-2xl">{{
-                                                number_format(data.total_todo, 0, 1)
-                                            }}</small> </label>
+                                        <label class="text-xl text-center"> Total final:<small class="px-3 font-bold text-2xl">{{ number_format(data.total_todo, 0, 1) }}</small> </label>
                                     </div>
                                 </div>
                                 <hr/>
