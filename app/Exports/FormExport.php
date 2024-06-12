@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\helpers\MyConst;
 use App\Models\formulario;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -11,6 +12,14 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class FormExport implements WithHeadingRow, ShouldAutoSize, FromQuery, WithMapping, WithHeadings
 {
+    
+    private $procesoQueSolicitaPresupuesto;
+
+    function __construct()
+    {
+        $this->procesoQueSolicitaPresupuesto = MyConst::procesoQueSolicitaPresupuesto();    
+    }
+    
     public function query()
     {
         return formulario::query()->Where('enviado', 0);
