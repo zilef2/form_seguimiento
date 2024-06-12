@@ -93,54 +93,28 @@ class UserController extends Controller {
 //        return $result;
     }
 
-    public function MapearClasePP(&$users, $numberPermissions,$request,&$roles)
-    {
+    public function MapearClasePP(&$users, $numberPermissions,$request,&$roles){
 //        $role = auth()->user()->roles->pluck('name')[0];
-        $roles = Role::where('name', '<>', 'superadmin')->where('name', '<>', 'admin')->get();
         if ($numberPermissions < 9) {
+            $roles = Role::where('name', '<>', 'superadmin')->where('name', '<>', 'admin')->get();
             $users->whereHas('roles', function ($query) {
-                return $query->whereNotIn('name', ['superadmin', 'admin']);
+                return $query->whereNotIn('name', ['superadmin', 'admin'])->orderBy('name');
             });
         } else {
-            if ($numberPermissions === 9) {
-                $users->whereHas('roles', function ($query) {
-                    return $query->where('name', '<>', 'superadmin');
-                });
-            }
+            $users->whereHas('roles', function ($query) {
+                return $query->where('name', '<>', 'superadmin')->orderBy('name');
+            });
             $roles = Role::get();
         }
 
-
-        $userA = Myhelp::AuthU();
+//            dd($request->field, $request->has(['field', 'order']));
         if ($request->has(['field', 'order'])) {
             $users = $users->orderBy($request->field, $request->order);
-        }else{
+            
+        } else {
             $users = $users->orderBy('updated_at', 'desc');
         }
 
-        if($numberPermissions < 9){
-            $users = $users->get()->map(function ($user) use ($userA) {
-                if($user->empresa_id == $userA->empresa_id){
-//                    $user->empresa = $user->empresa()->first()->nombre;
-                    return $user;
-                }
-            })->filter();
-        }else{
-
-            $users = $users->get()->map(function ($user) use ($userA) {
-//                $user->empresa = $user->empresa()->first()->nombre;
-                return $user;
-            })->filter();
-        }
-    }
-
-
-    public function index(UserIndexRequest $request) {
-        $permissions = Myhelp::EscribirEnLog($this, ' users');
-        $numberPermissions = CargosModelos::getPermissionToNumber($permissions);
-
-        $users = User::query()->with('roles');
-        $this->MapearClasePP($users,$numberPermissions,$request,$roles);
         if ($request->has('search')) {
             $users->where(function ($query) use ($request) {
                 $query->where('name', 'LIKE', "%" . $request->search . "%")
@@ -149,6 +123,20 @@ class UserController extends Controller {
             })->where('name', '!=', 'admin')->where('name', '!=', 'Superadmin');
             // $users->where('name', 'LIKE', "%" . $request->search . "%");
         }
+        
+        $users = $users->get()->map(function ($user) {
+            return $user;
+        })->filter();
+    }
+
+
+    public function index(Request $request) {
+        $permissions = Myhelp::EscribirEnLog($this, ' users');
+        $numberPermissions = CargosModelos::getPermissionToNumber($permissions);
+
+        $users = User::query()->with('roles');
+        $this->MapearClasePP($users,$numberPermissions,$request,$roles);
+        
 
         $perPage = $request->has('perPage') ? $request->perPage : 10;
         $total = $users->count();

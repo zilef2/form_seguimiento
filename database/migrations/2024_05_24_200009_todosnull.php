@@ -17,7 +17,7 @@ php artisan migrate --path=/database/migrations/2024_05_24_200009_todosnull.php
             $table->string('proceso_que_solicita_presupuesto')->nullable()->change();//1. sel unica
             $table->text('necesidad')->nullable()->change();//2
             $table->text('justificacion')->nullable()->change();
-            $table->string('actividad')->nullable()->change();// sel unica
+            $table->string('actividad', 2255)->nullable()->change();// sel unica
             $table->string('categoria')->nullable()->change();// sel unica
             $table->string('unidad_de_medida')->nullable()->change();// sel unica
             $table->decimal('cantidad', 20, 2)->nullable()->change();

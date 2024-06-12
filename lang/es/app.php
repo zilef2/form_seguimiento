@@ -4,6 +4,7 @@ return [
     'label' => [
         'formulariosEnviados' => 'formularios Enviados',
         'formulariosGuardados' => 'formularios Guardados',
+        'agregado' => 'agregado',
         'formulario' => 'formulario',
         'Formulario' => 'Formulario',
         'empresa' => 'empresa',
@@ -31,7 +32,7 @@ return [
         'Sexo' => 'Sexo',
         'Fecha nacimiento' => 'Fecha nacimiento',
         //dashboard
-        'formularios' => 'formularios',
+        'formularios' => 'Formularios',
         'roles' => 'roles',
 
         //parametros

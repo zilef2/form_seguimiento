@@ -51,9 +51,7 @@ const data = reactive({
 
 const order = (field) => {
     data.params.field = field
-    console.log("🧈 debu data.params.field:", data.params.field);
     data.params.order = data.params.order === "asc" ? "desc" : "asc"
-    console.log("🧈 debu data.params.order:", data.params.order);
 }
 
 watch(() => _.cloneDeep(data.params), debounce(() => {
@@ -75,7 +73,7 @@ const selectAll = (event) => {
     }
 }
 const select = () => {
-    if (props.users?.data.length == data.selectedId.length) {
+    if (props.users?.data.length === data.selectedId.length) {
         data.multipleSelect = true
     } else {
         data.multipleSelect = false
@@ -96,16 +94,10 @@ const titulos = [
     { order: 'name', label: 'Nombre', type: 'text',required: true },
     { order: 'email', label: 'Email', type: 'text' ,required: true},
     { order: 'identificacion', label: 'Identificacion', type: 'text' ,required: true},
-    // { order: 'sexo', label: 'Sexo', type: 'foreign' },
-    { order: 'area', label: 'area', type: 'text',required: true},
-    { order: 'cargo', label: 'cargo', type: 'text',required: true},
     { order: 'sexo', label: 'sexo', type: 'foreign', nameid: 'sexo_S' ,required: false},
     { order: 'celular', label: 'celular', type: 'text',required: false},
     { order: 'fecha_nacimiento', label: 'Fecha nacimiento', type: 'date' ,required: false},
 ];
-// if(props.numberPermissions > 8){
-//   titulos.push({ order: 'empresa_id', label: 'Empresa', type: 'foreign',nameid:'nombre' ,required: true})
-// }
 
 </script>
 
@@ -137,12 +129,12 @@ const titulos = [
                     <div class="flex space-x-2">
                         <SelectInput v-model="data.params.perPage" :dataSet="data.dataSet" />
                         <DangerButton @click="data.deleteBulkOpen = true"
-                            v-show="data.selectedId.length != 0 && can(['delete user'])" class="px-3 py-1.5"
+                            v-show="data.selectedId.length !== 0 && can(['delete user'])" class="px-3 py-1.5"
                             v-tooltip="lang().tooltip.delete_selected">
                             <TrashIcon class="w-5 h-5" />
                         </DangerButton>
                     </div>
-                    <TextInput v-if="props.numberPermissions > 1" v-model="data.params.search" type="text"
+                    <TextInput v-if="props.numberPermissions >= 0" v-model="data.params.search" type="text"
                         class="block w-4/6 md:w-3/6 lg:w-2/6 rounded-lg" placeholder="Nombre, correo o identificación" />
                 </div>
                 <div class="overflow-x-auto scrollbar-table">
@@ -159,16 +151,14 @@ const titulos = [
                                         <ChevronUpDownIcon class="w-4 h-4" />
                                     </div>
                                 </th>
-                                <!-- <th class="px-2 py-4 cursor-pointer" v-on:click="order('email')">
-                                    <div class="flex justify-between items-center"> <span>{{ lang().label.email }}</span> <ChevronUpDownIcon class="w-4 h-4" /> </div>
-                                </th> -->
-                                <th class="px-2 py-4">{{ lang().label.role }}</th>
-
-<!--                                <th class="px-2 py-4 cursor-pointer" v-on:click="order('identificacion')">-->
-<!--                                    <div class="flex justify-between items-center"> <span>{{ lang().label.empresa }}</span>-->
-<!--                                        <ChevronUpDownIcon class="w-4 h-4" />-->
-<!--                                    </div>-->
-<!--                                </th>-->
+                                <th class="px-2 py-4 cursor-pointer" 
+                                    v-on:click="order('roles')"
+                                >
+                                    <div class="flex justify-between items-center">
+                                        <span>{{ lang().label.role }}</span>
+                                        <ChevronUpDownIcon class="w-4 h-4" />
+                                    </div>
+                                </th>
                                 <th class="px-2 py-4 cursor-pointer" v-on:click="order('identificacion')">
                                     <div class="flex justify-between items-center"> <span>{{ lang().label.identificacion }}</span>
                                         <ChevronUpDownIcon class="w-4 h-4" />
@@ -179,28 +169,30 @@ const titulos = [
                                         <ChevronUpDownIcon class="w-4 h-4" />
                                     </div>
                                 </th>
-                                <th class="px-2 py-4 cursor-pointer" v-on:click="order('fecha_nacimiento')">
-                                    <div class="flex justify-between items-center"> <span>{{ lang().label.edad }}</span>
-                                        <ChevronUpDownIcon class="w-4 h-4" />
-                                    </div>
-                                </th>
+<!--                                <th class="px-2 py-4 cursor-pointer" v-on:click="order('fecha_nacimiento')">-->
+<!--                                    <div class="flex justify-between items-center"> <span>{{ lang().label.edad }}</span>-->
+<!--                                        <ChevronUpDownIcon class="w-4 h-4" />-->
+<!--                                    </div>-->
+<!--                                </th>-->
                                 <th class="px-2 py-4 cursor-pointer" v-on:click="order('celular')">
                                     <div class="flex justify-between items-center"> <span>{{ lang().label.celular }}</span>
                                         <ChevronUpDownIcon class="w-4 h-4" />
                                     </div>
                                 </th>
-                                <th class="px-2 py-4 cursor-pointer" v-on:click="order('area')">
+                                <th class="px-2 py-4 cursor-pointer"
+                                    v-on:click="order('area')"
+                                >
                                     <div class="flex justify-between items-center"> <span>{{ lang().label.area }}</span>
                                         <ChevronUpDownIcon class="w-4 h-4" />
                                     </div>
                                 </th>
-<!--                                <th class="px-2 py-4 cursor-pointer" v-on:click="order('cargo')">-->
-<!--                                    <div class="flex justify-between items-center"> <span>{{ lang().label.cargo }}</span>-->
-<!--                                        <ChevronUpDownIcon class="w-4 h-4" />-->
-<!--                                    </div>-->
-<!--                                </th>-->
-
-<!--                                <th class="px-2 py-4">Accion</th>-->
+                                <th class="px-2 py-4 cursor-pointer"
+                                    v-on:click="order('agregado')"
+                                >
+                                    <div class="flex justify-between items-center"> <span>{{ lang().label.agregado }}</span>
+                                        <ChevronUpDownIcon class="w-4 h-4" />
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -231,9 +223,11 @@ const titulos = [
 <!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.empresa }}</td>-->
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.identificacion }}</td>
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.sexo }}</td>
-                                <td class="whitespace-nowrap text-center py-4 px-2 sm:py-3">{{ CalcularEdad(user.fecha_nacimiento) }}</td>
+<!--                                <td class="whitespace-nowrap text-center py-4 px-2 sm:py-3">{{ CalcularEdad(user.fecha_nacimiento) }}</td>-->
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.celular }}</td>
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.area }}</td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.agregado }}</td>
+                                
 <!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.cargo }}</td>-->
 <!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">-->
 <!--                                    <div class="flex justify-center items-center">-->

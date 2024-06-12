@@ -24,7 +24,7 @@ const toggleContent2 = () => {
 }
 
 const sidebarButtons = [ //SAME AS WEB.PHP
-    // 'formulario',
+    'formulario',
 ];
 const sidebarButtonsJefe = [ //SAME AS WEB.PHP
 ];
@@ -70,6 +70,14 @@ const sidebarButtonsAdmin = [ //SAME AS WEB.PHP
                 <Link :href="route('user.index')" class="flex items-center py-2 px-4">
                 <UserIcon class="w-6 h-5" />
                 <span class="ml-3">{{ lang().label.user }}</span>
+                </Link>
+            </li>
+            <li v-show="can(['read user'])"
+                class="bg-gray-700/40 dark:bg-gray-800/40 text-white rounded-lg hover:bg-primary dark:hover:bg-primary"
+                :class="{ 'bg-sky-600 dark:bg-sky-600': route().current('user.formularioSA') }">
+                <Link :href="route('formularioSA')" class="flex items-center py-2 px-4">
+                <UserIcon class="w-6 h-5" />
+                <span class="ml-3">{{ lang().label.formularios }}</span>
                 </Link>
             </li>
             <button v-show="can(['isAdmin'])" @click="toggleContent" class="text-blue-500">

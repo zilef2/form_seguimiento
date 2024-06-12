@@ -51,13 +51,17 @@ class UserLideresSeeder extends Seeder
             ['name' => 'CARLOS EDUARDO CARVAJAL TANGARIFE', 'identificacion' => '9976965', 'area' => 'SST', 'agregado' => 'FUNCIONAMIENTO','sexo'=>'Masculino'],
             ['name' => 'VIVIANA DIAZ GIRALDO', 'identificacion' => '32141336', 'area' => 'VIRTUALIDAD', 'agregado' => 'INVERSION','sexo'=>'Femenino'],
             ['name' => 'LINA PATRICIA JIMENEZ', 'identificacion' => '43590765', 'area' => 'FTDH', 'agregado' => 'INVERSION','sexo'=>'Femenino'],
+            
+            
+            ['name' => 'JUAN DIEGO VILLA CARVAJAL', 'identificacion' => '1039447799', 'area' => 'Proceso de investigación', 'agregado' => 'Profesional Universitario','sexo'=>'Masculino', 'email' => 'juan.villa@colmayor.edu.co'],
+            ['name' => 'JULIAN STIVEN ORTIZ RESTREPO', 'identificacion' => '1047996764', 'area' => 'Centro de Lenguas', 'agregado' => 'Profesional','sexo'=>'Masculino', 'email' => 'julian.ortiz@colmayor.edu.co'],
+            
         ];
         foreach ($users2 as $user) {
             $cedula = $user['identificacion'];
             $nuevoUsuario = User::create([
                 'name' => $user['name'],
-//                'email' => strtolower(str_replace(' ', '', $user['name'])) . '@colmayor.edu.co',
-                'email' => $cedula,
+                'email' => $user['email'] ?? $cedula,
                 'identificacion' => $cedula,
                 'password' => bcrypt($cedula . '..'),
                 'area' => $user['area'],

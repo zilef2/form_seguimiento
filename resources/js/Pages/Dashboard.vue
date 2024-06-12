@@ -89,9 +89,8 @@ const downloadAnexos = () => {
                     <div @click="downloadAnexos"
                         class="bg-green-600 dark:bg-green-600/80 rounded-b-none sm:rounded-b-lg p-2 overflow-hidden hover:bg-green-600/90 dark:hover:bg-green-600/70">
 <!--                            :href="route('downloadAnexos')"-->
-                        <a
-                              class="flex justify-between items-center">
-                        <p>Descargar Adjuntos 2</p>
+                        <a class="flex justify-between items-center">
+                        <p>Descargar Adjuntos</p>
                         <ChevronRightIcon class="w-5 h-5" />
                         </a>
                     </div>

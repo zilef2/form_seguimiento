@@ -35,24 +35,6 @@ class FormularioController extends Controller
         return formulario::Where('id', '>', 0);
     }
 
-
-    public function Filtros(&$formularios, $request)
-    {
-        if ($request->has('search')) {
-            $formularios = $formularios->where(function ($query) use ($request) {
-                $query->where('nombre', 'LIKE', "%" . $request->search . "%")
-                    //                    ->orWhere('codigo', 'LIKE', "%" . $request->search . "%")
-                    //                    ->orWhere('identificacion', 'LIKE', "%" . $request->search . "%")
-                ;
-            });
-        }
-
-        if ($request->has(['field', 'order'])) {
-            $formularios = $formularios->orderBy($request->field, $request->order);
-        } else
-            $formularios = $formularios->orderBy('updated_at', 'DESC');
-    }
-
     public function nombreYvalue($tipo)
     {
         $objeto = DB::table('selecsForm')->Where('tipo', $tipo)->pluck('nombre');
@@ -189,6 +171,7 @@ class FormularioController extends Controller
     }
 
 
+    //validar si si se usa
     public function index(Request $request)
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' formularios '));
@@ -203,6 +186,56 @@ class FormularioController extends Controller
             'fromController' => $formularios->paginate($perPage),
             'total' => $formularios->count(),
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . '.index')]],
+            'title' => __('app.label.' . $this->FromController),
+            'filters' => $request->all(['search', 'field', 'order']),
+            'perPage' => (int)$perPage,
+            'numberPermissions' => $numberPermissions,
+            'losSelect' => $losSelect,
+        ]);
+    }
+
+    public function MapearSA($formus)
+    {
+        //$formularios = formulario::with('no_nada');
+        $formus->get()->map(function ($form) {
+            $form->userName = $form->userName();
+            return $form;
+        })->filter();
+        
+        return $formus;
+    }
+
+    public function Filtros(&$formularios, $request)
+    {
+        if ($request->has('search')) {
+            $formularios = $formularios->where(function ($query) use ($request) {
+                $query->where('necesidad', 'LIKE', "%" . $request->search . "%")
+                    ->orWhere('justificacion', 'LIKE', "%" . $request->search . "%")
+                    ->orWhere('valor_unitario', 'LIKE', "%" . $request->search . "%")//                    ->orWhere('identificacion', 'LIKE', "%" . $request->search . "%")
+                ;
+            });
+        }
+
+        if ($request->has(['field', 'order'])) {
+            $formularios = $formularios->orderBy($request->field, $request->order);
+        } else
+            $formularios = $formularios->orderBy('updated_at', 'DESC');
+    }
+    
+    public function formularioSA(Request $request)
+    {
+        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' formularios SA '));
+        $formus = formulario::Query();
+        $this->Filtros($formus, $request);
+        $formularios = $this->MapearSA($formus);
+        $losSelect = $this->Dependencias();
+        
+        $perPage = $request->has('perPage') ? $request->perPage : 10;
+
+        return Inertia::render($this->FromController . '/IndexSA', [
+            'fromController' => $formularios->paginate($perPage),
+            'total' => $formularios->count(),
+            'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . 'SA')]],
             'title' => __('app.label.' . $this->FromController),
             'filters' => $request->all(['search', 'field', 'order']),
             'perPage' => (int)$perPage,

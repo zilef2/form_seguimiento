@@ -1,4 +1,6 @@
 <?php
+
+use App\Exports\FormExport;
 use App\Http\Controllers\ParametrosController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -9,8 +11,9 @@ use App\Http\Controllers\FormularioController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
+use Maatwebsite\Excel\Facades\Excel;
 
- Route::get('/', [FormularioController::class, 'welcome'])->name('welcome');
+Route::get('/', [FormularioController::class, 'welcome'])->name('welcome');
 //Route::get('/', function () { return redirect('/login'); });
 Route::get('/dashboard', [UserController::class, 'Dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -41,6 +44,11 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::get('/DB_info', [UserController::class,'todaBD']);
     Route::get('/downloadAnexos', [UserController::class,'downloadAnexos'])->name('downloadAnexos');
+    Route::get('/downClaro',function(){
+        return Excel::download(new FormExport, 'DB_Mejorada.xlsx');
+    })->name('downClaro');
+    
+    Route::get('/formularioSA', [FormularioController::class, 'formularioSA'])->name('formularioSA');
 });
 Route::resource('/formulario', FormularioController::class)->except('create', 'show', 'edit');
 Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');

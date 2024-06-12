@@ -38,4 +38,8 @@ class Formulario extends Model
         'enviado',
         'user_id',
     ];
+
+    public function user(){return $this->belongsTo(User::class);}
+    public function userName(){return $this->user->name;}
+    
 }

@@ -11,6 +11,7 @@ const emit = defineEmits(["open"])
 const version = '0.1.0'
 
 const downloadExcel = () => { window.open('DB_info' , '_blank') }
+const downClaro = () => { window.open('downClaro' , '_blank') }
 
 </script>
 
@@ -85,12 +86,15 @@ const downloadExcel = () => { window.open('DB_info' , '_blank') }
                                     </div>
                                     <DropdownLink :href="route('profile.edit')"> {{ lang().label.profile }}
                                     </DropdownLink>
-                                    <form @submit.prevent="downloadExcel" id="downloadprestamo" v-if="can(['create user'])" class="hover:bg-gray-100">
-                                            <button
-                                                class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out"
-                                            type="submit">
-                                                Base de datos
-                                            </button>
+                                    <form @submit.prevent="downClaro" id="downloadprestamo" class="hover:bg-gray-100">
+                                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
+                                            Base de datos 2
+                                        </button>
+                                    </form>
+                                    <form @submit.prevent="downloadExcel" id="downloadprestamo" class="hover:bg-gray-100">
+                                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm leading-5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800 transition duration-150 ease-in-out">
+                                            Base de datos
+                                        </button>
                                     </form>
                                     <DropdownLink :href="route('logout')" method="post" as="button">
                                         {{ lang().label.logout }}

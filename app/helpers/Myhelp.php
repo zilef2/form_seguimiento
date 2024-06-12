@@ -156,6 +156,28 @@ class Myhelp {
 //                Log::critical('Vista: ' . $nombreC . 'U:' . Auth::user()->name . ' ||' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
             }
         }
+        
+        public static function WriteAuthLog($thiis, $clase = '', $mensaje = '', $returnPermission = true, $critico = false) {
+            $permissions = $returnPermission ? auth()->user()->roles->pluck('name')[0] : null;
+            $ListaControladoresYnombreClase = (explode('\\', get_class($thiis)));
+            $nombreC = end($ListaControladoresYnombreClase);
+            if (!$critico) {
+
+                $Elpapa = (explode('\\', get_parent_class($thiis)));
+                $nombreP = end($Elpapa);
+
+                if ($permissions == 'admin' || $permissions == 'superadmin') {
+                    $ElMensaje = $mensaje != '' ? ' Mensaje: ' . $mensaje : '';
+                    Log::channel('soloadmin')->info('Vista:' . $nombreC . ' Padre: ' . $nombreP . '|  U:' . Auth::user()->name . $ElMensaje);
+                } else {
+                    Log::info('Vista: ' . $nombreC . ' Padre: ' . $nombreP .' | '. $clase . '| ' . ' Mensaje: ' . $mensaje);
+                }
+                return $permissions;
+            } else {
+//                Log::critical('Vista: ' . $nombreC . 'U:' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
+                Log::critical('Vista: ' . $nombreC . 'U:' . Auth::user()->name . ' ||' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
+            }
+        }
 
     //fin LARAVEL
 

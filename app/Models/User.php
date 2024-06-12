@@ -69,6 +69,11 @@ class User extends Authenticatable
         return $this->Where('id','>',1)->get();
     }
 
+    public function formularios()
+    {
+        return $this->hasMany(Formulario::class);
+    }
+
 //    public function formularios(): HasMany {
 //        return $this->HasMany(formulario::class,'operario_id');
 //    }
