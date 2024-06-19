@@ -15,18 +15,16 @@ class FormExport implements WithHeadingRow, ShouldAutoSize, FromQuery, WithMappi
     
     private $procesoQueSolicitaPresupuesto;
 
-    function __construct()
-    {
+    function __construct(){
+        dd('2');
         $this->procesoQueSolicitaPresupuesto = MyConst::procesoQueSolicitaPresupuesto();    
     }
     
-    public function query()
-    {
+    public function query(){
         return formulario::query()->Where('enviado', 0);
     }
     
-    public function map($form): array
-    {
+    public function map($form): array{
         $proceso_que_solicita_presupuesto = [
             1 => "Admisiones, Registro y Control",
             2 => "Aseguramiento de la Calidad Académica",

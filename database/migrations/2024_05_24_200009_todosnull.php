@@ -31,7 +31,7 @@ php artisan migrate --path=/database/migrations/2024_05_24_200009_todosnull.php
             $table->string('linea_del_plan_desarrollo_al_que_apunta_la_necesidad')->nullable()->change(); //sel multiple
             $table->string('frecuencia_de_uso')->nullable()->change();//sel unica
             $table->string('mantenimientos_requeridos')->nullable()->change();//sel unica
-            $table->string('capacidad_instalada')->nullable()->change();//sel unica
+            $table->string('capacidad_instalada',1300)->nullable()->change();//sel unica
             $table->string('riesgo_de_la_inversion')->nullable()->change(); //sel unica
         });
         

@@ -31,3 +31,13 @@ user_id: 2,
 enviado:0,
 valor_total_de_la_solicitud_actual:0
 });
+
+
+/*transformaciones simples
+
+
+ */
+/*transformaciones compuestas
+
+
+ */

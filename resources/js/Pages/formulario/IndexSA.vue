@@ -22,7 +22,7 @@ import Delete from '@/Pages/formulario/Delete.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import InfoButton from '@/Components/InfoButton.vue';
 
-import { PrimerasPalabras, vectorSelect, formatDate, CalcularAvg, number_format } from '@/global.ts';
+import {PrimerasPalabras, vectorSelect, formatDate, CalcularAvg, number_format, plata_format} from '@/global.ts';
 
 const { _, debounce, pickBy } = pkg
 const props = defineProps({
@@ -53,7 +53,27 @@ const data = reactive({
     deleteOpen: false,
     // deleteBulkOpen: false,
     dataSet: usePage().props.app.perpage,
+    ElTotalFinal: 0,
+    ElCantidadTotal: 0,
 })
+onMounted(() => {
+    let value
+    props.fromController.data.forEach(element => {
+
+        console.log("=>(IndexSA.vue:63) element.valor_total_solicitatdo_por_necesidad", element.valor_total_solicitatdo_por_necesidad);
+        // value = element.valor_total_solicitatdo_por_necesidad.replace('.00','');
+        value = element.valor_total_solicitatdo_por_necesidad.replace(/\.0+$/, '');
+        
+        value = parseInt(value);
+        console.log("=>(IndexSA.vue:64) valuea", value);
+        data.ElTotalFinal += value
+        
+        
+        data.ElCantidadTotal += parseInt(element.cantidad)
+        
+    });
+});
+
 
 // <!--<editor-fold desc="order, watchclone, select">-->
 const order = (field) => {
@@ -80,7 +100,7 @@ const selectAll = (event) => {
     }
 }
 const select = () => {
-    if (props.fromController?.data.length == data.selectedId.length) {
+    if (props.fromController?.data.length === data.selectedId.length) {
         data.multipleSelect = true
     } else {
         data.multipleSelect = false
@@ -117,6 +137,7 @@ const titulos = [
     { order: 'capacidad_instalada', label: 'Capacidad instalada', type: 'text' },
     { order: 'riesgo_de_la_inversion', label: 'Riesgo de la inversion', type: 'text' },
     { order: 'valor_total_de_la_solicitud_actual', label: 'Valor total de la solicitud actual', type: 'dinero' },
+    { order: 'enviado', label: 'Enviado', type: 'boolEnviado' },
   // { order: 'inventario', label: 'inventario', type: 'foreign',nameid:'nombre'},
   //   anexos
   //   user_id
@@ -168,15 +189,15 @@ const titulos = [
                     <table v-if="props.total > 0" class="w-full">
                         <thead class="uppercase text-sm border-t border-gray-200 dark:border-gray-700">
                             <tr class="dark:bg-gray-900/50 text-left">
-                                <th class="px-2 py-4 text-center">
-                                    <Checkbox v-model:checked="data.multipleSelect" @change="selectAll" />
-                                </th>
+<!--                                <th class="px-2 py-4 text-center">-->
+<!--                                    <Checkbox v-model:checked="data.multipleSelect" @change="selectAll" />-->
+<!--                                </th>-->
 <!--                                <th v-if="numberPermissions > 1" class="px-2 py-4">Accion</th>-->
 
 <!--                                <th class="px-2 py-4 text-center">#</th>-->
                                 <th v-for="titulo in titulos" class="px-2 py-4 cursor-pointer"
                                     v-on:click="order(titulo['order'])">
-                                    <div class="flex justify-between items-center">
+                                    <div class="flex justify-between items-center ml-4">
                                         <span>{{ titulo['label'] }}</span>
 <!--                                        <span>{{ lang().label[titulo['label']] }}</span>-->
                                         <ChevronUpDownIcon class="w-4 h-4" />
@@ -194,30 +215,30 @@ const titulos = [
                             <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"
                                 class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-200/30 hover:dark:bg-gray-900/20">
 
-                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center">
-                                    <input
-                                        class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-primary dark:text-primary shadow-sm focus:ring-primary/80 dark:focus:ring-primary dark:focus:ring-offset-gray-800 dark:checked:bg-primary dark:checked:border-primary"
-                                        type="checkbox" @change="select" :value="claseFromController.id"
-                                        v-model="data.selectedId" />
-                                </td>
-                                <td v-if="numberPermissions > 1" class="whitespace-nowrap py-4 w-12 px-2 sm:py-3">
-                                    <div class="flex justify-center items-center">
-                                        <div class="rounded-md overflow-hidden">
-                                            <InfoButton v-show="can(['update user'])" type="button"
-                                                @click="(data.editOpen = true), (data.formularioo = claseFromController)"
-                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">
-                                                <PencilIcon class="w-4 h-4" />
-                                            </InfoButton>
-                                            <DangerButton v-show="can(['delete user'])" type="button"
-                                                @click="(data.deleteOpen = true), (data.formularioo = claseFromController)"
-                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.delete">
-                                                <TrashIcon class="w-4 h-4" />
-                                            </DangerButton>
-                                        </div>
-                                    </div>
-                                </td>
+<!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center">-->
+<!--                                    <input-->
+<!--                                        class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-primary dark:text-primary shadow-sm focus:ring-primary/80 dark:focus:ring-primary dark:focus:ring-offset-gray-800 dark:checked:bg-primary dark:checked:border-primary"-->
+<!--                                        type="checkbox" @change="select" :value="claseFromController.id"-->
+<!--                                        v-model="data.selectedId" />-->
+<!--                                </td>-->
+<!--                                <td v-if="numberPermissions > 9" class="whitespace-nowrap py-4 w-12 px-2 sm:py-3">-->
+<!--                                    <div class="flex justify-center items-center">-->
+<!--                                        <div class="rounded-md overflow-hidden">-->
+<!--                                            <InfoButton v-show="can(['update user'])" type="button"-->
+<!--                                                @click="(data.editOpen = true), (data.formularioo = claseFromController)"-->
+<!--                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">-->
+<!--                                                <PencilIcon class="w-4 h-4" />-->
+<!--                                            </InfoButton>-->
+<!--                                            <DangerButton v-show="can(['delete user'])" type="button"-->
+<!--                                                @click="(data.deleteOpen = true), (data.formularioo = claseFromController)"-->
+<!--                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.delete">-->
+<!--                                                <TrashIcon class="w-4 h-4" />-->
+<!--                                            </DangerButton>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </td>-->
 <!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center">{{ ++indexu }}</td>-->
-                                <td v-for="titulo in titulos" class="whitespace-nowrap py-4 px-2 sm:py-3">
+                                <td v-for="titulo in titulos" class="whitespace-nowrap text-center py-4 px-2 sm:py-3">
                                     <span v-if="titulo['type'] === 'text'"> {{ claseFromController[titulo['order']] }} </span>
                                     <span v-if="titulo['type'] === 'number'"> {{ number_format(claseFromController[titulo['order']], 0, false) }} </span>
                                     <span v-if="titulo['type'] === 'dinero'"> {{ number_format(claseFromController[titulo['order']], 0, true) }} </span>
@@ -225,17 +246,27 @@ const titulos = [
                                     <span v-if="titulo['type'] === 'datetime'"> {{ formatDate(claseFromController[titulo['order']], true) }} </span>
                                     <span v-if="titulo['type'] === 'foreign'"> {{ claseformularioa[titulo['order']][titulo['nameid']] }} </span>
                                     <span v-if="titulo['type'] === 'alterNumber'"> {{ parseInt(claseFromController[titulo['order']])+1 }} </span>
+                                    <span v-if="titulo['type'] === 'boolEnviado'"> {{ (claseFromController[titulo['order']] ? 'Enviado' : 'Guardado') }} </span>
                                 </td>
 
                             </tr>
                             <tr class="border-t border-gray-600">
-                                <td v-if="numberPermissions > 1"
-                                    class="whitespace-nowrap py-4 w-12 px-2 sm:py-3 text-center"> -
-                                </td>
-                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> Total: </td>
-                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center">
+<!--                                <td v-if="numberPermissions > 1"-->
+<!--                                    class="whitespace-nowrap py-4 w-12 px-2 sm:py-3 text-center"> - -->
+<!--                                </td>-->
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> # </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> Necesidades: </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-extrabold">
                                     {{ props.total }}
                                 </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> - </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> - </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> - </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> - </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> - </td>
+<!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> {{ data.ElCantidadTotal }} </td>-->
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> - </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> {{ plata_format(data.ElTotalFinal) }} </td>
                             </tr>
                         </tbody>
                     </table>

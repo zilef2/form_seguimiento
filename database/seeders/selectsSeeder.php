@@ -66,6 +66,7 @@ class selectsSeeder extends Seeder
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>"Riesgos Fiscal", 'tipo' => 'riesgo_de_la_inversion']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>"Riesgos de Gestión", 'tipo' => 'riesgo_de_la_inversion']);
         DB::table('selecsForm')->insertOrIgnore(['nombre' =>"Riesgos de Corrupción", 'tipo' => 'riesgo_de_la_inversion']);
+        DB::table('selecsForm')->insertOrIgnore(['nombre' =>"No aplica", 'tipo' => 'riesgo_de_la_inversion']);
     }
 }
 /*

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Illuminate\Foundation\Application;
+use PhpOffice\PhpSpreadsheet\Writer\Ods\Formula;
 
 class FormularioController extends Controller
 {
@@ -60,16 +61,23 @@ class FormularioController extends Controller
 
     //</editor-fold>
 
-    //toinfo: SE VALIDAN si el doc ya evaluó o no
-    public function welcome(Request $request)
+    public function InfoEnviada($cedula)
     {
-//        dd($request->identUser);
+        $elUser = User::Where('identificacion',$cedula)->first();
+        if(!$elUser) return [];
+
+        $TablaNecesidades = Formulario::Where('user_id',$elUser->id)->get();
+        
+        if($TablaNecesidades->isEmpty()) return [];
+        return $TablaNecesidades;
+    }
+
+    //toinfo: SE VALIDAN si el doc ya evaluó o no
+    public function welcome(Request $request){
         $UIDformulariosYaDiligenciados = Formulario::Where('enviado', 1)->pluck('user_id')->unique();
         $UIDformulariosGuardados = Formulario::Where('enviado', 0)->pluck('user_id')->unique();
         $losSelect = $this->Dependencias();
 
-
-//dd($request->identUser);
         $cedLideresDiligenciados = User::Where('esLider', 1)
             ->WhereIn('id', $UIDformulariosYaDiligenciados)
             ->get()->mapWithKeys(function ($user) {
@@ -81,10 +89,11 @@ class FormularioController extends Controller
                 ];
             }
             )->toArray();
-//        $TodosDiligenciados = count($cedLideres) === 0 && count($cedLideresGuardados) === 0;
         $cedlideres = $this->getcedLideres($request);
+        
+        
+        $infoEnviada = $this->InfoEnviada($request->identUser);
 
-//        $cedLideresGuardados = $cedlideres === [] ? $this->getcedLideresGuardados($request) : [];
         
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
@@ -96,12 +105,11 @@ class FormularioController extends Controller
 
             'cedLideresDiligenciados' => $cedLideresDiligenciados,
 
-//            'cedLideresGuardados' => $cedLideresGuardados,
-//            'cedLideres' => $cedLideres,
+            'infoEnviada' => $infoEnviada,
+            
             //lazy loads
             'cedLideres' => Inertia::lazy(fn() => $cedlideres),
             'cedLideresGuardados' => Inertia::lazy(fn() => $this->getcedLideresGuardados($request)),
-//            'identifi_user' => Inertia::lazy(fn() => $request->identUser),
         ]);
     }
 
@@ -174,7 +182,10 @@ class FormularioController extends Controller
     //validar si si se usa
     public function index(Request $request)
     {
-        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' formularios '));
+        $numberPermissions = MyModels::getPermissionToNumber(
+            Myhelp::WriteAuthLog($this, ' --formularios index-- ')
+        );
+        
         $formularios = $this->Mapear();
         $this->Filtros($formularios, $request);
         $losSelect = $this->Dependencias();
@@ -194,6 +205,8 @@ class FormularioController extends Controller
         ]);
     }
 
+    
+    //empieza Formularios SA
     public function MapearSA($formus)
     {
         //$formularios = formulario::with('no_nada');
@@ -309,11 +322,11 @@ class FormularioController extends Controller
 
     public function store(Request $request){ //guardar
         try {
+            
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formularios');
             $user = User::Where('identificacion', $request->identificacion_user)->first();
-            if(!$user){ // error de autoguardado
+            if(!$user){ // Autoguardado acumulado
                 return back();
-//                return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . 'Hay un error de red');
             }
             
             DB::beginTransaction();
@@ -368,6 +381,7 @@ class FormularioController extends Controller
             }
             
             DB::commit();
+            
             return back()->with('success', __('app.label.formulario_created_successfully', ['number' => $numeroTotal]));
         } catch (\Throwable $th) {
             DB::rollback();

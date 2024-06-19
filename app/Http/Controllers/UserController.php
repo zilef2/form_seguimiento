@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\helpers\CargosModelos;
 use App\helpers\HelpExcel;
 use App\helpers\Myhelp;
+use App\helpers\MyModels;
 use App\Http\Requests\User\UserIndexRequest;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
@@ -39,7 +40,6 @@ class UserController extends Controller {
     }
 
     public function Dashboard() {
-//        $numberPermissions = CargosModelos::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' Dashboard'));
 //        if($numberPermissions > 1){
         $sourcePath = storage_path('app/public/anexosPrimerForm');
         $files = File::files($sourcePath);
@@ -132,7 +132,7 @@ class UserController extends Controller {
 
     public function index(Request $request) {
         $permissions = Myhelp::EscribirEnLog($this, ' users');
-        $numberPermissions = CargosModelos::getPermissionToNumber($permissions);
+        $numberPermissions = MyModels::getPermissionToNumber($permissions);
 
         $users = User::query()->with('roles');
         $this->MapearClasePP($users,$numberPermissions,$request,$roles);
@@ -263,7 +263,6 @@ class UserController extends Controller {
 
     public function subirexceles(){ //just  a view
         $permissions = Myhelp::EscribirEnLog($this, ' materia');
-        $numberPermissions = CargosModelos::getPermissionToNumber($permissions);
 
         return Inertia::render('User/subirExceles', [
             'breadcrumbs'   => [['label' => __('app.label.user'), 'href' => route('user.index')]],

@@ -70,7 +70,7 @@ class administrativosUserSeeder extends Seeder{
 //                'email' => strtolower(str_replace(' ', '', $user['name'])) . '@colmayor.edu.co',
                     'email' => $user['email'],
                     'identificacion' => $cedula,
-                    'password' => bcrypt($nombre . '+Presupuesto'), //JACKELINE+Presupuesto
+                    'password' => bcrypt($nombre . '+Presupuesto'), //JACKELINE+Presupuesto  LUIS+Presupuesto
                     'area' => $user['area'],
                     'agregado' => $user['agregado'],
                     'sexo' => $user['sexo'],

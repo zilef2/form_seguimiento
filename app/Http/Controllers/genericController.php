@@ -58,7 +58,7 @@ class geenericController extends Controller
     //</editor-fold>
 
     public function index(Request $request) {
-        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' generics '));
+//        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' generics '));
         $generics = $this->Mapear();
         $this->Filtros($generics,$request);
         $losSelect = $this->Dependencias();

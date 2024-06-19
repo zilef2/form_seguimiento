@@ -100,8 +100,8 @@ Categoria_producto
             $contador++;
         }
 
-        if($permissions === 'admin') return 9;
-        if($permissions === 'superadmin') return 10;
+        if($permissions === 'admin') return 90;
+        if($permissions === 'superadmin') return 100;
         return 0;
     }
 }

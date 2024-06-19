@@ -2,16 +2,17 @@
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import SwitchDarkMode from '@/Components/SwitchDarkMode.vue';
 import {Head, router} from '@inertiajs/vue3'; //Link
-import {ref, reactive, watch, watchEffect} from "vue";
+import {reactive, ref, watch, watchEffect} from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {form} from './form';
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
-import {number_format, plata_format, separador_ceros} from "@/global";
+import {number_format, plata_format} from "@/global";
 import Toast from "@/Components/Toast.vue";
 import {AumentarForm, DisminuirForm} from "@/Pages/formFunctions";
 import {throttle} from 'lodash';
 import MasyMenos from "@/Pages/MasyMenos.vue";
+import TablaResumenEnviado from "@/Pages/TablaResumenEnviado.vue";
 
 
 const props = defineProps({
@@ -20,6 +21,7 @@ const props = defineProps({
     cedLideresGuardados: Object,
     cedLideresDiligenciados: Object,
     TodosDiligenciados: Boolean,
+    infoEnviada: Object,
 })
 
 let anioActual = new Date().getFullYear();
@@ -102,7 +104,8 @@ const data = reactive({
         {value:5,label:"Infraestructura Física"},
         {value:6,label:"Sistema de Gestión Integral - SGI -"},
         {value:7,label:"Tecnología y Medios Audiovisuales"},
-        {value:8,label:"Talento Humano"}
+        {value:8,label:"Talento Humano"},
+        {value:9,label:"Ninguno"}
     ],
 
     actividades: [
@@ -338,7 +341,8 @@ const data = reactive({
         {label: "Subvencion", value: 43},
         {label: "Suministro de comidad y refrigerios", value: 44},
         {label: "Telefoniacelular e internet", value: 45},
-        {label: "Viaticos", value: 46}
+        {label: "Viaticos", value: 46},
+        {label: "Otra", value: 47}, // data.OpcionOtra
     ],
     vigencias_anteriores: [
         {
@@ -361,6 +365,8 @@ const data = reactive({
     valor_total_solicitatdo_por_necesidad: [],
     Otras_unidad_de_medida: [false],
     Otras_capacidad_instalada: [false],
+    Otras_categoria: [true],
+    OpcionOtra: 47, //cambiar si aparecen mas opciones
 
     unidad_de_medida: [],
     //showopciones
@@ -373,7 +379,7 @@ const data = reactive({
     classOfText2: "min-w-[320px] max-h-[110px] p-4",
     classOfTextLG: "min-w-[400px] max-h-[110px] p-4",
     classOfTextXL: "min-w-[600px] max-h-[110px] p-4",
-    classOfText_checkbox: "min-w-[380px] max-h-[250px] overflow-y-scroll p-4",
+    classOfText_checkbox: "min-w-[480px] max-h-[350px] overflow-y-scroll p-4",
     
     //el checkbox de ninguno
     checkdisabled:[[false,false,false,false]]
@@ -506,7 +512,7 @@ function isSelected3(value) {
 // <!--</editor-fold>-->
 
 
-// <!--<editor-fold desc="no important functions">-->
+// <!--<editor-fold desc="on and of functions - localhost">-->
 const onContent = () => {
     data.showContent = true
 }
@@ -553,6 +559,7 @@ function recuperaform(Formulario) {
         form.justificacion[index] = element.justificacion
         form.actividad[index] = element.actividad
         form.categoria[index] = element.categoria
+        data.Otras_categoria[index] = !isNan(element.categoria)
         form.unidad_de_medida[index] = element.unidad_de_medida
         form.cantidad[index] = (element.cantidad)
         form.valor_total_solicitatdo_por_necesidad[index] = element.valor_total_solicitatdo_por_necesidad
@@ -768,6 +775,8 @@ watchEffect(() => {
                         form.valor_total_solicitatdo_por_necesidad[index] = 0
                         data.valor_total_solicitatdo_por_necesidad[index] = 0
                     }
+
+                    
                 } catch (exceptionVar) {
                     form.valor_total_solicitatdo_por_necesidad[index] = 0
                     data.valor_total_solicitatdo_por_necesidad[index] = 0
@@ -834,6 +843,24 @@ watch(() => form.vigencias_anteriores, (NuevaVig) => {
     })
 }, {deep: true});
 
+watch(() => form.actividad, (nuevaActi) => {
+    let valorMaxActividad = 1200
+    nuevaActi.forEach((element, index) => {
+        if (element.length > valorMaxActividad) {
+            form.actividad[index] = form.actividad[index].substring(0,valorMaxActividad)
+        } 
+    })
+}, {deep: true});
+
+watch(() => form.capacidad_instalada, (nuevoVal) => {
+    let valorMax = 1200
+    nuevoVal.forEach((element, index) => {
+        if (element.length > valorMax) {
+            form.capacidad_instalada[index] = form.capacidad_instalada[index].substring(0, valorMax)
+        }
+    })
+}, {deep: true});
+
 
 function buscarEnProps(cedulaBuscada, elprops) {
     for (let cedula in elprops) {
@@ -867,6 +894,21 @@ watch(() => form.capacidad_instalada, (nuevx) => {
             if(element === 'No' || element === 'no'){
                 form.capacidad_instalada[index] = 'No'
                 data.Otras_capacidad_instalada[index] = false
+            }
+        }
+    });
+}, {deep: true});
+
+watch(() => form.categoria, (nuevx) => {
+    
+    nuevx.forEach((element, index) => {
+        if (!isNaN(element) && element == data.OpcionOtra) {
+            data.Otras_categoria[index] = false
+            // form.categoria[index] = 1
+        }else{
+            if(element === 'No' || element === 'no'){
+                // form.categoria[index] = 'No'
+                data.Otras_categoria[index] = true
             }
         }
     });
@@ -936,7 +978,7 @@ const handleEnterCedula2 = () => {
             } else {
                 if (buscarEnProps(form.identificacion_user, props.cedLideresDiligenciados)) {
                     data.mensajeYaHaSidoGuardado = "Si requiere realizar algún tipo de modificación o corrección por favor comunicarse con el proceso de Presupuesto o Planeación."
-                    alert(data.mensajeYaHaSidoGuardado)
+                    // alert(data.mensajeYaHaSidoGuardado)
                     data.identificacion_disbled = true
                 } else {
                     offContent();
@@ -1064,8 +1106,7 @@ const create = (validator, second) => {
                         <section class="bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-900 space-y-6 rounded-2xl">
                             <div class="md:inline-flex space-y-4 md:space-y-0 w-full p-4 text-gray-700 dark:text-gray-200 items-center">
                                 <h2 v-show="!data.showContent" class="md:w-1/2 max-w-sm mx-auto dark:text-gray-100 2xl:text-xl">Por favor, digite el
-                                    numero de
-                                    documento para empezar:
+                                    numero de documento para empezar:
                                 </h2>
                                 <div class="md:w-2/3 max-w-lg mx-auto">
                                     <label class="text-md text-gray-400"></label>
@@ -1137,9 +1178,9 @@ const create = (validator, second) => {
                             <hr class="mb-4"/>
                             <div v-for="(indexFila,conteoi) in data.ConteoCosas" v-show="data.showContent" name="fade">
                                 <div>
-                                    <div class="md:inline-flex  space-y-4 md:space-y-0 w-full p-4 text-gray-700 items-center">
+                                    <div class="md:inline-flex  space-y-2 md:space-y-0 w-full p-4 text-gray-700 items-center">
                                         <div ref="container"
-                                            class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[190px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl"
+                                            class="flex gap-8 w-full mx-auto overflow-x-scroll min-h-[370px] bg-gray-300 dark:bg-gray-600 shadow-lg rounded-2xl"
                                             :class="{'border-t border-red-600' : indexFila === data.ConteoCosas}"
                                         >
 
@@ -1148,13 +1189,9 @@ const create = (validator, second) => {
 <!--                                            </div>-->
 
                                             
-                                            
-                                            
                                             <div :class="data.classOfTxtAreas">
-                                                
-                                                 <label class="text-md text-gray-900 font-extrabold"> Necesidad
                                                     <!--                          {{ conteoi + 1 }}-->
-                                                </label>
+                                                 <label class="text-md text-gray-900 font-extrabold"> Necesidad </label>
                                                 <p class="text-md text-gray-700 mb-12">
                                                     Describir de manera detallada la necesidad a solicitar<br>
                                                     Ejemplo: Se requiere contratista de apoyo con experiencia en atención al cliente
@@ -1196,7 +1233,7 @@ const create = (validator, second) => {
                                                     <!--                                                           :dataSet="data.actividades"-->
                                                     <!--                                                           class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"-->
                                                     <!--                                                           />-->
-                                                    <input v-model="form.actividad[conteoi]" @keydown.enter.prevent="create" @blur="metodoConThrottle"
+                                                    <textarea cols="100" rows="7" v-model="form.actividad[conteoi]" @keydown.enter.prevent="create" @blur="metodoConThrottle"
                                                            type="text"
                                                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                            autocomplete="off"/>
@@ -1206,14 +1243,22 @@ const create = (validator, second) => {
                                             <div :class="data.classOfTextLG">
                                                  <label class="text-md text-gray-900 font-bold capitalize">categoría</label>
                                                 <p class="text-md text-gray-700">
-                                                    Seleccionar la categoría acorde a la
-                                                    necesidad
+                                                    Seleccionar la categoría acorde a la necesidad
                                                 </p>
-                                                <div class="w-full inline-flex">
+                                                <div v-if="data.Otras_categoria[conteoi]" class="w-full inline-flex">
                                                     <SelectInput v-model="form.categoria[conteoi]" @keydown.enter.prevent="create"
                                                                  :dataSet="data.categoria"
                                                                  class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                                  autocomplete="off"/>
+                                                    <InputError class="mt-2" :message="form.errors.categoria"/>
+                                                </div>
+                                                <div v-else class="w-full inline-flex">
+                                                    <input
+                                                        v-model="form.categoria[conteoi]" @keydown.enter.prevent="create"
+                                                        @blur="metodoConThrottle"
+                                                        type="text"
+                                                        class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                                        />
                                                     <InputError class="mt-2" :message="form.errors.categoria"/>
                                                 </div>
                                             </div>
@@ -1281,8 +1326,7 @@ const create = (validator, second) => {
 
                                             <div :class="data.classOfText2">
                                                  <label class="text-md text-gray-900 font-bold">Período de inicio de ejecución</label>
-                                                <p class="text-md text-gray-700">Seleccionar el cuatrimestre en el que iniciará
-                                                    la ejecución</p>
+                                                <p class="text-md text-gray-700">Seleccionar el cuatrimestre en el que iniciará la ejecución</p>
                                                 <div class="w-full inline-flex">
                                                     <SelectInput @keydown.enter.prevent="create"
                                                                  :dataSet="props.losSelect.periodo_de_inicio_de_ejecucion" @blur="metodoConThrottle"
@@ -1466,7 +1510,7 @@ const create = (validator, second) => {
                                                     <InputError class="mt-2" :message="form.errors.capacidad_instalada"/>
                                                 </div>
                                                 <div v-else class="w-full inline-flex">
-                                                    <input v-model="form.capacidad_instalada[conteoi]" type="text" @keydown.enter.prevent="create"
+                                                    <textarea cols="100" rows="7" v-model="form.capacidad_instalada[conteoi]" type="text" @keydown.enter.prevent="create"
                                                            @blur="metodoConThrottle"
                                                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                                            autocomplete="off"/>
@@ -1507,11 +1551,11 @@ const create = (validator, second) => {
                                                     />
                                                     <p v-if="form.anexos[conteoi]"
                                                        class="w-full my-2 mx-6 text-green-700 underline">
-                                                        {{ form.anexos[conteoi].name }} achu
+                                                        {{ form.anexos[conteoi].name }}
                                                     </p>
                                                     <p v-else-if="data.showanexos[conteoi]"
                                                        class="w-full my-2 mx-6 text-green-700 underline">
-                                                        {{ data.showanexos[conteoi] }} achu2
+                                                        {{ data.showanexos[conteoi] }}
                                                     </p>
                                                 </div>
                                             </div>
@@ -1648,12 +1692,22 @@ const create = (validator, second) => {
                          class="grid mx-auto sm:mx-0 text-center">
                         <p class="text-lg text-black dark:text-white">{{ $page.props.app.name }} ©️</p>
                     </div>
-                    <div v-else class="grid text-[#499884] font-medium text-xl mx-auto flex-row justify-center text-center">
+                    <div v-else class="grid text-[#499884] font-extrabold text-xl mx-auto flex-row justify-center text-center">
                         <p class="mx-auto text-center">{{ data.mensajeYaHaSidoGuardado }}</p>
                     </div>
                 </div>
+<!--                qwe {{ props.infoEnviada}}-->
+                
+                <div v-if="data.mensajeYaHaSidoGuardado !== ''" class="my-8">
+                    <TablaResumenEnviado
+                        :identificacion_user = form.identificacion_user
+                        :infoEnviada = props.infoEnviada
+                        :lista_pros_presupuestp = data.lista_pros_presupuestp
+                    />
+                </div>
             </section>
         </div>
+        
     </div>
 </template>
 <style>

@@ -36,17 +36,6 @@ class CargosModelos {
             'isSome' => $isSome,
         ];
     }
-
-    public static function getPermissionToNumber($permissions){
-
-        if ($permissions === 'administrativo') return 1;
-        if ($permissions === 'lider') return 2;
-
-
-        if ($permissions === 'admin') return 90;
-        if ($permissions === 'superadmin') return 100;
-        return 0;
-    }
 }
 
 ?>
