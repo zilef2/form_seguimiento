@@ -28,7 +28,7 @@ let anioActual = new Date().getFullYear();
 
 const data = reactive({
     // modoCero:false,
-    TamanoMAX: 10, //10MB
+    TamanoMAX: 5, //5MB
     mensajeYaHaSidoGuardado: '',
     tamanin: '',
     mensajes: '',
@@ -404,7 +404,7 @@ const GuardarArchivo = ((n) => {
         ) {
             var formpeso = (Math.round(form.anexos[n].size / (1024 * 1024))) //MB
             if (formpeso > data.TamanoMAX) {
-                alert('El peso del archivo supera los 2MB')
+                alert('El peso del archivo supera las 5MB')
                 borrarARchivo(n)
             }
         } else {
@@ -476,7 +476,6 @@ function toggleSelection2(value, conteoi) {
         modoNinguno(conteoi,false) //habilitar
     }
 }
-
 function pintarTodoCero(conteoi) {
     let elcheckbox
     form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].forEach((element) => {
@@ -485,8 +484,6 @@ function pintarTodoCero(conteoi) {
             elcheckbox.checked = false;
     });
 }
-
-
 function isSelected2(value, conteoi) {
     // return setTimeout(() => {
     //     if (form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi])
@@ -496,6 +493,7 @@ function isSelected2(value, conteoi) {
             return form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(value)
 }
 
+
 function toggleSelection3(value, conteoi) {
     const selectedIndex = form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].indexOf(value);
     if (selectedIndex === -1) {
@@ -504,9 +502,21 @@ function toggleSelection3(value, conteoi) {
         form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
     }
 }
-
 function isSelected3(value) {
     return form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad.includes(value);
+}
+
+
+function isSelected_riesgo(value) {
+    return form.riesgo_de_la_inversion.includes(value);
+}
+function toggleSelectio_riesgo(value, conteoi) {
+    const selectedIndex = form.riesgo_de_la_inversion[conteoi].indexOf(value);
+    if (selectedIndex === -1) {
+        form.riesgo_de_la_inversion[conteoi].push(value);
+    } else {
+        form.riesgo_de_la_inversion[conteoi].splice(selectedIndex, 1);
+    }
 }
 
 // <!--</editor-fold>-->
@@ -559,7 +569,7 @@ function recuperaform(Formulario) {
         form.justificacion[index] = element.justificacion
         form.actividad[index] = element.actividad
         form.categoria[index] = element.categoria
-        data.Otras_categoria[index] = !isNan(element.categoria)
+        data.Otras_categoria[index] = !isNaN(element.categoria)
         form.unidad_de_medida[index] = element.unidad_de_medida
         form.cantidad[index] = (element.cantidad)
         form.valor_total_solicitatdo_por_necesidad[index] = element.valor_total_solicitatdo_por_necesidad
@@ -571,7 +581,7 @@ function recuperaform(Formulario) {
         form.valor_asignado_en_la_vigencia_anterior[index] = plata_format(parseInt(element.valor_asignado_en_la_vigencia_anterior))
 
         // <!--<editor-fold desc="multiples">-->
-                let mento;
+        let mento;
         let eleInteger;
         let checkboxNinguno
         // form.procesos_involucrados = []
@@ -594,7 +604,6 @@ function recuperaform(Formulario) {
         if (!data.checkdisabled[index]) {
             data.checkdisabled[index] = [false,false,false,false];
         }
-
         if (element.plan_de_mejoramiento_al_que_apunta_la_necesidad.length) {
             form.plan_de_mejoramiento_al_que_apunta_la_necesidad[index] = []
             element.plan_de_mejoramiento_al_que_apunta_la_necesidad.forEach(generico => {
@@ -623,7 +632,27 @@ function recuperaform(Formulario) {
                 //form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index].filter(item => item !== null);
             });
         }
-                // <!--</editor-fold>-->
+       
+        //riesgo
+        let CheckRiesgo
+
+        if (element.riesgo_de_la_inversion.length) {
+            form.riesgo_de_la_inversion[index] = []
+            element.riesgo_de_la_inversion.forEach(generico => {
+                // eleInteger = parseInt(generico)
+                // console.log("=>(Welcome.vue:645) eleInteger", eleInteger);
+                props.losSelect.riesgo_de_la_inversion.forEach((item, inde) => {
+                    if (item.value === generico) {
+                        form.riesgo_de_la_inversion[index].push(item.value)
+                        console.log("=>", item.value + '_d' + index);
+                        CheckRiesgo = document.getElementById(inde + '_d' + index);
+                        if (CheckRiesgo) CheckRiesgo.checked = true;
+                    }
+                });
+            });
+        }
+
+        // <!--</editor-fold>-->
 
 
         form.frecuencia_de_uso[index] = element.frecuencia_de_uso
@@ -681,29 +710,37 @@ const AumentarMasUno = () => {
     
     if(Bandera) return 
 
-    let valCombi;
+    let Bandera2;
     if (!!form.vigencias_anteriores[ene]) {
         if (form.vigencias_anteriores[ene] === 'No') {
-            valCombi = true
+            Bandera2 = true //aquiii
         } else {
-            valCombi = !!(form.valor_asignado_en_la_vigencia_anterior[ene])
+            Bandera2 = !!(form.valor_asignado_en_la_vigencia_anterior[ene])
         }
     }
+    console.log("=>(Welcome.vue:724) Bandera2", Bandera2);
     
-    if(valCombi){
+    // let Bandera3;
+    // if (!!form.categoria[ene]) {
+    //     if (form.categoria[ene] === ) {
+    //         Bandera3 = true
+    //     } else {
+    //         Bandera3 = !!(form.valor_asignado_en_la_vigencia_anterior[ene])
+    //     }
+    // }
+
+    if(Bandera2){
         metodoConThrottle();
         if (!data.checkdisabled[tamanoActual]) {
             data.checkdisabled[tamanoActual] = [];
         }
         modoNinguno(tamanoActual,false)//habilitar
-        // data.checkdisabled[conteoi]
-        console.log("=>(Welcome.vue:684) tamanoActual", tamanoActual);
-        console.log("=>(Welcome.vue:683) data.checkdisabled[tamanoActual]", data.checkdisabled[tamanoActual]);
 
         AumentarForm(form)
         data.ConteoCosas++
         data.Otras_unidad_de_medida[tamanoActual] = false;
         data.Otras_capacidad_instalada[tamanoActual] = false;
+        data.Otras_categoria[tamanoActual] = true;
         data.desabilitar_vigencias_anteriores[tamanoActual] = false;
 
     }else{
@@ -904,7 +941,7 @@ watch(() => form.categoria, (nuevx) => {
     nuevx.forEach((element, index) => {
         if (!isNaN(element) && element == data.OpcionOtra) {
             data.Otras_categoria[index] = false
-            // form.categoria[index] = 1
+            form.categoria[index] = ''
         }else{
             if(element === 'No' || element === 'no'){
                 // form.categoria[index] = 'No'
@@ -1517,24 +1554,48 @@ const create = (validator, second) => {
                                                     <InputError class="mt-2" :message="form.errors.capacidad_instalada"/>
                                                 </div>
                                             </div>
-                                            <div class="min-w-[300px] max-h-[110px] p-4">
-                                                 <label class="text-md text-gray-900 font-bold">Riesgo</label>
-                                                    <p class="text-md text-gray-700">
-                                                        Seleccionar ¿Cuáles son los posibles riesgos involucrados en actividad?
-                                                    </p>
-                                                <div class="w-full inline-flex">
-                                                    <SelectInput :dataSet="props.losSelect.riesgo_de_la_inversion" @keydown.enter.prevent="create"
-                                                                 v-model="form.riesgo_de_la_inversion[conteoi]"
-                                                                 type="text"
-                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                                                 autocomplete="off"/>
-                                                    <InputError class="mt-2" :message="form.errors.riesgo_de_la_inversion"/>
+<!--                                            <div class="min-w-[300px] max-h-[110px] p-4">-->
+<!--                                                 <label class="text-md text-gray-900 font-bold">Riesgo</label>-->
+<!--                                                    <p class="text-md text-gray-700">-->
+<!--                                                        Seleccionar ¿Cuáles son los posibles riesgos involucrados en actividad?-->
+<!--                                                    </p>-->
+<!--                                                <div class="w-full inline-flex">-->
+<!--                                                    <SelectInput :dataSet="props.losSelect.riesgo_de_la_inversion" @keydown.enter.prevent="create"-->
+<!--                                                                 v-model="form.riesgo_de_la_inversion[conteoi]"-->
+<!--                                                                 type="text"-->
+<!--                                                                 class="w-full bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"-->
+<!--                                                                 autocomplete="off"/>-->
+<!--                                                    <InputError class="mt-2" :message="form.errors.riesgo_de_la_inversion"/>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+                                            <div :class="data.classOfText_checkbox">
+                                                <label for="multi-select" class="mb-4 text-md text-gray-900 font-bold">Riesgos</label>
+                                                <p class="text-md text-gray-700">Seleccionar ¿Cuáles son los posibles riesgos involucrados en actividad?</p>
+                                                <div v-for="(option,inde) in props.losSelect.riesgo_de_la_inversion" :key="inde" class="mt-3">
+                                                    <input type="checkbox" :id="inde+'_d'+conteoi"
+                                                           :value="option.value" 
+                                                           :checked="isSelected_riesgo(option.value)"
+                                                           @change="toggleSelectio_riesgo(option.value,conteoi)"
+                                                           @keydown.enter.prevent="create"
+                                                           @blur="metodoConThrottle"
+                                                           class="p-1 w-7 h-7 ring-1 ring-zinc-400"
+                                                    />
+                                                    <label :for="option.value" class="mx-2">{{ option.label }}</label>
                                                 </div>
+                                                <InputError class="mt-2" :message="form.errors.procesos_involucrados"/>
+                                            </div>
+                                            <div class="min-w-[450px] max-h-[250px] p-4 border-x-2 border-zinc-400">
+                                                <label for="multi-select" class="mb-4  text-md text-blue-900 font-bold">Riesgos seleccionados</label>
+                                                <p v-if="form.riesgo_de_la_inversion[conteoi]"
+                                                   v-for="itemsito in form.riesgo_de_la_inversion[conteoi]"
+                                                   class="font-bold mt-1">
+                                                    - {{ props.losSelect.riesgo_de_la_inversion.find((item) => item.value === itemsito)?.label }}
+                                                </p> 
                                             </div>
 
 
                                             <div class="min-w-[500px] max-h-[110px] p-4">
-                                                <label class="text-md text-gray-900 font-bold capitalize">anexos</label>
+                                                <label class="text-md text-gray-900 font-bold capitalize">anexos (opcional)</label>
                                                 <p class="text-md text-gray-700 my-2">
                                                     Relacionar los anexos que hacen parte del ítem de la inversión, compra o reposición, donde
                                                     se enuncien las especificaciones técnicas. Si la solicitud es una reposición, adjuntar el
@@ -1607,9 +1668,7 @@ const create = (validator, second) => {
                                                     {{ data.categoria.find((item) => item.value == form.categoria[indexNecesidad])?.label }}
                                                 </td>
                                                 <td v-else-if="form.justificacion[indexNecesidad] !== 'Elemento_Borrado'"
-                                                    class="w-full text-center py-2">{{
-                                                        (form.categoria[indexNecesidad])
-                                                    }}
+                                                    class="w-full text-center py-2">{{ (form.categoria[indexNecesidad]) }}
                                                 </td>
 
                                                 <td v-if="form.justificacion[indexNecesidad] !== 'Elemento_Borrado'" class="w-full text-center py-2">

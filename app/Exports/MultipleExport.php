@@ -12,13 +12,7 @@ class MultipleExport implements WithMultipleSheets,ShouldAutoSize
 {
     use Exportable;
 
-    protected $year;
-
-    public function __construct()
-    {
-//        $this->year = $year;
-    }
-
+    public function __construct(){}
 
     public function sheets(): array{
         $nombresModelos = $this->listarModelos();
@@ -35,10 +29,8 @@ class MultipleExport implements WithMultipleSheets,ShouldAutoSize
         $archivos = File::files($directorioModelos);
 
         $ListaNegra = [
-            "Parametro",
-            "Permission",
-            "Role",
-            "actividades",
+            "Parametro", "Permission",
+            "Role", "actividades",
         ];
 
         // Filtrar los nombres de clase que sean modelos

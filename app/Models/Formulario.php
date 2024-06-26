@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\helpers\MyConst;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -41,5 +42,32 @@ class Formulario extends Model
 
     public function user(){return $this->belongsTo(User::class);}
     public function userName(){return $this->user->name;}
+    public function proceso_que_solicita_presupuesto(){
+//        if ($this->proceso_que_solicita_presupuesto)        dd($this->proceso_que_solicita_presupuesto);
+        if($this->proceso_que_solicita_presupuesto)
+            return MyConst::proceso_que_solicita_presupuesto()[intval($this->proceso_que_solicita_presupuesto)];
+        return '';
+    }
+    
+    public function BDToString($nameArray){
+//        $this->procesos_involucrados = MyConst::procesos_involucrados();
+//        $this->plan_de_mejoramiento_al_que_apunta_la_necesidad = MyConst::plan_de_mejoramiento_al_que_apunta_la_necesidad();
+//        $this->linea_del_plan_desarrollo_al_que_apunta_la_necesidad = MyConst::linea_del_plan_desarrollo_al_que_apunta_la_necesidad();
+        $$nameArray = MyConst::{$nameArray}();
+        
+//        return MyConst::procesos_involucrados()[$this->procesos_involucrados];
+            if ($this->{$nameArray} || $this->{$nameArray} == '0') {
+                $explodedArray = explode(',', $this->{$nameArray});
+                $StringArray = [];
+                foreach ($explodedArray as $index => $item) {
+                    $itemNum = intval($item);
+                    $StringArray[] = ($$nameArray[$itemNum]);
+                }
+                return implode(',', $StringArray);
+            }
+            return 'Formulario sin diligenciar';
+    }
+    public function plan_de_mejoramiento_al_que_apunta_la_necesidad(){return MyConst::plan_de_mejoramiento_al_que_apunta_la_necesidad()[$this->plan_de_mejoramiento_al_que_apunta_la_necesidad];}
+    public function linea_del_plan_desarrollo_al_que_apunta_la_necesidad(){return MyConst::linea_del_plan_desarrollo_al_que_apunta_la_necesidad()[$this->linea_del_plan_desarrollo_al_que_apunta_la_necesidad];}
     
 }

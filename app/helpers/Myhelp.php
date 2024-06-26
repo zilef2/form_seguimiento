@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 //STRING S
 //LARAVELFunctions
 //dateFunctions
+//arrayFunctions 
 
 class Myhelp {
 
@@ -261,6 +262,20 @@ class Myhelp {
         }
         return $result;
     }
+    
 
+    
+//arrayFunctions
+
+    public static function ImplodeSinNulos($theArrayofStrings,$index) {
+        if (isset($theArrayofStrings[$index])) {
+            $arraySinNulos = array_filter($theArrayofStrings[$index], function ($value) {
+                return !is_null($value);
+            });
+            return implode(',', $arraySinNulos);
+        }
+        return null;
+    }
 }
 ?>
+

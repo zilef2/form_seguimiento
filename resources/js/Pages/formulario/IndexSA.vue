@@ -115,33 +115,34 @@ const select = () => {
 
 // text // number // dinero // date // datetime // foreign
 const titulos = [
-    // { order: 'codigo', label: 'codigo', type: 'text' },
     { order: 'numero_necesidad', label: '#', type: 'alterNumber' },
+    { order: 'identificacion_user', label: 'cc', type: 'number' },
+    {order: 'enviado', label: 'Enviado', type: 'boolEnviado'},
     { order: 'necesidad', label: 'necesidad', type: 'text' },
     { order: 'justificacion', label: 'justificacion', type: 'text' },
-    { order: 'proceso_que_solicita_presupuesto', label: 'Proceso que solicita presupuesto', type: 'text' },
+    { order: 'proceso_que_solicita_presupuesto', label: 'Proceso que solicita presupuesto', type: 'selectsMultiple',newName:'proceso_que_solicita_presupuest' },
     { order: 'actividad', label: 'Actividad', type: 'text' },
     { order: 'categoria', label: 'Categoria', type: 'text' },
-    { order: 'unidad_de_medida', label: 'Unidad de medida', type: 'text' },
     { order: 'cantidad', label: 'Cantidad', type: 'number' },
+    { order: 'unidad_de_medida', label: 'Unidad de medida', type: 'text' },
     { order: 'valor_unitario', label: 'Valor unitario', type: 'dinero' },
     { order: 'valor_total_solicitatdo_por_necesidad', label: 'Valor total solicitatdo por necesidad', type: 'dinero' },
     { order: 'periodo_de_inicio_de_ejecucion', label: 'Periodo de inicio de ejecucion', type: 'text' },
     { order: 'vigencias_anteriores', label: 'Vigencias anteriores', type: 'text' },
-    { order: 'valor_asignado_en_la_vigencia_anterior', label: 'Valor asignado en la vigencia anterior', type: 'text' },
-    { order: 'procesos_involucrados', label: 'Procesos involucrados', type: 'text' },
-    { order: 'plan_de_mejoramiento_al_que_apunta_la_necesidad', label: 'Plan de mejoramiento al que apunta la necesidad', type: 'text' },
-    { order: 'linea_del_plan_desarrollo_al_que_apunta_la_necesidad', label: 'Linea del plan desarrollo al que apunta la necesidad', type: 'text' },
+    { order: 'valor_asignado_en_la_vigencia_anterior', label: 'Valor asignado en la vigencia anterior', type: 'dinero' },
+    
+    { order: 'procesos_involucrados', label: 'Procesos involucrados', type: 'selectsMultiple',newName:'procesos_involucrado'},
+    { order: 'plan_de_mejoramiento_al_que_apunta_la_necesidad', label: 'Plan de mejoramiento al que apunta la necesidad', type: 'selectsMultiple',newName:'plan_de_mejoramiento_al_que_apunta_la_necesida'},
+    { order: 'linea_del_plan_desarrollo_al_que_apunta_la_necesidad', label: 'Linea del plan desarrollo al que apunta la necesidad', type: 'selectsMultiple',newName:'linea_del_plan_desarrollo_al_que_apunta_la_necesida'},
+    
     { order: 'frecuencia_de_uso', label: 'Frecuencia de uso', type: 'text' },
     { order: 'mantenimientos_requeridos', label: 'Mantenimientos requeridos', type: 'text' },
     { order: 'capacidad_instalada', label: 'Capacidad instalada', type: 'text' },
     { order: 'riesgo_de_la_inversion', label: 'Riesgo de la inversion', type: 'text' },
     { order: 'valor_total_de_la_solicitud_actual', label: 'Valor total de la solicitud actual', type: 'dinero' },
-    { order: 'enviado', label: 'Enviado', type: 'boolEnviado' },
   // { order: 'inventario', label: 'inventario', type: 'foreign',nameid:'nombre'},
   //   anexos
   //   user_id
-  //   enviado
 ];
 
 </script>
@@ -152,7 +153,7 @@ const titulos = [
     <AuthenticatedLayout>
         <Breadcrumb :title="title" :breadcrumbs="breadcrumbs" class="capitalize text-xl font-bold"/>
         <div class="space-y-4">
-            <!-- {{ props.fromController.data[2] }} -->
+<!--             {{ props.losSelect }} -->
             <div class="px-4 sm:px-0">
                 <div class="rounded-lg overflow-hidden w-fit">
 <!--                    <PrimaryButton class="rounded-none" @click="data.createOpen = true"-->
@@ -239,22 +240,24 @@ const titulos = [
 <!--                                </td>-->
 <!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center">{{ ++indexu }}</td>-->
                                 <td v-for="titulo in titulos" class="whitespace-nowrap text-center py-4 px-2 sm:py-3">
-                                    <span v-if="titulo['type'] === 'text'"> {{ claseFromController[titulo['order']] }} </span>
+                                    <span v-if="titulo['type'] === 'alterNumber'"> {{ parseInt(claseFromController[titulo['order']])+1 }} </span>
+                                    <span v-if="titulo['type'] === 'text'" class="flex flex-col flex-wrap whitespace-normal min-w-[350px]"> <p class="text-sm"> {{
+                                            PrimerasPalabras(claseFromController[titulo['order']], 15)
+                                        }}</p> </span>
                                     <span v-if="titulo['type'] === 'number'"> {{ number_format(claseFromController[titulo['order']], 0, false) }} </span>
                                     <span v-if="titulo['type'] === 'dinero'"> {{ number_format(claseFromController[titulo['order']], 0, true) }} </span>
                                     <span v-if="titulo['type'] === 'date'"> {{ formatDate(claseFromController[titulo['order']], false) }} </span>
                                     <span v-if="titulo['type'] === 'datetime'"> {{ formatDate(claseFromController[titulo['order']], true) }} </span>
                                     <span v-if="titulo['type'] === 'foreign'"> {{ claseformularioa[titulo['order']][titulo['nameid']] }} </span>
-                                    <span v-if="titulo['type'] === 'alterNumber'"> {{ parseInt(claseFromController[titulo['order']])+1 }} </span>
                                     <span v-if="titulo['type'] === 'boolEnviado'"> {{ (claseFromController[titulo['order']] ? 'Enviado' : 'Guardado') }} </span>
+                                    <span v-if="titulo['type'] === 'selectsMultiple'"> {{ (claseFromController[titulo['newName']]) }} </span>
                                 </td>
-
                             </tr>
                             <tr class="border-t border-gray-600">
 <!--                                <td v-if="numberPermissions > 1"-->
 <!--                                    class="whitespace-nowrap py-4 w-12 px-2 sm:py-3 text-center"> - -->
 <!--                                </td>-->
-                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> # </td>
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> Total </td>
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-bold text-lg"> Necesidades: </td>
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3 text-center font-extrabold">
                                     {{ props.total }}
@@ -272,7 +275,8 @@ const titulos = [
                     </table>
                     <h2 v-else class="text-center text-xl my-8">Sin Registros</h2>
                 </div>
-                <div v-if="props.total > 10"
+<!--                    v-if="props.total"-->
+                <div 
                     class="flex justify-between items-center p-2 border-t border-gray-200 dark:border-gray-700">
                     <Pagination :links="props.fromController" :filters="data.params" />
                 </div>

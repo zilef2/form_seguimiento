@@ -2,8 +2,7 @@
     <div>
         <div>
             <h2 class="mx-auto text-center shadow-sm text-[#499884] font-extrabold animate-pulse p-4 bg-blue-100 rounded-lg">
-<!--                {{ infoEnviada[0]}} qwe- -->
-                {{ proceso_que_solicita_presupuesto.find((item) => item.value == infoEnviada[0].proceso_que_solicita_presupuesto)?.label }}
+                {{ titulote }}
             </h2>
             <div class="px-1 flex py-2 text-gray-700 items-center text-center bg-transparent p-0">
                 <div class="mx-auto relative overflow-x-auto shadow-md rounded-2xl">
@@ -112,6 +111,7 @@ name: 'TablaResumenEnviado',
     data() {
         return {
             totalnecesidades:0,
+            titulote:'',
             // selects multiples
             planmejoramientonecesidad: [
                 {value: 1, label: 'PMM Institucional'},
@@ -430,13 +430,21 @@ name: 'TablaResumenEnviado',
             ],
         }
     },
+    watch: {
+        infoEnviada(newVal) {
+            if (newVal) {
+                this.recuperarTitulo()
+            }
+        }
+    },
     computed: {
         Eltotal() {
             this.infoEnviada.forEach(element => {
                 this.totalnecesidades += parseInt(element.valor_total_solicitatdo_por_necesidad)
             });
+            this.titulote = this.proceso_que_solicita_presupuesto.find((item) => item.value == this.infoEnviada[0]?.proceso_que_solicita_presupuesto)?.label
             return this.totalnecesidades
-        }
+        },
     },
     
     props: {
@@ -446,6 +454,9 @@ name: 'TablaResumenEnviado',
     },
     methods: {
         number_format,
+        recuperarTitulo(){
+            this.titulote = this.proceso_que_solicita_presupuesto.find((item) => item.value == this.infoEnviada[0]?.proceso_que_solicita_presupuesto)?.label
+        },
         ProInvolucrados(texto) {
             if (!texto || texto.length < 1) return ''
             let Arraytexto = texto.split(',')

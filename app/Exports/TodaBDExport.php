@@ -27,12 +27,12 @@ class TodaBDExport implements FromQuery, WithTitle, WithHeadings, ShouldAutoSize
             unset($this->{$NombreTabla}[2]);
             unset($this->{$NombreTabla}[3]);//pass
         }
-        if(isset($this->formulario)){
+//        if(isset($this->Formulario)){ //los campos del modelo 
 //            dd($this->{$NombreTabla}[1]);
 //            unset($this->{$NombreTabla}[13]);
 //            unset($this->{$NombreTabla}[14]);
 //            unset($this->{$NombreTabla}[15]);
-        }
+//        }
     }
 
     public function headings(): array {

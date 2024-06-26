@@ -45,7 +45,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/DB_info', [UserController::class,'todaBD']);
     Route::get('/downloadAnexos', [UserController::class,'downloadAnexos'])->name('downloadAnexos');
     Route::get('/downClaro',function(){
-        return Excel::download(new FormExport, 'DB_Mejorada.xlsx');
+        return Excel::download(new FormExport, 'DB_Con_Nombres.xlsx');
     })->name('downClaro');
     
     Route::get('/formularioSA', [FormularioController::class, 'formularioSA'])->name('formularioSA');

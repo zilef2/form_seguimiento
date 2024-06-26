@@ -11,14 +11,10 @@ const props = defineProps({
 
 const data = reactive({
     params: {
-        search: props.filters?.search,
-        field: props.filters?.field,
-        order: props.filters?.order,
+    //     search: props.filters?.search,
+    //     field: props.filters?.field,
+    //     order: props.filters?.order,
         perPage: props.filters?.perPage,
-        searchdia: props.filters.searchdia,
-        soloTiEstimado: props.filters.soloTiEstimado,
-        ultimosmeses: props.filters.ultimosmeses,
-        FiltroCentro: props.filters.FiltroCentro,
     },
 })
 
@@ -32,15 +28,12 @@ const goto = (link) => {
 }
 
 watchEffect(() => {
-    data.params.search = props.filters?.search
-    data.params.field = props.filters?.field
-    data.params.order = props.filters?.order
+    // data.params.search = props.filters?.search
+    // data.params.field = props.filters?.field
+    // data.params.order = props.filters?.order
     data.params.perPage = props.filters?.perPage
-    data.params.searchdia = props.filters?.searchdia
-    data.params.soloTiEstimado = props.filters?.soloTiEstimado
-    data.params.ultimosmeses = props.filters?.ultimosmeses
-    data.params.FiltroCentro = props.filters?.FiltroCentro
 })
+console.log("=>(Pagination.vue:37) links", props.links);
 
 </script>
 <template>
@@ -52,26 +45,27 @@ watchEffect(() => {
         <p>{{ lang().label.no_data }}</p>
     </div>
     <div v-if="links.links.length > 3">
+<!--        hidden-->
         <ul
-            class="hidden lg:flex justify-center items-center rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            class="flex justify-center items-center rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
             <li v-for="(link, index) in links.links" :key="index">
                 <button v-on:click="goto(link.url)" class="px-4 py-2 hover:bg-primary hover:text-white"
                     :class="{ 'bg-primary text-white': link.active }" v-html="link.label"
                     :disabled="link.url == null"></button>
             </li>
         </ul>
-        <!-- <ul class="flex justify-center items-center rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-            <li>
-                <button v-on:click="goto(links.prev_page_url)" class="px-4 py-2" v-html="'&laquo;'"
-                    :disabled="links.prev_page_url == null"></button>
-            </li>
-            <li>
-                <p class="px-4 py-2 bg-primary text-white" v-html="links.current_page"></p>
-            </li>
-            <li>
-                <button v-on:click="goto(links.next_page_url)" class="px-4 py-2" v-html="'&raquo;'"
-                    :disabled="links.next_page_url == null"></button>
-            </li>
-        </ul> -->
+<!--         <ul class="flex justify-center items-center rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">-->
+<!--            <li>-->
+<!--                <button v-on:click="goto(links.prev_page_url)" class="px-4 py-2" v-html="'&laquo;'"-->
+<!--                    :disabled="links.prev_page_url == null"></button>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--                <p class="px-4 py-2 bg-primary text-white" v-html="links.current_page"></p>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--                <button v-on:click="goto(links.next_page_url)" class="px-4 py-2" v-html="'&raquo;'"-->
+<!--                    :disabled="links.next_page_url == null"></button>-->
+<!--            </li>-->
+<!--        </ul> -->
     </div>
 </template>

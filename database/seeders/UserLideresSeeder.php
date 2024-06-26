@@ -56,6 +56,8 @@ class UserLideresSeeder extends Seeder
             ['name' => 'JUAN DIEGO VILLA CARVAJAL', 'identificacion' => '1039447799', 'area' => 'Proceso de investigación', 'agregado' => 'Profesional Universitario','sexo'=>'Masculino', 'email' => 'juan.villa@colmayor.edu.co'],
             ['name' => 'JULIAN STIVEN ORTIZ RESTREPO', 'identificacion' => '1047996764', 'area' => 'Centro de Lenguas', 'agregado' => 'Profesional','sexo'=>'Masculino', 'email' => 'julian.ortiz@colmayor.edu.co'],
             
+            //se agregaron 2 personas el 20 jun2024 -- jackepruebas y  8105904 del Lider Jose Mario Lopez Gomez.
+            //26 jun JULIAN STIVEN ORTIZ RESTREPO CC 1047996763
         ];
         foreach ($users2 as $user) {
             $cedula = $user['identificacion'];

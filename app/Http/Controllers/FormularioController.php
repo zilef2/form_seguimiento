@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Http\Request;
 use App\helpers\Myhelp;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -30,14 +31,11 @@ class FormularioController extends Controller
         $this->thisAtributos = (new formulario())->getFillable(); //not using
     }
 
-    public function Mapear()
-    {
-        //$formularios = formulario::with('no_nada');
-        return formulario::Where('id', '>', 0);
+    public function Mapear(){
+        return Formulario::Where('id', '>', 0);
     }
 
-    public function nombreYvalue($tipo)
-    {
+    public function nombreYvalue($tipo){
         $objeto = DB::table('selecsForm')->Where('tipo', $tipo)->pluck('nombre');
         $returningObject = [];
         foreach ($objeto as $index => $gen) {
@@ -47,8 +45,7 @@ class FormularioController extends Controller
         return $returningObject;
     }
 
-    public function Dependencias()
-    {
+    public function Dependencias(){
         $Selects['unidad_de_medida'] = $this->nombreYvalue('unidad_de_medida');
         $Selects['periodo_de_inicio_de_ejecucion'] = $this->nombreYvalue('periodo_de_inicio_de_ejecucion');
         $Selects['vigencias_anteriores'] = $this->nombreYvalue('vigencias_anteriores');
@@ -139,7 +136,6 @@ class FormularioController extends Controller
 
     private function getcedLideresGuardados($req){
         if (isset($req->identUser)) {
-//            $UIDformulariosGuardados = Formulario::Where('enviado', 0)->pluck('user_id')->unique();
             $UIDformulariosGuardados = User::Where('identificacion', $req->identUser)->first();
             if($UIDformulariosGuardados){
                 $UIDformulariosGuardados = [$UIDformulariosGuardados->id];
@@ -158,6 +154,7 @@ class FormularioController extends Controller
                                     $form->procesos_involucrados = explode(',', $form->procesos_involucrados);
                                     $form->plan_de_mejoramiento_al_que_apunta_la_necesidad = explode(',', $form->plan_de_mejoramiento_al_que_apunta_la_necesidad);
                                     $form->linea_del_plan_desarrollo_al_que_apunta_la_necesidad = explode(',', $form->linea_del_plan_desarrollo_al_que_apunta_la_necesidad);
+                                    $form->riesgo_de_la_inversion = explode(',', $form->riesgo_de_la_inversion);
                                 }
                                 return [
                                     $user->identificacion => [
@@ -177,7 +174,6 @@ class FormularioController extends Controller
         }
         return [];
     }
-
 
     //validar si si se usa
     public function index(Request $request)
@@ -209,13 +205,17 @@ class FormularioController extends Controller
     //empieza Formularios SA
     public function MapearSA($formus)
     {
-        //$formularios = formulario::with('no_nada');
-        $formus->get()->map(function ($form) {
+        $formuResult = $formus->get()->map(function ($form) {
             $form->userName = $form->userName();
+            $form->proceso_que_solicita_presupuest = $form->proceso_que_solicita_presupuesto();
+            
+            $form->procesos_involucrado = $form->BDToString('procesos_involucrados');
+            $form->plan_de_mejoramiento_al_que_apunta_la_necesida = $form->BDToString('plan_de_mejoramiento_al_que_apunta_la_necesidad');
+            $form->linea_del_plan_desarrollo_al_que_apunta_la_necesida = $form->BDToString('linea_del_plan_desarrollo_al_que_apunta_la_necesidad');
             return $form;
-        })->filter();
+        });
         
-        return $formus;
+        return $formuResult;
     }
 
     public function Filtros(&$formularios, $request)
@@ -238,15 +238,23 @@ class FormularioController extends Controller
     public function formularioSA(Request $request)
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' formularios SA '));
-        $formus = formulario::Query();
+        $formus = Formulario::Query();
         $this->Filtros($formus, $request);
         $formularios = $this->MapearSA($formus);
         $losSelect = $this->Dependencias();
         
         $perPage = $request->has('perPage') ? $request->perPage : 10;
-
+        $total = $formularios->count();
+        $page = request('page', 1); // Current page number
+        $fromController = new LengthAwarePaginator(
+            $formularios->forPage($page, $perPage),
+            $total,
+            $perPage,
+            $page,
+            ['path' => request()->url()]
+        );
         return Inertia::render($this->FromController . '/IndexSA', [
-            'fromController' => $formularios->paginate($perPage),
+            'fromController' => $fromController,
             'total' => $formularios->count(),
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . 'SA')]],
             'title' => __('app.label.' . $this->FromController),
@@ -256,14 +264,6 @@ class FormularioController extends Controller
             'losSelect' => $losSelect,
         ]);
     }
-
-//    public function getString(Re)
-//    {
-//        $param = $request->input('param');
-//        // Aquí obtienes el string de la base de datos o lo defines manualmente
-//        $string = 'Valor del string desde la base de datos';
-//        return response()->json(['string' => $string]);
-//    }
 
     public function EnviarFormulario(Request $request) // FormularioStoreRequest
     {
@@ -322,7 +322,6 @@ class FormularioController extends Controller
 
     public function store(Request $request){ //guardar
         try {
-            
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formularios');
             $user = User::Where('identificacion', $request->identificacion_user)->first();
             if(!$user){ // Autoguardado acumulado
@@ -394,17 +393,30 @@ class FormularioController extends Controller
 
         if ($request['justificacion'][$index] !== 'Elemento_Borrado') {
 
-            if (isset($request['procesos_involucrados'][$index])) {
-                $procesosInvol = implode(',', $request['procesos_involucrados'][$index]);
-            } else $procesosInvol = null;
+            $procesosInvol = Myhelp::ImplodeSinNulos($request['procesos_involucrados'],$index);
+            $planmejor = Myhelp::ImplodeSinNulos($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'],$index);
+            $lineadelplan = Myhelp::ImplodeSinNulos($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'],$index);
+            $riesgou = Myhelp::ImplodeSinNulos($request['riesgo_de_la_inversion'],$index);
+//            if (isset($request['procesos_involucrados'][$index])) {
+//                $request['procesos_involucrados'][$index]
+//                $procesosInvol = implode(',', );
+//            } else $procesosInvol = null;
 
-            if (isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])) {
-                $planmejor = implode(',', $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]);
-            } else $planmejor = null;
-
-            if (isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])) {
-                $lineadelplan = implode(',', $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]);
-            } else $lineadelplan = null;
+//            if (isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])) {
+//                $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]
+//                $planmejor = implode(',', );
+//            } else $planmejor = null;
+//
+//            if (isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])) {
+//                $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]
+//                $lineadelplan = implode(',', );
+//            } else $lineadelplan = null;
+            
+//            if (isset($request['riesgo_de_la_inversion'][$index])) {
+//                dd($request['riesgo_de_la_inversion']);
+//                $request['riesgo_de_la_inversion'][$index]
+//                $riesgo_de_la_inversion = implode(',', );
+//            } else $riesgo_de_la_inversion = null;
 
             $anexou = '';
             if (isset($request['anexos']))
@@ -443,7 +455,7 @@ class FormularioController extends Controller
                 'frecuencia_de_uso' => $request['frecuencia_de_uso'][$index] ?? '',
                 'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index] ?? '',
                 'capacidad_instalada' => $request['capacidad_instalada'][$index] ?? '',
-                'riesgo_de_la_inversion' => $request['riesgo_de_la_inversion'][$index] ?? '',
+                'riesgo_de_la_inversion' => $riesgou,
                 'anexos' => $this->guardarAnexo($anexou),
                 'enviado' => $request['enviado'],
                 'user_id' => $user->id,
@@ -486,7 +498,7 @@ class FormularioController extends Controller
     {
         $permissions = Myhelp::EscribirEnLog($this, ' Begin UPDATE:formularios');
         DB::beginTransaction();
-        $formulario = formulario::findOrFail($id);
+        $formulario = Formulario::findOrFail($id);
         $request->merge(['no_nada_id' => $request->no_nada['id']]);
         $formulario->update($request->all());
 
@@ -505,7 +517,7 @@ class FormularioController extends Controller
     public function destroy($formularioid)
     {
 //        $permissions = Myhelp::EscribirEnLog($this, 'DELETE:formularios');
-        $formulario = formulario::find($formularioid);
+        $formulario = Formulario::find($formularioid);
         $elnombre = $formulario->nombre;
         $formulario->delete();
         Myhelp::EscribirEnLog($this, 'DELETE:formularios', 'formulario id:' . $formulario->id . ' | ' . $formulario->nombre . ' borrado', false);
@@ -514,7 +526,7 @@ class FormularioController extends Controller
 
     public function destroyBulk(Request $request)
     {
-        $formulario = formulario::whereIn('id', $request->id);
+        $formulario = Formulario::whereIn('id', $request->id);
         $formulario->delete();
         return back()->with('success', __('app.label.deleted_successfully', ['name' => count($request->id) . ' ' . __('app.label.formulario')]));
     }

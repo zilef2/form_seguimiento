@@ -11,13 +11,13 @@ export function AumentarForm(form){
     form.necesidad.push('')
     form.justificacion.push('')
     form.actividad.push('')
-    form.categoria.push('') //Otras
+    form.categoria.push([]) //Otras
     form.unidad_de_medida.push('')
     form.periodo_de_inicio_de_ejecucion.push('')
     form.vigencias_anteriores.push('')
     form.mantenimientos_requeridos.push('')
     form.capacidad_instalada.push('') //Si, ¿Cual?
-    form.riesgo_de_la_inversion.push('')
+    form.riesgo_de_la_inversion.push([])
     form.anexos.push('')
     form.frecuencia_de_uso.push('')
     form.cantidad.push(0)
