@@ -2,6 +2,10 @@
 
 return [
     'label' => [
+        //idea
+        'idea'=> 'idea',
+        'Idea'=> 'Idea',
+        //fin idea
         'formulariosEnviados' => 'formularios Enviados',
         'formulariosGuardados' => 'formularios Guardados',
         'agregado' => 'agregado',

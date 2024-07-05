@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property mixed $categoria
+ */
 class Formulario extends Model
 {
     use HasFactory, SoftDeletes;
@@ -44,7 +47,6 @@ class Formulario extends Model
     public function user(){return $this->belongsTo(User::class);}
     public function userName(){return $this->user->name;}
     public function proceso_que_solicita_presupuesto(){
-//        if ($this->proceso_que_solicita_presupuesto)        dd($this->proceso_que_solicita_presupuesto);
         if($this->proceso_que_solicita_presupuesto)
             return MyConst::proceso_que_solicita_presupuesto()[intval($this->proceso_que_solicita_presupuesto)];
         return '';
@@ -71,4 +73,28 @@ class Formulario extends Model
     public function plan_de_mejoramiento_al_que_apunta_la_necesidad(){return MyConst::plan_de_mejoramiento_al_que_apunta_la_necesidad()[$this->plan_de_mejoramiento_al_que_apunta_la_necesidad];}
     public function linea_del_plan_desarrollo_al_que_apunta_la_necesidad(){return MyConst::linea_del_plan_desarrollo_al_que_apunta_la_necesidad()[$this->linea_del_plan_desarrollo_al_que_apunta_la_necesidad];}
     
+    public function categoria(){
+        if(isset(MyConst::categoria()[$this->categoria])){
+            return MyConst::categoria()[$this->categoria];
+        }
+        return $this->categoria;
+    }
+    public function ListarCategoria(){
+        $catUnicas = Formulario::select('categoria')->distinct()->get();
+
+        $todasLasCat = [[
+            'label' => 'Sin categoria',
+            'value' => ''
+        ]];
+        foreach ($catUnicas as $index => $LasCategoria) {
+            $nombre = $LasCategoria->categoria();
+            
+            $todasLasCat[] = [
+                'label' => $nombre,
+                'value' => $nombre
+            ];
+        }
+        
+        return $todasLasCat;
+    }
 }

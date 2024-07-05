@@ -6,6 +6,7 @@ use App\helpers\MyModels;
 use App\Http\Requests\FormularioStoreRequest;
 use App\Models\Formulario;
 use App\Models\User;
+use Google\Service\Forms\Form;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Http\Request;
 use App\helpers\Myhelp;
@@ -53,6 +54,11 @@ class FormularioController extends Controller
         $Selects['mantenimientos_requeridos'] = $this->nombreYvalue('mantenimientos_requeridos');
         $Selects['capacidad_instalada'] = $this->nombreYvalue('capacidad_instalada');
         $Selects['riesgo_de_la_inversion'] = $this->nombreYvalue('riesgo_de_la_inversion');
+
+        $formu = new Formulario();
+        $todasCat = $formu->ListarCategoria();
+        $Selects['ListarCategoria'] = $todasCat;
+        
         return $Selects;
     }
 
@@ -185,7 +191,6 @@ class FormularioController extends Controller
         $formularios = $this->Mapear();
         $this->Filtros($formularios, $request);
         $losSelect = $this->Dependencias();
-        //TODO: las dependencias multiples estan hardcode en el welcome
         
         $perPage = $request->has('perPage') ? $request->perPage : 10;
 
@@ -207,6 +212,7 @@ class FormularioController extends Controller
     {
         $formuResult = $formus->get()->map(function ($form) {
             $form->userName = $form->userName();
+            $form->Categori = $form->categoria();
             $form->proceso_que_solicita_presupuest = $form->proceso_que_solicita_presupuesto();
             
             $form->procesos_involucrado = $form->BDToString('procesos_involucrados');
@@ -248,9 +254,15 @@ class FormularioController extends Controller
         }
 
         if ($request->has(['field', 'order'])) {
-            $formularios = $formularios->orderBy($request->field, $request->order);
-        } else
+            if($request->field == 'numero_necesidad'){
+                $formularios = $formularios->orderBy(DB::raw('CAST(numero_necesidad AS UNSIGNED)'), $request->order);
+            }else{
+                $formularios = $formularios->orderBy($request->field, $request->order);
+            }
+        } else{
+
             $formularios = $formularios->orderBy('updated_at', 'DESC');
+        }
     }
     
     public function formularioSA(Request $request)
