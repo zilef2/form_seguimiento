@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
                 'warning' => fn () => $request->session()->get('warning'),
+                'warning2' => fn () => $request->session()->get('warning2'),
                 'info' => fn () => $request->session()->get('info'),
             ],
             'auth' => [
@@ -44,11 +45,10 @@ class HandleInertiaRequests extends Middleware
             'app' => [
                 'name' => config('app.name'),
                 'perpage' => [
-                    ['label' => '5', 'value' => 5],
                     ['label' => '10', 'value' => 10],
-                    ['label' => '20', 'value' => 20],
                     ['label' => '50', 'value' => 50],
                     ['label' => '100', 'value' => 100],
+                    ['label' => '1000', 'value' => 1000],
                 ],
             ],
             'locale' => function () {

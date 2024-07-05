@@ -262,7 +262,7 @@ class UserController extends Controller {
     //FIN : STORE - UPDATE - DELETE
 
     public function subirexceles(){ //just  a view
-        $permissions = Myhelp::EscribirEnLog($this, ' materia');
+        Myhelp::EscribirEnLog($this, ' materia');
 
         return Inertia::render('User/subirExceles', [
             'breadcrumbs'   => [['label' => __('app.label.user'), 'href' => route('user.index')]],
@@ -270,81 +270,6 @@ class UserController extends Controller {
             'numUsuarios'   => count(User::all()) - 1,
             // 'UniversidadSelect'   => Universidad::all()
         ]);
-    }
-
-
-    // Duplicate entry '1152194566' for key 'users_identificacion_unique'
-    private function MensajeWar(){
-        $bandera = false;
-        $contares = [
-            'contar1',
-            'contar2',
-            'contar3',
-            'contar4',
-            'contar5',
-            'contarVacios',
-        ];
-        $mensajesWarnings = [
-            '#correos Existentes: ',
-            'Novedad, error interno: ',
-            '#cedulas no numericas: ',
-            '#generos distintos(M,F,otro): ',
-            '#identificaciones repetidas: ',
-            '#filas con celdas vacias: ',
-        ];
-
-        foreach ($contares as $key => $value) {
-            $$value = session($value, 0);
-            session([$value => 0]);
-            $bandera = $bandera || $$value > 0;
-        }
-        session(['contar2' => -1]);
-
-        $mensaje = '';
-        if ($bandera) {
-            foreach ($mensajesWarnings as $key => $value) {
-                if (${$contares[$key]} > 0) {
-                    $mensaje .= $value . ${$contares[$key]} . '. ';
-                }
-            }
-        }
-
-        return $mensaje;
-    }
-
-    public function uploadtrabajadors(Request $request){
-        Myhelp::EscribirEnLog($this, get_called_class(), 'Empezo a importar', false);
-        $countfilas = 0;
-        try {
-            if ($request->archivo1) {
-
-                $helpExcel = new HelpExcel();
-                $mensageWarning = $helpExcel->validarArchivoExcel($request);
-                if ($mensageWarning != '') return back()->with('warning', $mensageWarning);
-
-                Excel::import(new PersonalImport(), $request->archivo1);
-
-                $countfilas = session('CountFilas', 0);
-                session(['CountFilas' => 0]);
-
-                $MensajeWarning = $this->MensajeWar();
-                if ($MensajeWarning !== '') {
-                    return back()->with('success', 'Usuarios nuevos: ' . $countfilas)
-                        ->with('warning', $MensajeWarning);
-                }
-
-                Myhelp::EscribirEnLog($this, 'IMPORT:users', ' finalizo con exito', false);
-                if ($countfilas == 0)
-                    return back()->with('success', __('app.label.op_successfully') . ' No hubo cambios');
-                else
-                    return back()->with('success', __('app.label.op_successfully') . ' Se leyeron ' . $countfilas . ' filas con exito');
-            } else {
-                return back()->with('error', __('app.label.op_not_successfully') . ' archivo no seleccionado');
-            }
-        } catch (\Throwable $th) {
-            Myhelp::EscribirEnLog($this, 'IMPORT:users', ' Fallo importacion: ' . $th->getMessage() . ' L:' . $th->getLine() . ' Ubi: ' . $th->getFile(), false);
-            return back()->with('error', __('app.label.op_not_successfully') . ' Usuario del error: ' . session('larow')[0] . ' error en la iteracion ' . $countfilas . ' ' . $th->getMessage() . ' L:' . $th->getLine() . ' Ubi: ' . $th->getFile());
-        }
     }
 
     public function todaBD(): \Symfony\Component\HttpFoundation\BinaryFileResponse

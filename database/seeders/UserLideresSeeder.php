@@ -58,6 +58,8 @@ class UserLideresSeeder extends Seeder
             
             //se agregaron 2 personas el 20 jun2024 -- jackepruebas y  8105904 del Lider Jose Mario Lopez Gomez.
             //26 jun JULIAN STIVEN ORTIZ RESTREPO CC 1047996763
+            //28 jun 28jun    'area' => 'COMUNICACIONES', 'agregado' => 'INVERSION','sexo'=>'Femenino'], ??
+            //28 jun 28jun  43578829 BEATRIZ MILLAN  'area' => 'BIENES Y SERVICIOS', 'agregado' => 'PROFESIONAL','sexo'=>'Femenino'],
         ];
         foreach ($users2 as $user) {
             $cedula = $user['identificacion'];

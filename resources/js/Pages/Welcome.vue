@@ -408,8 +408,8 @@ const GuardarArchivo = ((n) => {
                 borrarARchivo(n)
             }
         } else {
-            borrarARchivo(n)
             alert('El archivo debe ser un WORD O EXCEL O PDF')
+            borrarARchivo(n)
         }
     }else{
         // borrarARchivo(n)
@@ -640,11 +640,9 @@ function recuperaform(Formulario) {
             form.riesgo_de_la_inversion[index] = []
             element.riesgo_de_la_inversion.forEach(generico => {
                 // eleInteger = parseInt(generico)
-                // console.log("=>(Welcome.vue:645) eleInteger", eleInteger);
                 props.losSelect.riesgo_de_la_inversion.forEach((item, inde) => {
                     if (item.value === generico) {
                         form.riesgo_de_la_inversion[index].push(item.value)
-                        console.log("=>", item.value + '_d' + index);
                         CheckRiesgo = document.getElementById(inde + '_d' + index);
                         if (CheckRiesgo) CheckRiesgo.checked = true;
                     }
@@ -669,6 +667,7 @@ function recuperaform(Formulario) {
         }
         form.unidad_de_medida[index] = element.unidad_de_medida
         data.showanexos[index] = element.anexos
+        console.log("=>(Welcome.vue:672) element.anexos", element.anexos);
     });
 }
 
@@ -718,7 +717,7 @@ const AumentarMasUno = () => {
             Bandera2 = !!(form.valor_asignado_en_la_vigencia_anterior[ene])
         }
     }
-    console.log("=>(Welcome.vue:724) Bandera2", Bandera2);
+    // console.log("=>(Welcome.vue:724) Bandera2", Bandera2);
     
     // let Bandera3;
     // if (!!form.categoria[ene]) {

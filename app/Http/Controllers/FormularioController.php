@@ -228,6 +228,24 @@ class FormularioController extends Controller
                 ;
             });
         }
+        
+        if ($request->has('searcLider')) {
+            $formularios = $formularios->where(function ($query) use ($request) {
+                $query->where('identificacion_user', 'LIKE', "%" . $request->searcLider . "%")
+//                    ->orWhere('valor_unitario', 'LIKE', "%" . $request->searcLider . "%")//                    ->orWhere('identificacion', 'LIKE', "%" . $request->search . "%")
+                ;
+            });
+        }
+
+        if ($request->has('SoloEnviados') && $request->soloEnviados !== 'Todos') {
+            $soloEnviados = $request->soloEnviados;
+            $envi = 0;
+//            if($soloEnviados === 'guardados') $envi = 0;
+            if ($soloEnviados === 'enviados') $envi = 1;
+            $formularios = $formularios->where(function ($query) use ($request, $envi) {
+                $query->where('enviado', $envi);
+            });
+        }
 
         if ($request->has(['field', 'order'])) {
             $formularios = $formularios->orderBy($request->field, $request->order);
@@ -243,7 +261,7 @@ class FormularioController extends Controller
         $formularios = $this->MapearSA($formus);
         $losSelect = $this->Dependencias();
         
-        $perPage = $request->has('perPage') ? $request->perPage : 10;
+        $perPage = $request->has('perPage') ? $request->perPage : 100;
         $total = $formularios->count();
         $page = request('page', 1); // Current page number
         $fromController = new LengthAwarePaginator(
@@ -258,7 +276,7 @@ class FormularioController extends Controller
             'total' => $formularios->count(),
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . 'SA')]],
             'title' => __('app.label.' . $this->FromController),
-            'filters' => $request->all(['search', 'field', 'order']),
+            'filters' => $request->all(['search', 'field', 'order','soloEnviados','searcLider']),
             'perPage' => (int)$perPage,
             'numberPermissions' => $numberPermissions,
             'losSelect' => $losSelect,
@@ -334,13 +352,20 @@ class FormularioController extends Controller
 
             if ($formulario) {
                 foreach ($request['necesidad'] as $index => $item) {
-                    if (($request['necesidad'][$index] === '' || $request['necesidad'][$index] === '') && ($request['justificacion'][$index] === '' || $request['justificacion'][$index] === '')) {
+                    if (($request['necesidad'][$index] === '' || $request['necesidad'][$index] === ' ') && ($request['justificacion'][$index] === '' || $request['justificacion'][$index] === ' ')) {
                         $numeroTotal--;
-                        
                     } else { //no es un elemento borrado
-
+                        
                         if (isset($formulario[$index])) {
-                            $arrayForm = $this->arrayFormulario($request, $index, $user);
+                            
+                            $formuAnexoGuardado = $formulario[$index];
+                            if (isset($formuAnexoGuardado)) $formuAnexoGuardado = $formuAnexoGuardado['anexos'];
+                            else $formuAnexoGuardado = '';
+                            
+                            if (!isset($formuAnexoGuardado))
+                                $formuAnexoGuardado = '';
+                            
+                            $arrayForm = $this->arrayFormulario($request, $index, $user,$formuAnexoGuardado);
                             if ($arrayForm) {
                                 $formulario[$index]->update($arrayForm);
                                 //updateOrCreate
@@ -367,14 +392,14 @@ class FormularioController extends Controller
             }
             $formulariosBorrar = Formulario::Where('user_id', $user->id)
                 ->where(function ($query) {
-                    $query->where('necesidad', '')
-                        ->orWhere('necesidad', ' ');
+                    $query->where('necesidad', '')->orWhere('necesidad', ' ');
                 })
                 ->where(function ($query) {
-                    $query->where('justificacion', '')
-                        ->orWhere('justificacion', ' ');
+                    $query->where('justificacion', '')->orWhere('justificacion', ' ');
                 })
+                ->whereNull('anexos')
                 ->get();
+            
             foreach ($formulariosBorrar as $formulario) {
                 $formulario->delete();
             }
@@ -385,11 +410,13 @@ class FormularioController extends Controller
         } catch (\Throwable $th) {
             DB::rollback();
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine() . ' | Ubi: ' . $th->getFile();
+            Myhelp::EscribirEnLog($this, ' ERRORFORMULARIOS: '. $mensajeErrorCompleto);
+
             return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         }
     }
 
-    private function arrayFormulario($request, $index, $user){
+    private function arrayFormulario($request, $index, $user,$anexoPasado = ''){
 
         if ($request['justificacion'][$index] !== 'Elemento_Borrado') {
 
@@ -397,26 +424,7 @@ class FormularioController extends Controller
             $planmejor = Myhelp::ImplodeSinNulos($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'],$index);
             $lineadelplan = Myhelp::ImplodeSinNulos($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'],$index);
             $riesgou = Myhelp::ImplodeSinNulos($request['riesgo_de_la_inversion'],$index);
-//            if (isset($request['procesos_involucrados'][$index])) {
-//                $request['procesos_involucrados'][$index]
-//                $procesosInvol = implode(',', );
-//            } else $procesosInvol = null;
 
-//            if (isset($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index])) {
-//                $request['plan_de_mejoramiento_al_que_apunta_la_necesidad'][$index]
-//                $planmejor = implode(',', );
-//            } else $planmejor = null;
-//
-//            if (isset($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index])) {
-//                $request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'][$index]
-//                $lineadelplan = implode(',', );
-//            } else $lineadelplan = null;
-            
-//            if (isset($request['riesgo_de_la_inversion'][$index])) {
-//                dd($request['riesgo_de_la_inversion']);
-//                $request['riesgo_de_la_inversion'][$index]
-//                $riesgo_de_la_inversion = implode(',', );
-//            } else $riesgo_de_la_inversion = null;
 
             $anexou = '';
             if (isset($request['anexos']))
@@ -429,6 +437,10 @@ class FormularioController extends Controller
             if (isset($request['valor_unitario'][$index])) $valoruni = str_replace(['.', '$'], '', $request['valor_unitario'][$index]);
             $valorAsigAnterior = 0;
             if (isset($request['valor_asignado_en_la_vigencia_anterior'][$index])) $valorAsigAnterior = str_replace(['.', '$'], '', $request['valor_asignado_en_la_vigencia_anterior'][$index]);
+            
+            //valores numericos
+                $canti = ($request['cantidad'][$index]) ?? 0;
+                $canti = floatval($canti);
             return [
                 'numero_necesidad' => $index,
                 'identificacion_user' => $request['identificacion_user'],
@@ -441,12 +453,12 @@ class FormularioController extends Controller
                 'actividad' => $request['actividad'][$index] ?? '',
                 'categoria' => $categori ?? '',
                 'unidad_de_medida' => $request['unidad_de_medida'][$index] ?? '',
-                'cantidad' => $request['cantidad'][$index] ?? 0,
+                'cantidad' => $canti,
                 'valor_unitario' => $valoruni,
                 'valor_total_solicitatdo_por_necesidad' => $request['valor_total_solicitatdo_por_necesidad'][$index] ?? 0,
                 'periodo_de_inicio_de_ejecucion' => $request['periodo_de_inicio_de_ejecucion'][$index] ?? '',
                 'vigencias_anteriores' => $request['vigencias_anteriores'][$index] ?? '',
-                'valor_asignado_en_la_vigencia_anterior' => $valorAsigAnterior,
+                'valor_asignado_en_la_vigencia_anterior' => intval($valorAsigAnterior),
 
                 'procesos_involucrados' => $procesosInvol,
                 'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $planmejor,
@@ -456,7 +468,7 @@ class FormularioController extends Controller
                 'mantenimientos_requeridos' => $request['mantenimientos_requeridos'][$index] ?? '',
                 'capacidad_instalada' => $request['capacidad_instalada'][$index] ?? '',
                 'riesgo_de_la_inversion' => $riesgou,
-                'anexos' => $this->guardarAnexo($anexou),
+                'anexos' => $this->guardarAnexo($anexou, $anexoPasado),
                 'enviado' => $request['enviado'],
                 'user_id' => $user->id,
             ];
@@ -464,8 +476,7 @@ class FormularioController extends Controller
         return null;
     }
 
-    private function guardarAnexo($anexo)
-    { //TODO: avisar que el nombre, no se guarda si no se puede obtener getClientOriginalName
+    private function guardarAnexo($anexo, $anexoPasado){
         if ($anexo !== '') {
             $originalName = $anexo->getClientOriginalName();
             if ($originalName) {
@@ -481,18 +492,12 @@ class FormularioController extends Controller
                 }
             }
         }
-        return '';
+        return $anexoPasado;
     }
 
     //fin store functions
 
-    public function show($id)
-    {
-    }
-
-    public function edit($id)
-    {
-    }
+    public function show($id){}public function edit($id){}
 
     public function update(Request $request, $id)
     {
@@ -531,5 +536,6 @@ class FormularioController extends Controller
         return back()->with('success', __('app.label.deleted_successfully', ['name' => count($request->id) . ' ' . __('app.label.formulario')]));
     }
     //FIN : STORE - UPDATE - DELETE
+   
 
 }

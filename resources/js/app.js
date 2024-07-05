@@ -9,7 +9,9 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import FloatingVue from 'floating-vue'
 import { usePage } from '@inertiajs/vue3';
 import Sticky from 'vue-sticky-directive'
+// import VueSticky from 'vue-sticky' // Es6 module
 
+// const VueSticky = VueSticky.default // Global variable
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
 createInertiaApp({

@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EjemploController;
 use App\Http\Controllers\FormularioController;
+use App\Http\Controllers\SubiExcel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
@@ -31,7 +32,8 @@ Route::middleware('auth', 'verified')->group(function () {
     //# user
     Route::resource('/user', UserController::class)->except('create', 'show', 'edit');
     Route::post('/user/destroy-bulk', [UserController::class, 'destroyBulk'])->name('user.destroy-bulk');
-    // Route::get('/subirexceles', [UserController::class, 'subirexceles'])->name('subirexceles');
+     Route::get('/subirexceles', [SubiExcel::class, 'subirexceles'])->name('subirexceles');
+     Route::post('/uploadExcel', [SubiExcel::class, 'uploadExcel'])->name('uploadExcel');
 
 
     Route::resource('/role', RoleController::class)->except('create', 'show', 'edit');

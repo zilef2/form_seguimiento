@@ -1,8 +1,7 @@
 <template>
     <transition name="slide-fade">
-        <div
-        v-if="flash.success && isVisible"
-            class="sticky top-6 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
+        <div v-if="flash.success && isVisible"
+            class="absolute top-8 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-green-600 rounded-lg">
                 <div>
                     <CheckCircleIcon class="h-8 w-8 text-white" fill="currentColor" />

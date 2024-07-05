@@ -11,9 +11,12 @@ const props = defineProps({
 
 const data = reactive({
     params: {
-    //     search: props.filters?.search,
-    //     field: props.filters?.field,
-    //     order: props.filters?.order,
+        search: props.filters?.search,
+        searcLider: props.filters?.searcLider,
+        SoloEnviados: props.filters?.SoloEnviados,
+        SoloGuardados: props.filters?.SoloGuardados,
+        field: props.filters?.field,
+        order: props.filters?.order,
         perPage: props.filters?.perPage,
     },
 })
@@ -28,12 +31,14 @@ const goto = (link) => {
 }
 
 watchEffect(() => {
-    // data.params.search = props.filters?.search
-    // data.params.field = props.filters?.field
-    // data.params.order = props.filters?.order
+    data.params.search = props.filters?.search
+    data.params.searcLider = props.filters?.searcLider
+    data.params.field = props.filters?.field
+    data.params.order = props.filters?.order
     data.params.perPage = props.filters?.perPage
+    data.params.SoloEnviados = props.filters?.SoloEnviados
+    data.params.SoloGuardados = props.filters?.SoloGuardados
 })
-console.log("=>(Pagination.vue:37) links", props.links);
 
 </script>
 <template>
