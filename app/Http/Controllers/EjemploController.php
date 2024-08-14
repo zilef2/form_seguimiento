@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmail;
 use App\Models\Formulario;
 use App\Models\Permission;
 use App\Models\User;
@@ -18,5 +19,9 @@ class EjemploController extends Controller
             'formulariosGuardados' => (int)Formulario::Where('enviado', 0)->count(),
             'permissions' => (int)Permission::count(),
         ]);
+    }
+    public function ejemplo2(){
+        $user = User::find(1);
+        SendEmail::dispatch($user);
     }
 }

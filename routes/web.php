@@ -27,6 +27,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/ejemplo', [EjemploController::class, 'ejemplo'])->name('ejemplo');
+    Route::get('/ejemplo2', [EjemploController::class, 'ejemplo2'])->name('ejemplo2');
 
     //# user
     Route::resource('/user', UserController::class)->except('create', 'show', 'edit');
@@ -39,7 +40,7 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::resource('/permission', PermissionController::class)->except('create', 'show', 'edit');
     Route::post('/permission/destroy-bulk', [PermissionController::class, 'destroyBulk'])->name('permission.destroy-bulk');
-    
+
     Route::resource('/parametro', ParametrosController::class);
 
     Route::get('/DB_info', [UserController::class,'todaBD']);
@@ -47,7 +48,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/downClaro',function(){
         return Excel::download(new FormExport, 'DB_Mejorada.xlsx');
     })->name('downClaro');
-    
+
     Route::get('/formularioSA', [FormularioController::class, 'formularioSA'])->name('formularioSA');
 });
 Route::resource('/formulario', FormularioController::class)->except('create', 'show', 'edit');

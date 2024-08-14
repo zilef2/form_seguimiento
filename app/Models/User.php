@@ -15,6 +15,13 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+//    public String $name;
+//    public mixed $email;
+//    public mixed $esLider;
+//    public mixed $area;
+//    public mixed $agregado;
+//    public Int $identificacion;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -43,6 +50,10 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+//    public static function find(int $int)
+//    {
+//    }
 
     public function getCreatedAtAttribute()
     {
