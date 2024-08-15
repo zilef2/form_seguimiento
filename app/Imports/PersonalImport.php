@@ -41,6 +41,7 @@ class PersonalImport implements ToModel
 
     /**
      * @throws \Exception
+     * las opcione smultiples deben quedar separadas por:" --"
      */
     function __construct(){
 //        if ($valor < 0) {
@@ -88,7 +89,7 @@ class PersonalImport implements ToModel
             //region Description
             session(['larow' => $row]);
             $identi = $row[0];
-            if (!isset($identi) || mb_strtolower($identi) == 'identificacion' || mb_strtolower($identi) == 'identificación' || mb_strtolower($identi) == 'cc') {
+            if (!isset($identi) || mb_strtolower($identi) == 'identificacion' || mb_strtolower($identi) == 'identificación' || mb_strtolower($identi) == 'cc' || !isset($row[8])) {
                 return null;
             }
             
@@ -189,17 +190,17 @@ class PersonalImport implements ToModel
 
             $laListaproceso = $this->laLista1($row);
             if($laListaproceso != "0" && !$laListaproceso){
-                dd("1a",$laListaproceso,'fila '.$this->ContarFilasAbsolutas);
+                dd("Seleccion multiple 1a",$laListaproceso,'fila '.$this->ContarFilasAbsolutas);
                 return null;
             }
             $laListaproceso2 = $this->laLista2($row);
             if($laListaproceso2 != "0" && !$laListaproceso2){
-                dd("2a",$laListaproceso2, $laListaproceso != "0",'fila '.$this->ContarFilasAbsolutas);
+                dd("Seleccion multiple 2a",$laListaproceso2, $laListaproceso != "0",'fila '.$this->ContarFilasAbsolutas);
                 return null;
             }
             $laListaproceso3 = $this->laLista3($row);
             if($laListaproceso3 != "0" && !$laListaproceso3){
-                dd("3a",$laListaproceso3,$row,'fila '.$this->ContarFilasAbsolutas);
+                dd("Seleccion multiple 3a",$laListaproceso3,$row,'fila '.$this->ContarFilasAbsolutas);
                 return null;
             }
             //fin transformaciones

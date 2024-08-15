@@ -25,9 +25,11 @@ mantenimientos_requeridos: [''],
 capacidad_instalada: [''], //caso especial:Si, ¿Cual? 
 riesgo_de_la_inversion: [[]],
 anexos: [''],
-user_id: 2,
+user_id: 0,
 enviado:0,
-valor_total_de_la_solicitud_actual:0
+valor_total_de_la_solicitud_actual:0,
+    
+    
 });
 
 

@@ -15,6 +15,8 @@ const data = reactive({
         searcLider: props.filters?.searcLider,
         SoloEnviados: props.filters?.SoloEnviados,
         SoloGuardados: props.filters?.SoloGuardados,
+        liderchu: props.filters?.liderchu,
+        Backcat: props.filters?.Backcat,
         field: props.filters?.field,
         order: props.filters?.order,
         perPage: props.filters?.perPage,
@@ -38,6 +40,8 @@ watchEffect(() => {
     data.params.perPage = props.filters?.perPage
     data.params.SoloEnviados = props.filters?.SoloEnviados
     data.params.SoloGuardados = props.filters?.SoloGuardados
+    data.params.liderchu = props.filters?.liderchu
+    data.params.Backcat = props.filters?.Backcat
 })
 
 </script>

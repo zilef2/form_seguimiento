@@ -4,26 +4,23 @@ namespace App\Http\Controllers;
 
 use App\helpers\Myhelp;
 use App\helpers\MyModels;
-use App\Models\Permission;
 use App\Models\generic;
-use App\Models\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Hash;
 
 class geenericController extends Controller
 {
     public $thisAtributos,$FromController = 'generic';
 
 
-    //<editor-fold desc="Construc | mapea | filtro and dependencia">
+    //<editor-fold desc="Construc | mapea | filtro and losSelect">
     public function __construct() {
-        $this->middleware('permission:create generic', ['only' => ['create', 'store']]);
-        $this->middleware('permission:read generic', ['only' => ['index', 'show']]);
-        $this->middleware('permission:update generic', ['only' => ['edit', 'update']]);
-        $this->middleware('permission:delete generic', ['only' => ['destroy', 'destroyBulk']]);
+//        $this->middleware('permission:create generic', ['only' => ['create', 'store']]);
+//        $this->middleware('permission:read generic', ['only' => ['index', 'show']]);
+//        $this->middleware('permission:update generic', ['only' => ['edit', 'update']]);
+//        $this->middleware('permission:delete generic', ['only' => ['destroy', 'destroyBulk']]);
         $this->thisAtributos = (new generic())->getFillable(); //not using
     }
 
@@ -49,7 +46,7 @@ class geenericController extends Controller
         }else
             $generics = $generics->orderBy('updated_at', 'DESC');
     }
-    public function Dependencias()
+    public function losSelect()
     {
         $dependexsSelect = deependex::all('id','nombre as name')->toArray();
         array_unshift($dependexsSelect,["name"=>"Seleccione un dependex",'id'=>0]);
@@ -58,10 +55,10 @@ class geenericController extends Controller
     //</editor-fold>
 
     public function index(Request $request) {
-//        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' generics '));
+        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::EscribirEnLog($this, ' generics '));
         $generics = $this->Mapear();
         $this->Filtros($generics,$request);
-        $losSelect = $this->Dependencias();
+//        $losSelect = $this->losSelect();
 
 
         $perPage = $request->has('perPage') ? $request->perPage : 10;
@@ -74,7 +71,7 @@ class geenericController extends Controller
             'filters'               => $request->all(['search', 'field', 'order']),
             'perPage'               => (int) $perPage,
             'numberPermissions'     => $numberPermissions,
-            'losSelect'             => $losSelect,
+//            'losSelect'             => $losSelect,
         ]);
     }
 
@@ -86,8 +83,8 @@ class geenericController extends Controller
     public function store(Request $request){
         $permissions = Myhelp::EscribirEnLog($this, ' Begin STORE:generics');
         DB::beginTransaction();
-        $dependex = $request->dependex['id'];
-        $request->merge(['dependex_id' => $request->dependex['id']]);
+//        $dependex = $request->dependex['id'];
+//        $request->merge(['dependex_id' => $request->dependex['id']]);
         $generic = generic::create($request->all());
 
         DB::commit();

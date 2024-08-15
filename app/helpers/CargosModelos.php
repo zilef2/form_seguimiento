@@ -2,40 +2,51 @@
 
 namespace App\helpers;
 
-use App\Models\User;
-use Carbon\Carbon;
-use Carbon\Translator;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-
 class CargosModelos {
 
-    //JUST THIS PROJECT
     public static function CargosYModelos() {
-        //otros cargos NO_ADMIN
-        $nombresDeCargos = [
-            'administrativo',
-            'lider',
-        ];
+        $crudSemiCompleto = ['update', 'read', 'create','download','sugerencia','firmar'];
+        $crudCompleto = array_merge(['delete'], $crudSemiCompleto);
+        
+        $nombresDeCargos = [////JUSTthisPROJECT
+            'lider',//1
+            'administrativo',//2
+        ];//recuerda userseeder, RoleSeeder
         $isSome = [];
         foreach ($nombresDeCargos as $key => $value) {
             $isSome[] = 'is' . $value;
         }
-        //arrrays for easyway
+        
+        $elcore = 'formulario'; ////JUSTthisPROJECT
         $Models = [
             'role',
             'permission',
             'user',
+            'parametro',
 
-            'formulario',//core
+            $elcore,
+            'actividades',
+            'categoria',
+            'estadoformulario',
+            'lineadelplan',
+            'parametro',
+            'planmejoramientonecesidad',
+            'proceso_que_solicita_presupuesto',
+            'vigencias_anteriores',
+        ];
+        
+        $fullCrud = [ ////JUSTthisPROJECT
+            'administrativo' => ['user', $elcore, 'area']
         ];
         return [
             'nombresDeCargos' => $nombresDeCargos,
             'Models' => $Models,
             'isSome' => $isSome,
+            'core' => $elcore,
+            'fullCrud' => $fullCrud,
+            'crudCompleto' => $crudCompleto,
+            'crudSemiCompleto' => $crudSemiCompleto,
         ];
     }
 }
-
 ?>

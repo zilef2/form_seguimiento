@@ -13,6 +13,8 @@ class UserSeeder extends Seeder
      * Run the database seeds.
      *
      * @return void
+        php artisan migrate --path=/database/migrations/UserSeeder.php
+     * 
      */
     public function run()
     {
@@ -25,20 +27,17 @@ class UserSeeder extends Seeder
         $superadmin = User::create([
             'name'              => 'Superadmin',
             'email'             => 'ajelof2+8@gmail.com',
-            'password'          => bcrypt($genPa.'~8~'), //
+            'password'          => bcrypt($genPa.'_new_'),
             'email_verified_at' => date('Y-m-d H:i'),
             'sexo' => $genero,
             'identificacion' => '11232454',
             'celular' => '11232454',
-
         ]);$superadmin->assignRole('superadmin');
-
-
 
         $admin = User::create([
             'name'              => "$nombreAdmin $App",
             'email'             => "alejofg2+8@gmail.com",
-            'password'          => bcrypt($genPa.'uiu'), //
+            'password'          => bcrypt($genPa.'_n2w_'),
             'email_verified_at' => date('Y-m-d H:i'),
             'sexo' => $genero,
             'identificacion' => '11232411',
@@ -48,8 +47,8 @@ class UserSeeder extends Seeder
         
         //baja categoria
         $nombresGenericos = [
-            'jose_administrativo' => '1152888999',
-            'madrid_administrativo' => '1152888199',
+//            'jose_administrativo' => '1152888999',
+//            'madrid_administrativo' => '1152888199',
         ];
 
         // $genero = 'Femenino';
@@ -66,10 +65,7 @@ class UserSeeder extends Seeder
                 'fecha_nacimiento' => $anios,
                 'sexo' => $genero,
             ]);
-//            if($yearRandom < 20)
-                $unUsuario->assignRole('administrativo');
-//            else
-//                $unUsuario->assignRole('lider');
+            $unUsuario->assignRole('administrativo');
         }
     }
 }

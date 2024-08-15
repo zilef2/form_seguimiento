@@ -42,6 +42,11 @@ class Formulario extends Model
         'anexos',//19
         'enviado',
         'user_id',
+        
+        'necesidad_sugerida',
+        'cantidad_sugerida',
+        'valor_unitario_sugerida',
+        'valor_total_solicitatdo_por_necesidad_sugerida',
     ];
 
     public function user(){return $this->belongsTo(User::class);}
@@ -97,4 +102,5 @@ class Formulario extends Model
         
         return $todasLasCat;
     }
+   
 }

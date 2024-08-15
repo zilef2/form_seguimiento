@@ -20,8 +20,8 @@ php artisan make:crud Material "codigo:string"
 php artisan make:crud Ordentrabajo "codigo:string"
 php artisan make:crud Pieza "codigo:string"
 php artisan make:crud Reproceso "codigo:string"
-//5marzo2024
-php artisan make:crud Empresa "nombre:string,NIT:string"
+//form_seguimiento 1ago2024
+php artisan make:crud EstadoFormulario "nombre:string"
 
 //19 septiembre 2023
 

@@ -49,7 +49,7 @@ class RoleSeeder extends Seeder
             'read user',  'create user', 'delete user', 'update user',
             //'downloadAllBD'
         ]);
-
+        
         // $role->revokePermissionTo($permission);
         // $permission->removeRole($role);
     }

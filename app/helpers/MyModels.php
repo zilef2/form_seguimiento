@@ -9,78 +9,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class MyModels {
-
-
-    //<editor-fold desc="zona estatica y permisos">
-
     /*
-Tienda
-Producto
-Inventario
-Venta_detalle
-Venta
-Compra
-Mascota
-Movimiento_financiero
-Gasto
-Tipo_venta
-Tipo_gasto
-Categoria_producto
-
+    actividades
+    categoria
+    estadoformulario
+    formulario //core
+    lineadelplan
+    parametro
+    planmejoramientonecesidad
+    proceso_que_solicita_presupuesto
+    vigencias_anteriores
      */
-    public static function namesOfCargos(){
-        return [
-            'trabajador',//1
-            'supervisor',//2
-        ];
-    }
+    public static function CargosYModelos(){
 
-    public static function WebModels(){
-        return array_merge(self::WebVueModels(),[
-            'permission',
-            'user',
-            'role',
-        ]);
-    }
-    public static function WebVueModels(){
-        return [
-            'producto',
-            'inventario',
-            'cliente',
-
-
-        ];
-    }
-    public static function WebVueModels_side(){
-        return [
-            'producto',
-            'inventario',
-            'cliente',
-
-            'venta',
-            'compra',
-            'mascota',
-            'movimiento_financiero',
-            'gasto',
-            'tipo_venta',
-            'tipo_gasto',
-            'categoria_producto',
-        ];
-    }
-    public static function CrudCompletou()
-    {
-        return [
-            'delete',
-            'update',
-            'read',
-            'create',
-            'specifyUpdate'
-        ];
-    }
-    //</editor-fold>
-
-    public static function CargosYModelos() {
-        $nombresDeCargos = self::namesOfCargos();
+        $nombresDeCargos = CargosModelos::CargosYModelos();
         $isSome = [];
         foreach ($nombresDeCargos as $key => $value) {
             $isSome[] = 'is' . $value;
@@ -92,16 +34,16 @@ Categoria_producto
         ];
     }
 
-    public static function getPermissionToNumber($permissions) {
+    public static function getPermissionToNumber($permissions): int{
         $contador = 1;
-        $nombresDeCargos = self::namesOfCargos();
-        foreach($nombresDeCargos as $cargo){
-            if($permissions === $cargo) return $contador;
+        $nombresDeCargos = CargosModelos::CargosYModelos();
+        foreach ($nombresDeCargos as $cargo) {
+            if ($permissions === $cargo) return $contador;
             $contador++;
         }
 
-        if($permissions === 'admin') return 90;
-        if($permissions === 'superadmin') return 100;
+        if ($permissions === 'admin') return 9000;
+        if ($permissions === 'superadmin') return 10000;
         return 0;
     }
 }

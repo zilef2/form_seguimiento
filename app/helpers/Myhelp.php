@@ -5,11 +5,15 @@ namespace App\helpers;
 use App\Models\User;
 use Carbon\Carbon;
 use Carbon\Translator;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
-//JUST THIS PROJECT
+//JUSTthisPROJECT
+//SHOULDBESHARED
 //STRING S
 //LARAVELFunctions
 //dateFunctions
@@ -17,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 
 class Myhelp {
 
-    public static function AuthU(): \Illuminate\Contracts\Auth\Authenticatable
+    public static function AuthU(): Authenticatable
     {
         $TheUser = Auth::user();
         if($TheUser){
@@ -26,8 +30,26 @@ class Myhelp {
         return redirect()->to('/');
     }
 
-    //STRING S
-        public function EncontrarEnString($frase, $busqueda): array {
+     public static function nombreYvalue($tipo){
+        $objeto = DB::table('selecsForm')->Where('tipo', $tipo)->pluck('nombre');
+        $returningObject = [];
+        foreach ($objeto as $index => $gen) {
+            $returningObject[$index]['value'] = $gen;
+            $returningObject[$index]['label'] = $gen;
+        }
+        return $returningObject;
+    }
+    
+    //<editor-fold desc="SHOULDBESHARED">
+    public static function ListaMultiple(){
+        
+    }
+    //</editor-fold>
+    
+    
+    
+    //<editor-fold desc="STRING S">
+    public function EncontrarEnString($frase, $busqueda): array {
             $Resultado = [];
             $NuevaPos = strlen($frase);
             $ResultOnce = strpos($frase, $busqueda);
@@ -88,16 +110,14 @@ class Myhelp {
                 }
             }
         }
+    //</editor-fold>
 
     //fin strings
+    
 
 
-
-
-
-
-    //LARAVELFunctions
-        public function mensajesErrorBD($e,$clasePrincipal,$elid,$elnombre) {
+    //<editor-fold desc="LARAVELFunctions">
+    public function mensajesErrorBD($e,$clasePrincipal,$elid,$elnombre) {
             $errorCode = $e->getCode();
             $arrayCodes = [
                 23000 => ' No se puede eliminar porque está relacionado con otros registros.',
@@ -181,13 +201,14 @@ class Myhelp {
             }
             return $permissions;
         }
+    //</editor-fold>
 
     //fin LARAVEL
 
 
 
-    //dateFunctions
-        public static function validateDate($dateString, $format = 'd/m/Y'){
+    //<editor-fold desc="dateFunctions">
+    public static function validateDate($dateString, $format = 'd/m/Y'){
             $dateString = date_create_from_format('d/m/Y', $dateString);
             return $dateString;
         }
@@ -210,7 +231,7 @@ class Myhelp {
                     $result = $carbonDate->format('d \d\e M \d\e Y');
                 }
                 return $result;
-            } catch (\Throwable $th) {
+            } catch (Throwable $th) {
                 return $th->getMessage();
             }
         }
@@ -221,6 +242,7 @@ class Myhelp {
             return '';
         }
     //fin dates
+    //</editor-fold>
 
 
 
@@ -266,7 +288,6 @@ class Myhelp {
 
     
 //arrayFunctions
-
     public static function ImplodeSinNulos($theArrayofStrings,$index) {
         if (isset($theArrayofStrings[$index])) {
             $arraySinNulos = array_filter($theArrayofStrings[$index], function ($value) {
@@ -276,6 +297,6 @@ class Myhelp {
         }
         return null;
     }
-}
-?>
+
+}?>
 

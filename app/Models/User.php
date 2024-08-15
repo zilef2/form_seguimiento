@@ -25,11 +25,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'identificacion',
         'esLider',
         'area',
         'agregado',
 
-        'identificacion',
 //        'sexo',
 //        'fecha_nacimiento',
 //        'celular',
@@ -83,4 +83,23 @@ class User extends Authenticatable
 
     // //# belongs to many
 
+    
+     public function ListarLideres(){
+        $Unicas = User::where('esLider',1)->distinct()->get();
+
+        $todas = [[
+            'label' => 'Sin Filtro por lider',
+            'value' => '',
+        ]];
+        foreach ($Unicas as $index => $unic) {
+            $nombre = $unic->name;
+            $identificacion = $unic->identificacion;
+            $todas[] = [
+                'label' => $nombre,
+                'value' => $identificacion,
+            ];
+        }
+        
+        return $todas;
+    }
 }

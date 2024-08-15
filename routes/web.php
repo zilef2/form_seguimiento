@@ -8,6 +8,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EjemploController;
 use App\Http\Controllers\FormularioController;
+use App\Http\Controllers\IdeasController;
+
 use App\Http\Controllers\SubiExcel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -51,10 +53,13 @@ Route::middleware('auth', 'verified')->group(function () {
     })->name('downClaro');
     
     Route::get('/formularioSA', [FormularioController::class, 'formularioSA'])->name('formularioSA');
+    Route::get('/PreFormSimplificado', [FormularioController::class, 'PreFormSimplificado'])->name('PreFormSimplificado');
+    Route::get('/IndexFormSimplificado/{idLider}/{opcionAprobado}', [FormularioController::class, 'IndexFormSimplificado'])->name('IndexFormSimplificado');
+    Route::get('/CategoriasSimilares', [IdeasController::class, 'index'])->name('CategoriasSimilares');
+    Route::resource('/formulario', FormularioController::class);
+    Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
+    Route::get('/get-string', [FormularioController::class, 'getString'])->name('seguridad');
 });
-Route::resource('/formulario', FormularioController::class)->except('create', 'show', 'edit');
-Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
-Route::get('/get-string', [FormularioController::class, 'getString'])->name('seguridad');
 
 // ultimo comit 25sept
 
