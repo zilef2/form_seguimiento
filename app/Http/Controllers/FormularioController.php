@@ -203,7 +203,7 @@ class FormularioController extends Controller
         );
         $dependenciasForm = new dependenciasForm();
         
-        $losSelect = $dependenciasForm->Dependencias();
+//        $losSelect = ;
 //        $dependenciasMultiples = $dependenciasForm->dependenciasMultiples();
         
 
@@ -211,27 +211,26 @@ class FormularioController extends Controller
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . '.index')]],
             'title' => __('app.label.' . $this->FromController),
             'numberPermissions' => $numberPermissions,
-            'losSelect' => $losSelect,
+            'losSelect' => $dependenciasForm->Dependencias(),
             //masivos
             
-            'unidad_de_medida' => $losSelect['unidad_de_medida'],
-            'periodo_de_inicio_de_ejecucion' => $losSelect['periodo_de_inicio_de_ejecucion'],
-            'vigencias_anteriores' => $losSelect['vigencias_anteriores'],
-            'frecuencia_de_uso' => $losSelect['frecuencia_de_uso'],
-            'mantenimientos_requeridos' => $losSelect['mantenimientos_requeridos'],
-            'capacidad_instalada' => $losSelect['capacidad_instalada'],
-            'riesgo_de_la_inversion' => $losSelect['riesgo_de_la_inversion'],
-            
-            //vienen de BD nuevos
-            'categoria' => $losSelect['ListarCategoria'],
-            'actividades' => [],
-            'vigencias_anteriores' => [],
-            
-            'lista_pros_presupuestp' => [],
-            
-            'planmejoramientonecesidad' => [],
-            'lineadelplan' => [],
-            'proceso_que_solicita_presupuesto' => [],
+//            'unidad_de_medida' => $losSelect['unidad_de_medida'],
+//            'periodo_de_inicio_de_ejecucion' => $losSelect['periodo_de_inicio_de_ejecucion'],
+//            'vigencias_anteriores' => $losSelect['vigencias_anteriores'],
+//            'frecuencia_de_uso' => $losSelect['frecuencia_de_uso'],
+//            'mantenimientos_requeridos' => $losSelect['mantenimientos_requeridos'],
+//            'capacidad_instalada' => $losSelect['capacidad_instalada'],
+//            'riesgo_de_la_inversion' => $losSelect['riesgo_de_la_inversion'],
+//            
+//            //vienen de BD nuevos
+//            'categoria' => $losSelect['ListarCategoria'],
+//            'actividades' => [], //aquiiii
+//            
+//            'lista_pros_presupuestp' => [], //aquiiii
+//            
+//            'planmejoramientonecesidad' => [], //aquiiii
+//            'lineadelplan' => [], //aquiiii
+//            'proceso_que_solicita_presupuesto' => [], //aquiiii
         ]);
     }
 

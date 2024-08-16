@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             selectsSeeder::class,
             administrativosUserSeeder::class,
             UserLideresSeeder::class,
+            TablasFrontendSeeder::class,
         ]);
         // Ejercicio::create(['nombre' => 'la funcion x^2 es continua? en que region?', 'descripcion' => 'descripcion generica', 'subtopico_id' => 2]);
     }

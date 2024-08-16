@@ -26,7 +26,7 @@ class PermissionSeeder extends Seeder
             Permission::create(['name' => 'is'.$value]);
         }
 
-        $crudCompleto = ['delete', 'update', 'read', 'create', 'cambiarNombre'];
+        $crudCompleto = ['delete', 'update', 'read', 'create', 'cambiarNombre','sugerencia'];
         foreach ($constantes['Models'] as $model) {
             foreach ($crudCompleto as $crud) {
                 Permission::create(['name' => $crud . ' ' . $model]);

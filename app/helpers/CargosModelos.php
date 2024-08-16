@@ -29,7 +29,6 @@ class CargosModelos {
             'categoria',
             'estadoformulario',
             'lineadelplan',
-            'parametro',
             'planmejoramientonecesidad',
             'proceso_que_solicita_presupuesto',
             'vigencias_anteriores',

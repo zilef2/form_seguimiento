@@ -41,8 +41,15 @@ class Myhelp {
     }
     
     //<editor-fold desc="SHOULDBESHARED">
-    public static function ListaMultiple(){
-        
+    public static function nombreYvalueNew($tableName){
+        $objeto = DB::table($tableName)->pluck('label');
+        dd($objeto);
+//        $returningObject = [];
+//        foreach ($objeto as $index => $gen) {
+//            $returningObject[$index]['value'] = $gen;
+//            $returningObject[$index]['label'] = $gen;
+//        }
+        return $objeto;
     }
     //</editor-fold>
     

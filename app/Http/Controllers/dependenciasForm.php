@@ -12,9 +12,14 @@ class dependenciasForm extends Controller
 {
     public function Dependencias(){
         //estaban en el frontend
-        $Selects['proceso_que_solicita_presupuesto'] = Myhelp::nombreYvalue('proceso_que_solicita_presupuesto');
+        $Selects['proceso_que_solicita_presupuesto'] = Myhelp::nombreYvalueNew('proceso_que_solicita_presupuesto');
+        $Selects['planmejoramientonecesidad'] = Myhelp::nombreYvalueNew('planmejoramientonecesidad');
+        $Selects['lineadelplan'] = Myhelp::nombreYvalueNew('lineadelplan');
+        $Selects['actividades'] = Myhelp::nombreYvalueNew('actividades');
+        $Selects['categorias'] = Myhelp::nombreYvalueNew('categorias');
+        $Selects['vigencias_anteriores'] = Myhelp::nombreYvalueNew('vigencias_anteriores');
+        dd($Selects);
         //FIN: estaban en el frontend
-        
         
         $Selects['unidad_de_medida'] = Myhelp::nombreYvalue('unidad_de_medida');
         $Selects['periodo_de_inicio_de_ejecucion'] = Myhelp::nombreYvalue('periodo_de_inicio_de_ejecucion');

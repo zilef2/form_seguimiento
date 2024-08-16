@@ -56,9 +56,10 @@ const props = defineProps({
                             <label htmlFor="plan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Proceso que solicita presupuesto asd
                             </label>
+                            {{props.losSelect.proceso_que_solicita_presupuesto}}
 <!--                                class="block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"-->
                             <SelectInput v-model="form.proceso_que_solicita_presupuesto"
-                                         :dataSet="data.proceso_que_solicita_presupuesto"
+                                         :dataSet="props.losSelect.proceso_que_solicita_presupuesto"
                                          class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                          autocomplete="off" placeholder="Especifique"/>
 <!--                            <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>-->

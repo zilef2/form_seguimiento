@@ -8,12 +8,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     php artisan migrate --path=database/migrations/nuevas/
+
      */
-    public function up(): void
-    {
-        Schema::create('planmejoramientonecesidad', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
-        Schema::create('lineadelplan', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
+    public function up(): void{
         Schema::create('proceso_que_solicita_presupuesto', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
+        Schema::create('planmejoramientonecesidad', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',512);$table->timestamps();});
+        Schema::create('lineadelplan', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
         Schema::create('actividades', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
         Schema::create('categorias', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
         Schema::create('vigencias_anteriores', function (Blueprint $table) {$table->id();$table->string('value');$table->string('label',255);$table->timestamps();});
