@@ -12,6 +12,7 @@ use Illuminate\Database\Schema\Builder;
 use Illuminate\Http\Request;
 use App\helpers\Myhelp;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -46,11 +47,11 @@ class FormularioController extends Controller
         $formu = new Formulario();
         $todasCat = $formu->ListarCategoria();
         $Selects['ListarCategoria'] = $todasCat;
-        
+
         $usergenerico = new User();
         $todasCat = $usergenerico->ListarLideres();
         $Selects['todasLideres'] = $todasCat;
-        
+
         return $Selects;
     }
     //</editor-fold>
@@ -61,7 +62,7 @@ class FormularioController extends Controller
         if(!$elUser) return [];
 
         $TablaNecesidades = Formulario::Where('user_id',$elUser->id)->get();
-        
+
         if($TablaNecesidades->isEmpty()) return [];
         return $TablaNecesidades;
     }
@@ -83,11 +84,11 @@ class FormularioController extends Controller
             }
             )->toArray();
         $cedlideres = $this->getcedLideres($request);
-        
-        
+
+
         $infoEnviada = $this->InfoEnviada($request->identUser);
 
-        
+
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
@@ -99,7 +100,7 @@ class FormularioController extends Controller
             'cedLideresDiligenciados' => $cedLideresDiligenciados,
 
             'infoEnviada' => $infoEnviada,
-            
+
             //lazy loads
             'cedLideres' => Inertia::lazy(fn() => $cedlideres),
             'cedLideresGuardados' => Inertia::lazy(fn() => $this->getcedLideresGuardados($request)),
@@ -177,11 +178,11 @@ class FormularioController extends Controller
         $numberPermissions = MyModels::getPermissionToNumber(
             Myhelp::WriteAuthLog($this, ' --formularios index-- ')
         );
-        
+
         $formularios = $this->Mapear();
         $this->Filtros($formularios, $request);
         $losSelect = $this->Dependencias();
-        
+
         $perPage = $request->has('perPage') ? $request->perPage : 10;
 
         return Inertia::render($this->FromController . '/Index', [
@@ -195,17 +196,17 @@ class FormularioController extends Controller
             'losSelect' => $losSelect,
         ]);
     }
-    
-    public function create(Request $request)
-    {
+
+    public function create(Request $request){
+
         $numberPermissions = MyModels::getPermissionToNumber(
             Myhelp::WriteAuthLog($this, ' --formularios index-- ')
         );
+        $AuthUser = Myhelp::AuthU();
         $dependenciasForm = new dependenciasForm();
-        
+
 //        $losSelect = ;
 //        $dependenciasMultiples = $dependenciasForm->dependenciasMultiples();
-        
 
         return Inertia::render($this->FromController . '/CreateWindow', [
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . '.index')]],
@@ -213,7 +214,7 @@ class FormularioController extends Controller
             'numberPermissions' => $numberPermissions,
             'losSelect' => $dependenciasForm->Dependencias(),
             //masivos
-            
+
 //            'unidad_de_medida' => $losSelect['unidad_de_medida'],
 //            'periodo_de_inicio_de_ejecucion' => $losSelect['periodo_de_inicio_de_ejecucion'],
 //            'vigencias_anteriores' => $losSelect['vigencias_anteriores'],
@@ -221,37 +222,37 @@ class FormularioController extends Controller
 //            'mantenimientos_requeridos' => $losSelect['mantenimientos_requeridos'],
 //            'capacidad_instalada' => $losSelect['capacidad_instalada'],
 //            'riesgo_de_la_inversion' => $losSelect['riesgo_de_la_inversion'],
-//            
+//
 //            //vienen de BD nuevos
 //            'categoria' => $losSelect['ListarCategoria'],
 //            'actividades' => [], //aquiiii
-//            
+//
 //            'lista_pros_presupuestp' => [], //aquiiii
-//            
+//
 //            'planmejoramientonecesidad' => [], //aquiiii
 //            'lineadelplan' => [], //aquiiii
 //            'proceso_que_solicita_presupuesto' => [], //aquiiii
         ]);
     }
 
-    
+
     //empieza Formularios SA
     private function MapearSA($formus)
     {
         $valorTotal = clone $formus;
         $valorTotal =  $valorTotal->sum('valor_total_solicitatdo_por_necesidad');
-        
+
         $formuResult = $formus->get()->map(function ($form) {
             $form->userName = $form->userName();
             $form->Categori = $form->categoria();
             $form->proceso_que_solicita_presupuest = $form->proceso_que_solicita_presupuesto();
-            
+
             $form->procesos_involucrado = $form->BDToString('procesos_involucrados');
             $form->plan_de_mejoramiento_al_que_apunta_la_necesida = $form->BDToString('plan_de_mejoramiento_al_que_apunta_la_necesidad');
             $form->linea_del_plan_desarrollo_al_que_apunta_la_necesida = $form->BDToString('linea_del_plan_desarrollo_al_que_apunta_la_necesidad');
             return $form;
         });
-        
+
         return [$formuResult,$valorTotal];
     }
 
@@ -272,7 +273,7 @@ class FormularioController extends Controller
                 ;
             });
         }
-        
+
         $searchFieldsLikeit = ['Backcat' ];
         $BDFieldsLikeit = ['categoria'];
         foreach ($searchFieldsLikeit as $index => $field) {
@@ -298,10 +299,10 @@ class FormularioController extends Controller
             }else{
                 $formularios = $formularios->orderBy($request->field, $request->order);
             }
-        } 
+        }
         $formularios = $formularios->orderBy('updated_at', 'DESC');
     }
-    
+
     public function formularioSA(Request $request)
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' formularios SA '));
@@ -309,7 +310,7 @@ class FormularioController extends Controller
         $this->Filtros($formus, $request);
         [$formularios,$totalValorUnitario] = $this->MapearSA($formus);
         $losSelect = $this->Dependencias();
-        
+
         $perPage = $request->has('perPage') ? $request->perPage : 1000;
         $total = $formularios->count();
         $page = request('page', 1); // Current page number
@@ -332,23 +333,23 @@ class FormularioController extends Controller
             'totalValorUnitario' => (int) $totalValorUnitario,
         ]);
     }
-    
+
     private function MapearSimplificado($formus)
     {
         $valorTotal = clone $formus;
         $valorTotal =  $valorTotal->sum('valor_total_solicitatdo_por_necesidad');
-        
+
         $formuResult = $formus->get()->map(function ($form) {
             $form->userName = $form->userName();
             $form->Categori = $form->categoria();
             $form->proceso_que_solicita_presupuest = $form->proceso_que_solicita_presupuesto();
-            
+
             $form->procesos_involucrado = $form->BDToString('procesos_involucrados');
             $form->plan_de_mejoramiento_al_que_apunta_la_necesida = $form->BDToString('plan_de_mejoramiento_al_que_apunta_la_necesidad');
             $form->linea_del_plan_desarrollo_al_que_apunta_la_necesida = $form->BDToString('linea_del_plan_desarrollo_al_que_apunta_la_necesidad');
             return $form;
         });
-        
+
         return [$formuResult,$valorTotal];
     }
     public function IndexFormSimplificado(Request $request,$idLider,$opcionAprobado)
@@ -358,7 +359,7 @@ class FormularioController extends Controller
         $this->Filtros($formus, $request);
         [$formularios,$totalValorUnitario] = $this->MapearSimplificado($formus);
         $losSelect = $this->Dependencias();
-        
+
         $perPage = $request->has('perPage') ? $request->perPage : 1000;
         $total = $formularios->count();
         $page = request('page', 1); // Current page number
@@ -422,11 +423,11 @@ class FormularioController extends Controller
             'riesgo_de_la_inversion.*' => 'required',
             'anexos.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx'
         ]);
-        
-        
+
+
         $user = User::Where('identificacion', $request->identificacion_user)->first();
         if (!$user) {return back();}
-        
+
         $formularioGuardados = Formulario::Where('user_id', $user->id)
             ->Where('enviado',0)
             ->get();
@@ -453,7 +454,7 @@ class FormularioController extends Controller
         return false;
     }
     public function store(Request $request){ //
-        
+
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formularios');
             $user = User::Where('identificacion', $request->identificacion_user)->first();
@@ -503,13 +504,13 @@ class FormularioController extends Controller
                 }
             }
             DB::commit();
-            
+
             $formulariosBorrar = Formulario::Where('user_id', $user->id)->where(function ($query) {
                     $query->where('necesidad', '')->orWhere('necesidad', ' ');
                 })->where(function ($query) {
                     $query->where('justificacion', '')->orWhere('justificacion', ' ');
                 })->whereNull('anexos')->get();
-            
+
             DB::beginTransaction();
             if(($formulariosBorrar)->count() < 5){
                 foreach ($formulariosBorrar as $formulario) {
@@ -550,7 +551,7 @@ class FormularioController extends Controller
             if (isset($request['valor_unitario'][$index])) $valoruni = str_replace(['.', '$'], '', $request['valor_unitario'][$index]);
             $valorAsigAnterior = 0;
             if (isset($request['valor_asignado_en_la_vigencia_anterior'][$index])) $valorAsigAnterior = str_replace(['.', '$'], '', $request['valor_asignado_en_la_vigencia_anterior'][$index]);
-            
+
             //valores numericos
                 $canti = ($request['cantidad'][$index]) ?? 0;
                 $canti = floatval($canti);
@@ -652,12 +653,12 @@ class FormularioController extends Controller
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' IndexFormSimplificado '));
         $ArrayIdentificaciones = Formulario::All()->pluck('identificacion_user');
-        
+
         $Arraylideres = User::WhereIn('identificacion',$ArrayIdentificaciones)->pluck('name','id');
-        
+
         $estadosFormulario = EstadoFormulario::all()->toArray();
-        
-        
+
+
          return Inertia::render($this->FromController . '/PreFormSimplificado', [
             'numberPermissions' => $numberPermissions,
             'Arraylideres' => $Arraylideres,
@@ -665,6 +666,6 @@ class FormularioController extends Controller
         ]);
     }
     //FIN : STORE - UPDATE - DELETE
-   
+
 
 }

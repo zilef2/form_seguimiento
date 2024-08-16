@@ -17,7 +17,7 @@ use Throwable;
 //STRING S
 //LARAVELFunctions
 //dateFunctions
-//arrayFunctions 
+//arrayFunctions
 
 class Myhelp {
 
@@ -39,22 +39,21 @@ class Myhelp {
         }
         return $returningObject;
     }
-    
+
     //<editor-fold desc="SHOULDBESHARED">
     public static function nombreYvalueNew($tableName){
         $objeto = DB::table($tableName)->pluck('label');
-        dd($objeto);
-//        $returningObject = [];
-//        foreach ($objeto as $index => $gen) {
-//            $returningObject[$index]['value'] = $gen;
-//            $returningObject[$index]['label'] = $gen;
-//        }
-        return $objeto;
+        $returningObject = [];
+        foreach ($objeto as $index => $gen) {
+            $returningObject[$index]['value'] = $gen;
+            $returningObject[$index]['label'] = $gen;
+        }
+        return $returningObject;
     }
     //</editor-fold>
-    
-    
-    
+
+
+
     //<editor-fold desc="STRING S">
     public function EncontrarEnString($frase, $busqueda): array {
             $Resultado = [];
@@ -120,7 +119,7 @@ class Myhelp {
     //</editor-fold>
 
     //fin strings
-    
+
 
 
     //<editor-fold desc="LARAVELFunctions">
@@ -183,11 +182,12 @@ class Myhelp {
                 Log::critical('Vista: ' . $nombreC . 'U:' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
 //                Log::critical('Vista: ' . $nombreC . 'U:' . Auth::user()->name . ' ||' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
             }
-            
+
         }
-        
+
         public static function WriteAuthLog($thiis, $clase = '', $mensaje = '', $returnPermission = true, $critico = false) {
-            $permissions = $returnPermission ? auth()->user()->roles->pluck('name')[0] : null;
+            $authU = auth()->user();
+            $permissions = $returnPermission ? $authU->roles->pluck('name')[0] : null;
             $ListaControladoresYnombreClase = (explode('\\', get_class($thiis)));
             $nombreC = end($ListaControladoresYnombreClase);
             if (!$critico) {
@@ -204,7 +204,7 @@ class Myhelp {
                 return $permissions;
             } else {
 //                Log::critical('Vista: ' . $nombreC . 'U:' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
-                Log::critical('Vista: ' . $nombreC . 'U:' . Auth::user()->name . ' ||' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
+                Log::critical('Vista: ' . $nombreC . 'U:' . $authU->name . ' ||' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
             }
             return $permissions;
         }
@@ -291,9 +291,9 @@ class Myhelp {
         }
         return $result;
     }
-    
 
-    
+
+
 //arrayFunctions
     public static function ImplodeSinNulos($theArrayofStrings,$index) {
         if (isset($theArrayofStrings[$index])) {
