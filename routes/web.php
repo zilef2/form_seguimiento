@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EjemploController;
 use App\Http\Controllers\FormularioController;
+use App\Http\Controllers\FormuController;
 use App\Http\Controllers\IdeasController;
 
 use App\Http\Controllers\SubiExcel;
@@ -59,6 +60,9 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::resource('/formulario', FormularioController::class);
     Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
     Route::get('/get-string', [FormularioController::class, 'getString'])->name('seguridad');
+    
+    Route::resource('/formu', FormuController::class);
+//    Route::match(['get', 'post'],
 });
 
 // ultimo comit 25sept

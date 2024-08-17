@@ -128,6 +128,7 @@ return [
 
 
         'op_successfully' => 'Operacion finalizada satisfactoriamente.',
+        'firstPart' => 'Primera parte completada',
         'op_not_successfully' => 'Operacion errada. ',
         'formulario_created_successfully' => '<b>:number</b> Necesidad(es) nueva(s).<br><b>:actualizados</b> Actualizadas',
         'created_successfully' => '<b>:name</b> creado satisfactoriamente.',

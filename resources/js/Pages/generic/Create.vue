@@ -94,7 +94,6 @@ const sexos = [{ label: 'Masculino', value: 0 }, { label: 'Femenino', value: 1 }
                             <v-select :options="data[atributosform.idd]" label="title"
                                 v-model="form[atributosform.idd]"></v-select>
                             <InputError class="mt-2" :message="form.errors[atributosform.idd]" />
-
                         </div>
 
 

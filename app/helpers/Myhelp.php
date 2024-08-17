@@ -50,6 +50,17 @@ class Myhelp {
         }
         return $returningObject;
     }
+    public static function vSelect($tableName): array
+    {
+        $objeto = DB::table($tableName)->select('id','label as name')->get()->toArray();
+        $returningObject = [];
+        foreach ($objeto as $index => $gen) {
+//            dd($gen);
+            $returningObject[$index]['id'] = $gen->id;
+            $returningObject[$index]['name'] = $gen->name;
+        }
+        return $returningObject;
+    }
     //</editor-fold>
 
 

@@ -96,7 +96,7 @@ class geenericController extends Controller
     public function show($id){}public function edit($id){}
 
     public function update(Request $request, $id){
-        $permissions = Myhelp::EscribirEnLog($this, ' Begin UPDATE:generics');
+        Myhelp::EscribirEnLog($this, ' Begin UPDATE:generics');
         DB::beginTransaction();
         $generic = generic::findOrFail($id);
         $request->merge(['dependex_id' => $request->dependex['id']]);

@@ -5,7 +5,12 @@ import {Head} from '@inertiajs/vue3';
 import TextAreaZilef from "@/Pages/formulario/TextAreaZilef.vue";
 import {form} from "@/Pages/formunique";
 import SelectInput from "@/Components/SelectInput.vue";
-
+import InputError from "@/Components/InputError.vue";
+import vselect from "vue-select";
+import "vue-select/dist/vue-select.css";
+import TextInput from "@/Components/TextInput.vue";
+import {handledinero, handleCantidad, calcularTotal, handledinerVigAnt} from "@/Pages/CreateFormFunctions";
+import {reactive, ref, watch,onMounted, watchEffect} from "vue";
 
 
 // roles: Number,
@@ -15,13 +20,52 @@ const props = defineProps({
     numberPermissions: Number,
     losSelect: Object,
 })
+const data = reactive({
+    valor_total_solicitatdo_por_necesidad: 0,
 
+})
+onMounted(() => {
+    form.valor_asignado_en_la_vigencia_anterior = 0
+    
+})
+
+// export function handlePaste(event) {
+//     event.preventDefault();
+//     let pasteContent = (event.clipboardData || window.clipboardData).getData('text');
+//     pasteContent = pasteContent.replace(/\D/g, '');
+//     this.form.cantidad = pasteContent;
+// }
+
+watchEffect(() => {
+    handleCantidad(form)
+    form.valor_total_solicitatdo_por_necesidad = calcularTotal(form.valor_unitario,form.cantidad,data)
+})
+
+
+const validaciones = () =>{
+    
+}
+const create = () => {
+    //todo: validar que el total sea numero
+    form.valor_unitario = parseInt(form.valor_unitario.toString().replace(/\$|\./g, ''))
+    console.log("=>(CreateWindow.vue:51) form.valor_unitario", form.valor_unitario);
+    
+    if(form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
+    form.post(route('formu.store'), {
+        preserveScroll: true,
+        forceFormData: true,
+        onSuccess: () => null,
+        // onSuccess: () => form.reset(),
+        onError: () => null,
+        // onError: () => alert('¡Hay campos faltantes!'),
+        onFinish: () => null,
+    })
+}
 
 
 </script>
 
 <template>
-
     <Head title="Dashboard"/>
     <AuthenticatedLayout>
         <Breadcrumb :title="title" :breadcrumbs="breadcrumbs"/>
@@ -30,71 +74,158 @@ const props = defineProps({
                 <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 md:p-10 lg:p-12">
                     <h1 class="text-2xl font-bold text-[#499884] dark:text-gray-100 mb-6">Necesidades económicas anuales por dependencia</h1>
                     <p class="text-gray-600 dark:text-gray-400 mb-8">Llena el siguiente formulario para que podamos ayudarte.</p>
-                    <form class="space-y-6">
-                        <div>
+                    <form @submit.prevent="create" method="POST" class="space-y-6 grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
                             <label htmlFor="plan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Proceso que solicita presupuesto
                             </label>
-
-<!--                                class="block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"-->
+                            <!--                                class="block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"-->
                             <SelectInput v-model="form.proceso_que_solicita_presupuesto"
                                          :dataSet="props.losSelect.proceso_que_solicita_presupuesto"
                                          class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                          autocomplete="off" placeholder="Especifique"/>
-<!--                            <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>-->
+                            <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>
                         </div>
-                        <TextAreaZilef v-model:valor="form.necesidad" placeholder="Describa aqui su " nombre="necesidad"/>
-                        <TextAreaZilef v-model:valor="form.justificacion" placeholder="Describa aqui su " nombre="justificacion"/>
-                        <TextAreaZilef v-model:valor="form.actividad" placeholder="Describa aqui su " nombre="actividad"/>
-<!--                        <div class="flex items-center">-->
-<!--                            <input-->
-<!--                                id="terms"-->
-<!--                                name="terms"-->
-<!--                                type="checkbox"-->
-<!--                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"-->
-<!--                            />-->
-<!--                            <label htmlFor="terms" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">-->
-<!--                                Acepto los términos y condiciones-->
-<!--                            </label>-->
-<!--                        </div>-->
-
-<!--                        TODO: AQUIIII empezar con categoria, que es un selectunique-->
-
-
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de usuario</label>
-                            <div class="flex items-center">
-                                <input id="individual" name="user-type" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"/>
-                                <label htmlFor="individual" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                                    Lider de Area
-                                </label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="business" name="user-type" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"/>
-                                <label htmlFor="business" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                                    Planeacion (administrador)
-                                </label>
-                            </div>
-                            <div class="flex items-center">
-                                <input id="business" name="user-type" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"/>
-                                <label htmlFor="business" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
-                                    Ambos
-                                </label>
-                            </div>
+                        <div class="col-span-2">
+                            <TextAreaZilef v-model:valor="form.necesidad" placeholder="Describa aqui su " nombre="necesidad"/>
+                            <InputError class="mt-2" :message="form.errors.necesidad"/>
                         </div>
-                        <div>
-                            <label htmlFor="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Adjuntar archivo
+                        <div class="col-span-2">
+                            <TextAreaZilef v-model:valor="form.justificacion" placeholder="Describa aqui su " nombre="justificacion"/>
+                            <InputError class="mt-2" :message="form.errors.justificacion"/>
+                        </div>
+                        <div class="col-span-2">
+                            <TextAreaZilef v-model:valor="form.actividad" placeholder="Describa aqui su " nombre="actividad"/>
+                            <InputError class="mt-2" :message="form.errors.actividad"/>
+                        </div>
+
+                        <div class="col-span-2">
+                            <label name="labelcategoria"> Categoria </label>
+                            <vselect
+                                :options="props.losSelect.categorias"
+                                v-model="form.categoria"
+                                label="name"></vselect>
+                            <InputError class="mt-2" :message="form.errors.categoria"/>
+                        </div>
+                        <div class="col-span-2">
+                            <label name="unidad_de_medida"> unidad de medida </label>
+                            <vselect
+                                :options="props.losSelect.unidad_de_medida"
+                                v-model="form.unidad_de_medida"
+                                label="label"></vselect>
+                            <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
+                        </div>
+                        <div class="col-span-1">
+                            <label :htmlFor="cantidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+                                cantidad
                             </label>
-                            <input id="file" name="file" type="file" class="hidden w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+                            <!--                                       @input="handledinero(form)"-->
+                            <TextInput
+                                name="cantidad"
+                                class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                :placeholder="'cantidad'"
+                                @input="handleCantidad(form)"
+                                onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
+                                v-model="form.cantidad"
+                            />
                         </div>
-                        <div>
-                            <button
-                                type="submit"
-                                class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                Enviar
+                        <div class="col-span-1">
+                            <label :htmlFor="cantidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+                                valor unitario
+                            </label>
+                            <TextInput
+                                name="valor_unitario"
+                                class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="valor unitario"
+                                @input="handledinero(form)"
+                                onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
+                                v-model="form.valor_unitario"
+                            />
+                        </div>
+                       
+                        <div class="col-span-full p-4">
+                            <label class="text-md text-gray-900 font-bold capitalize">valor total</label>
+                            <p class="text-md text-gray-700">Valor generado automáticamente</p>
+                            <div class="w-full inline-flex">
+<!--                                    @blur="metodoConThrottle"-->
+                                <input
+                                    disabled @keydown.enter.prevent="create" 
+                                    v-model="data.valor_total_solicitatdo_por_necesidad"
+                                    class="w-full bg-zinc-400 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                                    autocomplete="off"/>
+                            </div>
+                        </div>
+                        <div class="col-span-2">
+                            <label name="periodo_de_inicio_de_ejecucion"> periodo de inicio de ejecucion </label>
+                            <vselect
+                                :options="props.losSelect.periodo_de_inicio_de_ejecucion"
+                                v-model="form.periodo_de_inicio_de_ejecucion"
+                                label="label"></vselect>
+                            <InputError class="mt-2" :message="form.errors.periodo_de_inicio_de_ejecucion"/>
+                        </div>
+                        <div class="">
+                            <label name="vigencias_anteriores"> vigencias anteriores</label>
+                            <vselect
+                                :options="[{value:'Si',label:'Si'},{value:'No',label:'No'}]"
+                                v-model="form.vigencias_anteriores"
+                                label="label"></vselect>
+                            <InputError class="mt-2" :message="form.errors.vigencias_anteriores"/>
+                        </div>
+                        
+                         <div v-show="form.vigencias_anteriores && form.vigencias_anteriores.value != 'No'" class="">
+                            <label :htmlFor="valor_asignado_en_la_vigencia_anterior" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+                                valor asignado en la vigencia anterior
+                            </label>
+                            <TextInput
+                                name="valor_asignado_en_la_vigencia_anterior"
+                                class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="valor unitario"
+                                @input="handledinerVigAnt(form)"
+                                
+                                onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
+                                v-model="form.valor_asignado_en_la_vigencia_anterior"
+                            />
+                            <InputError class="mt-2" :message="form.errors.valor_asignado_en_la_vigencia_anterior"/>
+                        </div>
+                        
+                        <!--                        <div class="flex items-center">-->
+                        <!--                            <input-->
+                        <!--                                id="terms"-->
+                        <!--                                name="terms"-->
+                        <!--                                type="checkbox"-->
+                        <!--                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"-->
+                        <!--                            />-->
+                        <!--                            <label htmlFor="terms" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">-->
+                        <!--                                Acepto los términos y condiciones-->
+                        <!--                            </label>-->
+                        <!--                        </div>-->
+
+                        <!--                        <div>-->
+                        <!--                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tipo de usuario</label>-->
+                        <!--                            <div class="flex items-center">-->
+                        <!--                                <input id="individual" name="user-type" type="radio" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"/>-->
+                        <!--                                <label htmlFor="individual" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">-->
+                        <!--                                    Lider de Area-->
+                        <!--                                </label>-->
+                        <!--                            </div>
+                                                     </div>-->
+
+                        <div v-if="Object.keys(form.errors).length > 0" class="col-span-full">
+                            <ul>
+                                <li v-for="(errorMessages, field) in form.errors" :key="field">
+                                    <strong>{{ field.replace(/_/g, ' ') }}:</strong>
+                                    <ul>
+                                        <!--                                        <li v-for="(message, index) in errorMessages" :key="index">-->
+                                        {{ errorMessages }}
+                                        <!--                                        </li>-->
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-span-full">
+                            <button type="submit"
+                                    class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Siguiente
                             </button>
                         </div>
                     </form>

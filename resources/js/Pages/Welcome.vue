@@ -7,7 +7,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {form} from './form';
 import InputError from "@/Components/InputError.vue";
 import SelectInput from "@/Components/SelectInput.vue";
-import {number_format, plata_format} from "@/global";
+import {number_format, plata_format,tieneCaracteresNoNumericos, tieneCerosIzq} from "@/global";
 import Toast from "@/Components/Toast.vue";
 import {AumentarForm, DisminuirForm} from "@/Pages/formFunctions";
 import {throttle} from 'lodash';
@@ -838,15 +838,7 @@ function handleCantidad(conteoi) {
 
 }
 
-function tieneCaracteresNoNumericos(valor) {
-    const regex = /^[0-9.$]+$/;
-    return !regex.test(valor);
-}
 
-function tieneCerosIzq(valor) {
-    const regex = /^\$?([1-9][0-9]*|[1-9][0-9]*(\.[0-9]+)*)$/;
-    return !regex.test(valor);
-}
 
 function handledinero(conteoi) {
     if (tieneCaracteresNoNumericos(form.valor_unitario[conteoi])) form.valor_unitario[conteoi] = 0;
@@ -1591,8 +1583,7 @@ const create = (validator, second) => {
                                                     - {{ props.losSelect.riesgo_de_la_inversion.find((item) => item.value === itemsito)?.label }}
                                                 </p> 
                                             </div>
-
-
+                                            
                                             <div class="min-w-[500px] max-h-[110px] p-4">
                                                 <label class="text-md text-gray-900 font-bold capitalize">anexos (opcional)</label>
                                                 <p class="text-md text-gray-700 my-2">

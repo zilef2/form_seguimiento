@@ -198,44 +198,16 @@ class FormularioController extends Controller
     }
 
     public function create(Request $request){
-
-        $numberPermissions = MyModels::getPermissionToNumber(
-            Myhelp::WriteAuthLog($this, ' --formularios index-- ')
-        );
-        $AuthUser = Myhelp::AuthU();
+        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' --formularios index-- '));
         $dependenciasForm = new dependenciasForm();
-
-//        $losSelect = ;
-//        $dependenciasMultiples = $dependenciasForm->dependenciasMultiples();
 
         return Inertia::render($this->FromController . '/CreateWindow', [
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . '.index')]],
             'title' => __('app.label.' . $this->FromController),
             'numberPermissions' => $numberPermissions,
             'losSelect' => $dependenciasForm->Dependencias(),
-            //masivos
-
-//            'unidad_de_medida' => $losSelect['unidad_de_medida'],
-//            'periodo_de_inicio_de_ejecucion' => $losSelect['periodo_de_inicio_de_ejecucion'],
-//            'vigencias_anteriores' => $losSelect['vigencias_anteriores'],
-//            'frecuencia_de_uso' => $losSelect['frecuencia_de_uso'],
-//            'mantenimientos_requeridos' => $losSelect['mantenimientos_requeridos'],
-//            'capacidad_instalada' => $losSelect['capacidad_instalada'],
-//            'riesgo_de_la_inversion' => $losSelect['riesgo_de_la_inversion'],
-//
-//            //vienen de BD nuevos
-//            'categoria' => $losSelect['ListarCategoria'],
-//            'actividades' => [], //aquiiii
-//
-//            'lista_pros_presupuestp' => [], //aquiiii
-//
-//            'planmejoramientonecesidad' => [], //aquiiii
-//            'lineadelplan' => [], //aquiiii
-//            'proceso_que_solicita_presupuesto' => [], //aquiiii
         ]);
     }
-
-
     //empieza Formularios SA
     private function MapearSA($formus)
     {
@@ -454,11 +426,11 @@ class FormularioController extends Controller
         return false;
     }
     public function store(Request $request){ //
-
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formularios');
             $user = User::Where('identificacion', $request->identificacion_user)->first();
             if(!$user){ return back();}
+            
             DB::beginTransaction();
             $numeroTotal = count($request['necesidad']);
             $formulario = Formulario::Where('user_id', $user->id)->get();
@@ -538,8 +510,7 @@ class FormularioController extends Controller
             $planmejor = Myhelp::ImplodeSinNulos($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'],$index);
             $lineadelplan = Myhelp::ImplodeSinNulos($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'],$index);
             $riesgou = Myhelp::ImplodeSinNulos($request['riesgo_de_la_inversion'],$index);
-
-
+            
             $anexou = '';
             if (isset($request['anexos']))
                 $anexou = $request['anexos'][$index] ?? '';
@@ -667,5 +638,5 @@ class FormularioController extends Controller
     }
     //FIN : STORE - UPDATE - DELETE
 
-
+   
 }

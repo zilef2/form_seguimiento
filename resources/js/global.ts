@@ -36,6 +36,15 @@ import {toInteger} from "lodash";
 
 //<editor-fold desc="This Project">
 // this Project
+    export function tieneCaracteresNoNumericos(valor) {
+        const regex = /^[0-9.$]+$/;
+        return !regex.test(valor);
+    }
+
+    export function tieneCerosIzq(valor) {
+        const regex = /^\$?([1-9][0-9]*|[1-9][0-9]*(\.[0-9]+)*)$/;
+        return !regex.test(valor);
+    }
     export function LookForValueInArray(arrayOfObjects:Object[] , searchValue): String {
         if(arrayOfObjects === null) return null
         //ex: { title: '123', value: 1 },

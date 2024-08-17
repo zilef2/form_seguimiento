@@ -11,9 +11,11 @@
             v-model="thevalor"
         />
     </div>
+    
 </template>
 <script setup>
 import {defineProps, defineEmits, ref, watch, onMounted} from 'vue';
+import InputError from "@/Components/InputError.vue";
 
 const emit = defineEmits(['update:valor']);
 

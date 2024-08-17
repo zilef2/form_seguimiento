@@ -29,10 +29,10 @@ php artisan migrate --path=/database/migrations/2024_08_01_130407_create_estado_
         EstadoFormulario::Create(['estado' => 4, 'nombre' => 'Sugerencia']);
         
         Schema::table('formularios', function (Blueprint $table) {
-            $table->text('necesidad_sugerida');
-            $table->decimal('cantidad_sugerida', 20);
-            $table->decimal('valor_unitario_sugerida', 20);
-            $table->decimal('valor_total_solicitatdo_por_necesidad_sugerida', 20);
+            $table->text('necesidad_sugerida')->nullable();
+            $table->decimal('cantidad_sugerida', 20)->nullable();
+            $table->decimal('valor_unitario_sugerida', 20)->nullable();
+            $table->decimal('valor_total_solicitatdo_por_necesidad_sugerida', 20)->nullable();
         });
         
         //seeders
