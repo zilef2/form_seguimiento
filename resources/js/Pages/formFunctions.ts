@@ -1,10 +1,11 @@
+
+
 export function LimpiarArray(UnArray){
     // let arr = str.split(',');
-    let arryResult = UnArray.filter((element) => {
+    return UnArray.filter((element: number) => {
         console.log("=>(formFunctions.ts:7) element", element);
         return !isNaN(element)
     });
-    return arryResult;
 }
 
 export function AumentarForm(form){
@@ -53,3 +54,28 @@ export function DisminuirForm(form,nuev){
 }
 
 
+
+
+// export function handlePaste(event) {
+//     event.preventDefault();
+//     let pasteContent = (event.clipboardData || window.clipboardData).getData('text');
+//     pasteContent = pasteContent.replace(/\D/g, '');
+//     this.form.cantidad = pasteContent;
+// }
+
+//<editor-fold desc="usages: createWindows2.vue">
+const LabelNinguno = (elem):boolean =>{
+    console.log("=>(CreateWindow2.vue:41) elem", elem);
+    return elem.label === 'Ninguno';
+}
+export function borrarprocesos_involucrados(form):void {
+  if(form.procesos_involucrados.some(LabelNinguno)){
+    form.procesos_involucrados = [ { "label": "Ninguno", "value": 9 } ]
+  }
+}
+export function borrarplan_de_mejoramiento_al_que_apunta_la_necesidad(form):void {
+  if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad.some(LabelNinguno)){
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad = [ { "label": "Ninguno", "value": 0 } ]
+  }
+}
+//</editor-fold>

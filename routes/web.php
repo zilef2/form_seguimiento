@@ -44,7 +44,7 @@ Route::middleware('auth', 'verified')->group(function () {
 
     Route::resource('/permission', PermissionController::class)->except('create', 'show', 'edit');
     Route::post('/permission/destroy-bulk', [PermissionController::class, 'destroyBulk'])->name('permission.destroy-bulk');
-    
+
     Route::resource('/parametro', ParametrosController::class);
 
     Route::get('/DB_info', [UserController::class,'todaBD']);
@@ -52,7 +52,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/downClaro',function(){
         return Excel::download(new FormExport, 'DB_Con_Nombres.xlsx');
     })->name('downClaro');
-    
+
     Route::get('/formularioSA', [FormularioController::class, 'formularioSA'])->name('formularioSA');
     Route::get('/PreFormSimplificado', [FormularioController::class, 'PreFormSimplificado'])->name('PreFormSimplificado');
     Route::get('/IndexFormSimplificado/{idLider}/{opcionAprobado}', [FormularioController::class, 'IndexFormSimplificado'])->name('IndexFormSimplificado');
@@ -60,8 +60,10 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::resource('/formulario', FormularioController::class);
     Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
     Route::get('/get-string', [FormularioController::class, 'getString'])->name('seguridad');
-    
+
     Route::resource('/formu', FormuController::class);
+    Route::get('/Store2/{fid}', [FormuController::class, 'GetStore2'])->name('Store2');
+    Route::post('/Store2/{fid}', [FormuController::class, 'PostStore2'])->name('PStore2');
 //    Route::match(['get', 'post'],
 });
 

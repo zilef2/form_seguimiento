@@ -26,7 +26,23 @@ const data = reactive({
 })
 onMounted(() => {
     form.valor_asignado_en_la_vigencia_anterior = 0
-    
+    if(props.numberPermissions > 9000) {
+         const valueRAn = Math.floor(Math.random() * (900) + 1)
+        form.proceso_que_solicita_presupuesto = 'Biblioteca';
+        form.necesidad = 'Prueba necesidad '+ (valueRAn);
+        form.justificacion = 'Prueba justificacion '+ (valueRAn);
+        form.actividad = 'Prueba actividad '+ (valueRAn);
+        form.categoria = {name:'ARL'}
+        form.unidad_de_medida = {value:'Días'}
+        form.cantidad = '2'
+        form.valor_unitario = '3'
+        // form.valor_total_solicitatdo_por_necesidad = 0
+        form.periodo_de_inicio_de_ejecucion = {value:'Entre enero y abril'}
+        form.vigencias_anteriores = {value:'No'}
+        // form.valor_asignado_en_la_vigencia_anterior = 0
+    }
+
+
 })
 
 // export function handlePaste(event) {
@@ -43,15 +59,16 @@ watchEffect(() => {
 
 
 const validaciones = () =>{
-    
+
 }
 const create = () => {
     //todo: validar que el total sea numero
     form.valor_unitario = parseInt(form.valor_unitario.toString().replace(/\$|\./g, ''))
+    form.valor_asignado_en_la_vigencia_anterior = parseInt(form.valor_asignado_en_la_vigencia_anterior.toString().replace(/\$|\./g, ''))
     console.log("=>(CreateWindow.vue:51) form.valor_unitario", form.valor_unitario);
-    
+
     if(form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
-    form.post(route('formu.store'), {
+    form.post(route('PStore2'), {
         preserveScroll: true,
         forceFormData: true,
         onSuccess: () => null,
@@ -76,10 +93,9 @@ const create = () => {
                     <p class="text-gray-600 dark:text-gray-400 mb-8">Llena el siguiente formulario para que podamos ayudarte.</p>
                     <form @submit.prevent="create" method="POST" class="space-y-6 grid grid-cols-2 gap-4">
                         <div class="col-span-2">
-                            <label htmlFor="plan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Proceso que solicita presupuesto
                             </label>
-                            <!--                                class="block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"-->
                             <SelectInput v-model="form.proceso_que_solicita_presupuesto"
                                          :dataSet="props.losSelect.proceso_que_solicita_presupuesto"
                                          class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
@@ -116,7 +132,7 @@ const create = () => {
                             <InputError class="mt-2" :message="form.errors.unidad_de_medida"/>
                         </div>
                         <div class="col-span-1">
-                            <label :htmlFor="cantidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
                                 cantidad
                             </label>
                             <!--                                       @input="handledinero(form)"-->
@@ -130,7 +146,7 @@ const create = () => {
                             />
                         </div>
                         <div class="col-span-1">
-                            <label :htmlFor="cantidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
                                 valor unitario
                             </label>
                             <TextInput
@@ -142,14 +158,14 @@ const create = () => {
                                 v-model="form.valor_unitario"
                             />
                         </div>
-                       
+
                         <div class="col-span-full p-4">
                             <label class="text-md text-gray-900 font-bold capitalize">valor total</label>
                             <p class="text-md text-gray-700">Valor generado automáticamente</p>
                             <div class="w-full inline-flex">
 <!--                                    @blur="metodoConThrottle"-->
                                 <input
-                                    disabled @keydown.enter.prevent="create" 
+                                    disabled @keydown.enter.prevent="create"
                                     v-model="data.valor_total_solicitatdo_por_necesidad"
                                     class="w-full bg-zinc-400 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
                                     autocomplete="off"/>
@@ -171,9 +187,9 @@ const create = () => {
                                 label="label"></vselect>
                             <InputError class="mt-2" :message="form.errors.vigencias_anteriores"/>
                         </div>
-                        
+
                          <div v-show="form.vigencias_anteriores && form.vigencias_anteriores.value != 'No'" class="">
-                            <label :htmlFor="valor_asignado_en_la_vigencia_anterior" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
                                 valor asignado en la vigencia anterior
                             </label>
                             <TextInput
@@ -181,13 +197,13 @@ const create = () => {
                                 class="block w-full px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 placeholder="valor unitario"
                                 @input="handledinerVigAnt(form)"
-                                
+
                                 onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
                                 v-model="form.valor_asignado_en_la_vigencia_anterior"
                             />
                             <InputError class="mt-2" :message="form.errors.valor_asignado_en_la_vigencia_anterior"/>
                         </div>
-                        
+
                         <!--                        <div class="flex items-center">-->
                         <!--                            <input-->
                         <!--                                id="terms"-->

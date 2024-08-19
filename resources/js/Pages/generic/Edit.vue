@@ -29,7 +29,7 @@ const data = reactive({
 const justNames = props.titulos.map(names => names['order'] )
 const form = useForm({ ...Object.fromEntries(justNames.map(field => [field, ''])) });
 onMounted(() => {
-    if(props.numberPermissions > 9){
+    if(props.numberPermissions > 9000){
         const valueRAn = Math.floor(Math.random() * 9 + 1)
         form.nombre = 'admin orden trabajo '+ (valueRAn);
         form.codigo = (valueRAn);

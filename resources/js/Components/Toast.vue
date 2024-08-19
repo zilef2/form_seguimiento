@@ -17,7 +17,7 @@
         </div>
     </transition>
     <transition name="slide-fade">
-        <div v-if="flash.info && isVisible" class="sticky top-4 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
+        <div v-if="flash.info && isVisible" class="absolute top-4 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-primary rounded-lg">
                 <div>
                     <InformationCircleIcon class="h-8 w-8 text-white" fill="currentColor" />
@@ -33,7 +33,7 @@
         </div>
     </transition>
     <transition name="slide-fade">
-        <div v-if="flash.warning && isVisible" class="sticky top-24 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
+        <div v-if="flash.warning && isVisible" class="absolute top-24 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-amber-600 rounded-lg">
                 <div>
                     <ExclamationTriangleIcon class="h-8 w-8 text-white" fill="currentColor" />
@@ -49,7 +49,7 @@
         </div>
     </transition>
     <transition name="slide-fade">
-        <div v-if="flash.error && isErrorVisible" class="sticky top-4 right-4 w-3/4 2xl:w-7/12 z-[100]">
+        <div v-if="flash.error && isErrorVisible" class="absolute top-4 right-4 w-3/4 2xl:w-7/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-red-600 rounded-lg">
                 <div>
                     <ExclamationCircleIcon class="h-8 w-8 text-white" fill="currentColor" />
