@@ -201,21 +201,24 @@ class Myhelp {
             $permissions = $returnPermission ? $authU->roles->pluck('name')[0] : null;
             $ListaControladoresYnombreClase = (explode('\\', get_class($thiis)));
             $nombreC = end($ListaControladoresYnombreClase);
+            //nombre controller
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $controllerFile = $trace[1]['file'];
+            $controllerName = basename($controllerFile, '.php');
+            $Elpapa = (explode('\\', get_parent_class($thiis)));
+            $nombreP = end($Elpapa);
+
+            $ElMensaje = $mensaje != '' ? ' Mensaje: ' . $mensaje : '';
+            $ElMensaje = 'Controlador: '.$controllerName.'Vista:' . $nombreC . ' Padre: ' . $nombreP . '|  User:' . Auth::user()->name . $ElMensaje;
             if (!$critico) {
-
-                $Elpapa = (explode('\\', get_parent_class($thiis)));
-                $nombreP = end($Elpapa);
-
                 if ($permissions == 'admin' || $permissions == 'superadmin') {
-                    $ElMensaje = $mensaje != '' ? ' Mensaje: ' . $mensaje : '';
-                    Log::channel('soloadmin')->info('Vista:' . $nombreC . ' Padre: ' . $nombreP . '|  U:' . Auth::user()->name . $ElMensaje);
+                    Log::channel('soloadmin')->info($ElMensaje);
                 } else {
-                    Log::info('Vista: ' . $nombreC . ' Padre: ' . $nombreP .' | '. $clase . '| ' . ' Mensaje: ' . $mensaje);
+                    Log::info($ElMensaje);
                 }
                 return $permissions;
             } else {
-//                Log::critical('Vista: ' . $nombreC . 'U:' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
-                Log::critical('Vista: ' . $nombreC . 'U:' . $authU->name . ' ||' . $clase . '|| ' . ' Mensaje: ' . $mensaje);
+                Log::critical('Vista_Critica:::' . $ElMensaje);
             }
             return $permissions;
         }

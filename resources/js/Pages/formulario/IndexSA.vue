@@ -43,7 +43,7 @@ const data = reactive({
         SoloGuardados: props.filters.SoloGuardados,
         Backcat: props.filters.Backcat,
         liderchu: props.filters.liderchu,
-        
+
         field: props.filters.field,
         order: props.filters.order,
         perPage: props.perPage,
@@ -73,10 +73,10 @@ onMounted(() => {
 });
 
 watchEffect(() => {
-//    
+//
 //     setTimeout((()=> ActivarYDesactivarBooleans()
 //     ),500)
-// 
+//
 },{deep:true})
 
 // <!--<editor-fold desc="order, watchclone, select">-->
@@ -132,11 +132,11 @@ const titulos = [
     { order: 'periodo_de_inicio_de_ejecucion', label: 'Periodo de inicio de ejecucion', type: 'text' },
     { order: 'vigencias_anteriores', label: 'Vigencias anteriores', type: 'text' },
     { order: 'valor_asignado_en_la_vigencia_anterior', label: 'Valor asignado en la vigencia anterior', type: 'dinero' },
-    
+
     { order: 'procesos_involucrados', label: 'Procesos involucrados', type: 'selectsMultiple',newName:'procesos_involucrado'},
     { order: 'plan_de_mejoramiento_al_que_apunta_la_necesidad', label: 'Plan de mejoramiento al que apunta la necesidad', type: 'selectsMultiple',newName:'plan_de_mejoramiento_al_que_apunta_la_necesida'},
     { order: 'linea_del_plan_desarrollo_al_que_apunta_la_necesidad', label: 'Linea del plan desarrollo al que apunta la necesidad', type: 'selectsMultiple',newName:'linea_del_plan_desarrollo_al_que_apunta_la_necesida'},
-    
+
     { order: 'frecuencia_de_uso', label: 'Frecuencia de uso', type: 'text' },
     { order: 'mantenimientos_requeridos', label: 'Mantenimientos requeridos', type: 'text' },
     { order: 'capacidad_instalada', label: 'Capacidad instalada', type: 'text' },
@@ -165,20 +165,20 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
 
 <template>
     <Head :title="props.title" />
-
     <AuthenticatedLayout>
+
         <Breadcrumb :title="title" :breadcrumbs="breadcrumbs" class="capitalize text-xl font-bold"/>
         <div class="inline-flex text-center w-full">
-            <Link :href="route('PreFormSimplificado')" class="items-center py-2 px-1 underline text-sky-600">
+            <Link :href="route('PreFormSimplificado')" v-show="can(['read user'])" class="items-center py-2 px-1 underline text-sky-600">
                 Simplificar
             </Link>
-            <Link :href="route('formulario.create')" 
+            <Link :href="route('formulario.create')"
                   v-show="can(['create formulario'])" class="items-center py-2 px-1 underline text-sky-600">
                 Nueva necesidad
             </Link>
         </div>
-        
-        
+
+
         <div class="space-y-1">
             <div class="px-4 sm:px-0"><div class=" rounded-lg overflow-hidden w-fit"></div></div>
             <div class=" bg-white dark:bg-gray-800 shadow sm:rounded-lg">

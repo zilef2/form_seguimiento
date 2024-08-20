@@ -6,6 +6,7 @@ use App\helpers\MyConst;
 use App\helpers\Myhelp;
 use App\Models\actividades;
 use App\Models\Formulario;
+use App\Models\SMultiple;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -91,7 +92,21 @@ class dependenciasForm extends Controller
                 'value' => $index,
             ];
         }
-//        dd($Selects['procesos_involucrados']);
+        $Selects['frecuencia_de_uso'] = Myhelp::nombreYvalue('frecuencia_de_uso');
+        $Selects['mantenimientos_requeridos'] = Myhelp::nombreYvalue('mantenimientos_requeridos');
+        $Selects['capacidad_instalada'] = Myhelp::nombreYvalue('capacidad_instalada');
+        $Selects['riesgo_de_la_inversion'] = Myhelp::nombreYvalue('riesgo_de_la_inversion');
         return $Selects;
+    }
+
+    public function seleccionMultiple($request,$atributo,$elform)
+    {
+        foreach ($request->{$atributo} as $index => $item) {
+            SMultiple::create([
+                'tipo' => 'procesos_involucrados',
+                'value' => $item['value'],
+                'formulario_id' => $elform->id,
+            ]);
+        }
     }
 }

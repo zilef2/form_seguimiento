@@ -1,5 +1,7 @@
 <script setup>
 // const form = useForm({ })
+
+import vselect from "vue-select";import "vue-select/dist/vue-select.css";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import {Head} from '@inertiajs/vue3';
 import Breadcrumb from '@/Components/Breadcrumb.vue';
@@ -11,8 +13,8 @@ import DangerButton from '@/Components/DangerButton.vue';
 import pkg from 'lodash';
 import {router, usePage, Link, useForm} from '@inertiajs/vue3';
 import Pagination from '@/Components/Pagination.vue';
-import {ChevronUpDownIcon, PencilIcon, TrashIcon} from '@heroicons/vue/24/solid';
-
+import {ChevronUpDownIcon, PencilIcon, PresentationChartLineIcon, TrashIcon} from '@heroicons/vue/24/solid';
+import InputError from "@/Components/InputError.vue";
 
 const {_, debounce, pickBy} = pkg
 const props = defineProps({
@@ -29,7 +31,7 @@ onMounted(() => {
 
 });
 const form = useForm({
-    Arraylideres:0,
+    Arraylideres: props.Arraylideres[0],
 });
 
 watchEffect(() => {
@@ -80,31 +82,90 @@ const select = () => {
                 <div class="flex flex-wrap -m-4">
                     <div class="p-4 lg:w-1/2">
                         <div class="h-full bg-gray-100 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
-                            <h2 class="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">Seleccione</h2>
-                            <h1 class="title-font sm:text-2xl text-xl font-medium text-gray-900 mb-3">Lider a evaluar</h1>
-                            <p class="leading-relaxed mb-3">Las cedulas listadas, son las que actualmente tienen necesidades enviadas.</p>
-                            <SelectInput v-model="form.Arraylideres" :dataSet="form.Arraylideres" />
-                            {{form.Arraylideres}}
-                            
-                            <div class="text-center mt-2 leading-none flex justify-center absolute bottom-0 left-0 w-full py-4">
-                                <span class="text-gray-400 mr-3 inline-flex items-center leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">
-                                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+                            <h2 class="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
+                                Seleccione</h2>
+                            <h1 class="title-font sm:text-2xl text-xl font-medium text-gray-900 mb-3">Lider a
+                                evaluar</h1>
+                            <p class="leading-relaxed mb-3">Las cedulas listadas, son las que actualmente tienen
+                                necesidades enviadas.</p>
+                            <div class="col-span-2">
+                                <label name="labelcategoria"> Categoria </label>
+                                <vselect
+                                    :options="props.Arraylideres"
+                                    v-model="form.Arraylideres"
+                                    label="label"></vselect>
+                                <InputError class="mt-2" :message="form.errors.categoria"/>
+                            </div>
+
+                            <div
+                                class="text-center mt-2 leading-none flex justify-center absolute bottom-0 left-0 w-full py-4">
+                                <span
+                                    class="text-gray-400 mr-3 inline-flex items-center leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">
+                                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none"
+                                       stroke-linecap="round" stroke-linejoin="round"
                                        viewBox="0 0 24 24">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
-                                  </svg>1.2K
+                                  </svg>-
                                 </span>
-                                <span class="text-gray-400 inline-flex items-center leading-none text-sm">
-                                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-                                       viewBox="0 0 24 24">
-                                    <path
-                                        d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>
-                                  </svg>6
-                                </span>
+<!--                                <span class="text-gray-400 inline-flex items-center leading-none text-sm">-->
+<!--                                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none"-->
+<!--                                       stroke-linecap="round" stroke-linejoin="round"-->
+<!--                                       viewBox="0 0 24 24">-->
+<!--                                    <path-->
+<!--                                        d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>-->
+<!--                                  </svg>6-->
+<!--                                </span>-->
                             </div>
                         </div>
                     </div>
-                    
+                    <div class="p-4 lg:w-1/2">
+                        <div class="h-full bg-gray-100 bg-opacity-75 px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
+                            <h2 class="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">Conteo</h2>
+                            <h1 class="title-font sm:text-2xl text-xl font-medium text-gray-900 mb-3">Necesidades</h1>
+                            <p class="leading-relaxed mb-3 capitalize">aprobada: (pendiente)</p>
+                            <p class="leading-relaxed mb-3 capitalize">rechazada: (pendiente)</p>
+                            <p class="leading-relaxed mb-3 capitalize">pendiente: (pendiente)</p>
+<!--                            <div class="col-span-2">-->
+<!--                                <label name="labelcategoria"> Categoria </label>-->
+<!--                                <vselect-->
+<!--                                    :options="props.Arraylideres"-->
+<!--                                    v-model="form.Arraylideres"-->
+<!--                                    label="label"></vselect>-->
+<!--                                <InputError class="mt-2" :message="form.errors.categoria"/>-->
+<!--                            </div>-->
+
+<!--                            zona de info con svgs-->
+<!--                            <div-->
+<!--                                class="text-center mt-2 leading-none flex justify-center absolute bottom-0 left-0 w-full py-4">-->
+<!--                                <span-->
+<!--                                    class="text-gray-400 mr-3 inline-flex items-center leading-none text-sm pr-3 py-1 border-r-2 border-gray-200">-->
+<!--                                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none"-->
+<!--                                       stroke-linecap="round" stroke-linejoin="round"-->
+<!--                                       viewBox="0 0 24 24">-->
+<!--                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>-->
+<!--                                    <circle cx="12" cy="12" r="3"></circle>-->
+<!--                                  </svg>1.2K-->
+<!--                                </span>-->
+<!--                                <span class="text-gray-400 inline-flex items-center leading-none text-sm">-->
+<!--                                  <svg class="w-4 h-4 mr-1" stroke="currentColor" stroke-width="2" fill="none"-->
+<!--                                       stroke-linecap="round" stroke-linejoin="round"-->
+<!--                                       viewBox="0 0 24 24">-->
+<!--                                    <path-->
+<!--                                        d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"></path>-->
+<!--                                  </svg>6-->
+<!--                                </span>-->
+<!--                            </div>-->
+                        </div>
+                    </div>
+
+                    <div class="text-center flex mx-auto">
+                        <Link :href="route('IndexFormSimplificado',[form.Arraylideres, 0 ])" class="flex items-center py-1 px-4">
+                            <PresentationChartLineIcon class="w-6 h-6" />
+                            <span class="ml-3">Mostrar tabla</span>
+                        </Link>
+                    </div>
+
                 </div>
             </div>
         </section>

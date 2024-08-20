@@ -42,11 +42,12 @@ class Formulario extends Model
         'anexos',//19
         'enviado',
         'user_id',
-        
+
         'necesidad_sugerida',
         'cantidad_sugerida',
         'valor_unitario_sugerida',
         'valor_total_solicitatdo_por_necesidad_sugerida',
+        'Nombre',
     ];
 
     public function user(){return $this->belongsTo(User::class);}
@@ -56,13 +57,13 @@ class Formulario extends Model
             return MyConst::proceso_que_solicita_presupuesto()[intval($this->proceso_que_solicita_presupuesto)];
         return '';
     }
-    
+
     public function BDToString($nameArray){
 //        $this->procesos_involucrados = MyConst::procesos_involucrados();
 //        $this->plan_de_mejoramiento_al_que_apunta_la_necesidad = MyConst::plan_de_mejoramiento_al_que_apunta_la_necesidad();
 //        $this->linea_del_plan_desarrollo_al_que_apunta_la_necesidad = MyConst::linea_del_plan_desarrollo_al_que_apunta_la_necesidad();
         $$nameArray = MyConst::{$nameArray}();
-        
+
 //        return MyConst::procesos_involucrados()[$this->procesos_involucrados];
             if ($this->{$nameArray} || $this->{$nameArray} == '0') {
                 $explodedArray = explode(',', $this->{$nameArray});
@@ -77,7 +78,7 @@ class Formulario extends Model
     }
     public function plan_de_mejoramiento_al_que_apunta_la_necesidad(){return MyConst::plan_de_mejoramiento_al_que_apunta_la_necesidad()[$this->plan_de_mejoramiento_al_que_apunta_la_necesidad];}
     public function linea_del_plan_desarrollo_al_que_apunta_la_necesidad(){return MyConst::linea_del_plan_desarrollo_al_que_apunta_la_necesidad()[$this->linea_del_plan_desarrollo_al_que_apunta_la_necesidad];}
-    
+
     public function categoria(){
         if(isset(MyConst::categoria()[$this->categoria])){
             return MyConst::categoria()[$this->categoria];
@@ -93,14 +94,14 @@ class Formulario extends Model
         ]];
         foreach ($catUnicas as $index => $LasCategoria) {
             $nombre = $LasCategoria->categoria();
-            
+
             $todasLasCat[] = [
                 'label' => $nombre,
                 'value' => $nombre
             ];
         }
-        
+
         return $todasLasCat;
     }
-   
+
 }

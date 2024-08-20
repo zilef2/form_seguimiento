@@ -10,8 +10,13 @@ import vselect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import TextInput from "@/Components/TextInput.vue";
 import {handledinero, handleCantidad, calcularTotal, handledinerVigAnt} from "@/Pages/CreateFormFunctions";
-import {borrarplan_de_mejoramiento_al_que_apunta_la_necesidad, borrarprocesos_involucrados} from "@/Pages/formFunctions";
+import {
+  borrarplan_de_mejoramiento_al_que_apunta_la_necesidad,
+  borrarprocesos_involucrados
+} from "@/Pages/formFunctions";
 import {reactive, ref, watch, onMounted, watchEffect} from "vue";
+import SimpleToast from "@/Components/SimpleToast.vue";
+import Toast from "@/Components/Toast.vue";
 
 
 // roles: Number,
@@ -24,10 +29,25 @@ const props = defineProps({
 })
 const data = reactive({
   valor_total_solicitatdo_por_necesidad: 0,
+  Otras_capacidad_instalada: true,
 })
 onMounted(() => {
-  form.valor_asignado_en_la_vigencia_anterior = 0
+  form.capacidad_instalada = 'No'
 
+  if (props.numberPermissions > 9000) {
+    const valueRAn = Math.floor(Math.random() * (900) + 1)
+    form.proceso_que_solicita_presupuesto = 'Biblioteca';
+    form.necesidad = 'Prueba necesidad ' + (valueRAn);
+
+
+    form.procesos_involucrados = {label:'ARL',value: 'ARL'}
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad = {label:'ARL',value: 'ARL'}
+    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad = {label:'ARL',value: 'ARL'}
+    form.frecuencia_de_uso = {label:'ARL',value: 'ARL'}
+    form.mantenimientos_requeridos = {label:'ARL',value: 'ARL'}
+    form.capacidad_instalada = {label:'ARL',value: 'ARL'}
+    form.riesgo_de_la_inversion = {label:'ARL',value: 'ARL'}
+  }
 })
 
 watchEffect(() => {
@@ -38,12 +58,30 @@ watchEffect(() => {
   borrarplan_de_mejoramiento_al_que_apunta_la_necesidad(form)
 })
 
+watch(() => form.capacidad_instalada, (nuevx) => {
+  if (nuevx.value === 'Si, ¿Cual?') {
+    data.Otras_capacidad_instalada = false
+    form.capacidad_instalada = ''
+  } else {
+    if (nuevx.value === 'No' || nuevx.value === 'no') {
+      form.capacidad_instalada = 'No'
+      data.Otras_capacidad_instalada = true
+    }
+  }
+}, {deep: true});
 
-const create = () => {
+let VolverNo = () => {
+  form.capacidad_instalada = 'No'
+  data.Otras_capacidad_instalada = true
+}
+
+
+const create = (event) => {
+  event.preventDefault();
   //todo: validar (deep mode) que no se le permita seleccionar mas opciones si label:ninguno
   //todo: validar queno haya vacios
   if (form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
-  form.post(route('formu.store'), {
+  form.post(route('PStore2', props.formularioGuardado.id), {
     preserveScroll: true,
     forceFormData: true,
     onSuccess: () => form.reset(),
@@ -59,8 +97,9 @@ const create = () => {
 </script>
 
 <template>
-  <Head title="Dashboard"/>
+  <Head :title="props.title"/>
   <AuthenticatedLayout>
+    <SimpleToast :flash="$page.props.flash"/>
     <Breadcrumb :title="title" :breadcrumbs="breadcrumbs"/>
     <div class="bg-gray-100 dark:bg-gray-900 py-2 md:py-16 lg:py-2">
       <div class="flex-wrap mx-auto px-1 sm:px-6 lg:px-8 gap-8">
@@ -71,7 +110,7 @@ const create = () => {
           <form @submit.prevent="create" method="POST" class="space-y-6 grid grid-cols-2 gap-4">
             <div class="col-span-2">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Procesos involucrados
+                Procesos articulados
               </label>
               <vselect
                   :options="props.losSelect.procesos_involucrados"
@@ -80,7 +119,7 @@ const create = () => {
             </div>
             <div class="col-span-2">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Plan de mejoramiento al que apunta la necesidad
+                Plan de Mejoramiento y Mantenimiento (PMM) al que apunta la necesidad
               </label>
               <vselect
                   :options="props.losSelect.plan_de_mejoramiento_al_que_apunta_la_necesidad"
@@ -89,7 +128,7 @@ const create = () => {
             </div>
             <div class="col-span-2">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Linea del plan desarrollo al que apunta la necesidad
+                Líneas del Plan de Desarrollo Institucional 2024-2028 al que apunta la necesidad
               </label>
               <vselect
                   :options="props.losSelect.linea_del_plan_desarrollo_al_que_apunta_la_necesidad"
@@ -97,10 +136,48 @@ const create = () => {
                   label="label" class="col-span-2" multiple></vselect>
             </div>
 
-<!--            frecuencia_de_uso: '', //selec-->
-<!--mantenimientos_requeridos: '', //selec-->
-<!--capacidad_instalada: '', //caso especial:Si, ¿Cual? -->
-<!--riesgo_de_la_inversion: '',-->
+
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Frecuencia de uso</label>
+              <vselect
+                  :options="props.losSelect.frecuencia_de_uso"
+                  v-model="form.frecuencia_de_uso"
+                  label="label" class="col-span-2"></vselect>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mantenimientos
+                Requeridos</label>
+              <vselect
+                  :options="props.losSelect.mantenimientos_requeridos"
+                  v-model="form.mantenimientos_requeridos"
+                  label="label" class="col-span-2"></vselect>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Capacidad Instalada
+                <span @prevent="create" @click="VolverNo">⏪</span>
+              </label>
+              <vselect v-if="data.Otras_capacidad_instalada"
+                       :options="props.losSelect.capacidad_instalada"
+                       v-model="form.capacidad_instalada"
+                       label="label" class="col-span-2"></vselect>
+
+              <div v-else class="w-full inline-flex">
+                  <textarea cols="100" rows="7" v-model="form.capacidad_instalada" type="text"
+                            @keydown.enter.prevent="create"
+                            class="w-full bg-zinc-200 text-black dark:text-white dark:bg-black font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
+                            autocomplete="off"/>
+              </div>
+              <InputError class="mt-2" :message="form.errors.capacidad_instalada"/>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Riesgos</label>
+              <vselect
+                  :options="props.losSelect.riesgo_de_la_inversion"
+                  v-model="form.riesgo_de_la_inversion"
+                  label="label" class="col-span-2" multiple></vselect>
+            </div>
+
 
             <div v-if="Object.keys(form.errors).length > 0" class="col-span-full">
               <ul>
@@ -112,8 +189,8 @@ const create = () => {
             </div>
             <div class="col-span-full">
               <button type="submit"
-                      class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Siguiente
+                      class="w-full inline-flex justify-center py-2 px-4 border border-transparent hover:shadow-xl text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Registrar Necesidad
               </button>
             </div>
           </form>

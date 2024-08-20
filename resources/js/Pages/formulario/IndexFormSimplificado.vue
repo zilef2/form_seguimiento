@@ -11,10 +11,10 @@ import DangerButton from '@/Components/DangerButton.vue';
 import pkg from 'lodash';
 import { router, usePage, Link, useForm } from '@inertiajs/vue3';
 import Pagination from '@/Components/Pagination.vue';
-import { ChevronUpDownIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/solid';
-// import { CursorArrowRippleIcon, ChevronUpDownIcon,QuestionMarkCircleIcon, EyeIcon, PencilIcon, TrashIcon, UserGroupIcon } from '@heroicons/vue/24/solid';
+import {Squares2X2Icon, ChevronUpDownIcon, PencilIcon, TrashIcon} from '@heroicons/vue/24/solid';
 import Create from '@/Pages/formulario/Create.vue';
 import Edit from '@/Pages/formulario/Edit.vue';
+import Sugerir from '@/Pages/formulario/Sugerir.vue';
 import Delete from '@/Pages/formulario/Delete.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import InfoButton from '@/Components/InfoButton.vue';
@@ -34,6 +34,7 @@ const props = defineProps({
     numberPermissions: Number,
     losSelect:Object,
     totalValorUnitario:Number,
+    lider:Object,
 })
 
 const data = reactive({
@@ -44,7 +45,7 @@ const data = reactive({
         SoloGuardados: props.filters.SoloGuardados,
         Backcat: props.filters.Backcat,
         liderchu: props.filters.liderchu,
-        
+
         field: props.filters.field,
         order: props.filters.order,
         perPage: props.perPage,
@@ -74,10 +75,10 @@ onMounted(() => {
 });
 
 watchEffect(() => {
-//    
+//
 //     setTimeout((()=> ActivarYDesactivarBooleans()
 //     ),500)
-// 
+//
 },{deep:true})
 
 // <!--<editor-fold desc="order, watchclone, select">-->
@@ -117,31 +118,28 @@ const select = () => {
 
 // text // number // dinero // date // datetime // foreign
 const titulos = [
-    { order: 'userName', label: 'Lider', type: 'text' },
+    // { order: 'nombre', label: 'nombre', type: 'text' },
     { order: 'necesidad', label: 'necesidad', type: 'text' },
     { order: 'justificacion', label: 'justificacion', type: 'text' },
-    // { order: 'proceso_que_solicita_presupuesto', label: 'Proceso que solicita presupuesto', type: 'selectsMultiple',newName:'proceso_que_solicita_presupuest' },
     { order: 'actividad', label: 'Actividad', type: 'text' },
-    // { order: 'categoria', label: 'Categoria', type: 'selectsMultiple', newName: 'Categori'},
     { order: 'cantidad', label: 'Cantidad', type: 'numberWithUM' },
-    // { order: 'unidad_de_medida', label: 'Unidad de medida', type: 'text' },
     { order: 'valor_unitario', label: 'Valor unitario', type: 'dinero' },
     { order: 'valor_total_solicitatdo_por_necesidad', label: 'Valor total solicitatdo por necesidad', type: 'dinero' },
     { order: 'periodo_de_inicio_de_ejecucion', label: 'Periodo de inicio de ejecucion', type: 'text' },
     { order: 'vigencias_anteriores', label: 'Vigencias anteriores', type: 'text' },
     { order: 'valor_asignado_en_la_vigencia_anterior', label: 'Valor asignado en la vigencia anterior', type: 'dinero' },
-    
+
     { order: 'procesos_involucrados', label: 'Procesos involucrados', type: 'selectsMultiple',newName:'procesos_involucrado'},
     { order: 'plan_de_mejoramiento_al_que_apunta_la_necesidad', label: 'Plan de mejoramiento al que apunta la necesidad', type: 'selectsMultiple',newName:'plan_de_mejoramiento_al_que_apunta_la_necesida'},
     { order: 'linea_del_plan_desarrollo_al_que_apunta_la_necesidad', label: 'Linea del plan desarrollo al que apunta la necesidad', type: 'selectsMultiple',newName:'linea_del_plan_desarrollo_al_que_apunta_la_necesida'},
-    
+
     { order: 'frecuencia_de_uso', label: 'Frecuencia de uso', type: 'text' },
     { order: 'mantenimientos_requeridos', label: 'Mantenimientos requeridos', type: 'text' },
     { order: 'capacidad_instalada', label: 'Capacidad instalada', type: 'text' },
     { order: 'riesgo_de_la_inversion', label: 'Riesgo de la inversion', type: 'text' },
     { order: 'valor_total_de_la_solicitud_actual', label: 'Valor total de la solicitud actual', type: 'dinero' },
     { order: 'identificacion_user', label: 'cc', type: 'minitext' },
-    {order: 'enviado', label: 'Enviado', type: 'boolEnviado'},
+    { order: 'enviado', label: 'Enviado', type: 'boolEnviado'},
 ];
 
 const scrollY = ref(0);
@@ -163,48 +161,48 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
     <Head :title="props.title" />
     <AuthenticatedLayout>
 <!--        <Breadcrumb :title="title" :breadcrumbs="breadcrumbs" class="capitalize text-xl font-bold"/>-->
+    <div class="mx-auto text-center my-4"><p class="text-lg font-bold">{{ lider.name }}</p></div>
         <div class="space-y-1">
 <!--             {{ props.losSelect }} -->
-            <div class="px-4 sm:px-0"><div class=" rounded-lg overflow-hidden w-fit"></div></div>
+            <div class="px-4 sm:px-0">
+              <div class=" rounded-lg overflow-hidden w-fit">
+               <Sugerir :show="data.editOpen" @close="data.editOpen = false" :user="data.user" :roles="props.roles"
+                        v-if="can(['update user'])" :title="props.title" :titulos="titulos" :losSelect="props.losSelect"
+                    :numberPermissions ="props.numberPermissions"/>
+              </div>
+            </div>
             <div class=" bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div
                      v-sticky="{ zIndex: 100 }"
                      class="flex justify-items-start p-2 gap-6 dark:bg-gray-900/50 text-left top-0 bg-white"
                      :class="data.claseSticky">
-                    <div class="flex">
-                        <SelectInput v-model="data.params.perPage" :dataSet="data.dataSet" />
-                    </div>
+<!--                    <div class="flex">-->
+<!--                        <SelectInput v-model="data.params.perPage" :dataSet="data.dataSet" />-->
+<!--                    </div>-->
                     <TextInput v-if="props.numberPermissions >= 0" v-model="data.params.search" type="text"
-                        placeholder="Necesidad o justificacion"
-                        class="block w-1/6 md:w-1/5 rounded-lg" />
-<!--                    <SelectInput v-model="data.frontp.category" :dataSet="props.losSelect.ListarCategoria"-->
-<!--                        class="block w-1/6 md:w-1/5 rounded-lg" />-->
-                    <SelectInput v-model="data.params.liderchu" :dataSet="props.losSelect.todasLideres"
+                        placeholder="Necesidad o justificacion o nombre"
                         class="block w-1/6 md:w-1/5 rounded-lg" />
 
-                    <TextInput v-if="props.numberPermissions >= 0" v-model="data.params.searcLider" type="number"
-                        placeholder="Cedula"
-                        class="block w-1/6 md:w-1/5 rounded-lg"/>
-                    <div class="grid grid-rows-3 my-auto mx-1 h-12 z-20">
-                            <div>
-                                <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="Todos" checked/>
-                                <label for="guardados" class="mx-2 text-xs">Todos</label>
-                            </div>
-                            <div>
-                                <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="guardados"/>
-                                <label for="guardados" class="mx-2 text-xs">Guardados</label>
-                            </div>
+<!--                    <div class="grid grid-rows-3 my-auto mx-1 h-12 z-20">-->
+<!--                            <div>-->
+<!--                                <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="Todos" checked/>-->
+<!--                                <label for="guardados" class="mx-2 text-xs">Todos</label>-->
+<!--                            </div>-->
+<!--                            <div>-->
+<!--                                <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="guardados"/>-->
+<!--                                <label for="guardados" class="mx-2 text-xs">Guardados</label>-->
+<!--                            </div>-->
 
-                            <div>
-                                <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="enviados"/>
-                                <label for="enviados" class="mx-2 text-xs">Enviados</label>
-                            </div>
-                    </div>
+<!--                            <div>-->
+<!--                                <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="enviados"/>-->
+<!--                                <label for="enviados" class="mx-2 text-xs">Enviados</label>-->
+<!--                            </div>-->
+<!--                    </div>-->
                 </div>
                 <div class="overflow-auto scrollbar-table max-h-[70vh]">
                     <table v-if="props.total > 0" class="min-w-full border-collapse overflow-y-scroll max-h-sm ">
                         <caption class="caption-top">
-                            Tabla 1.0 Necesidades por cedula
+<!--                            Tabla 1.0 Necesidades por cedula-->
                         </caption>
                         <thead class="sticky top-0 z-10 bg-white uppercase text-sm border-t border-gray-200 dark:border-gray-700">
                             <tr class="dark:bg-gray-900/50">
@@ -225,24 +223,64 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"
+                        <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"
                                 class="border-t border-gray-200 dark:border-gray-700 hover:bg-sky-100 hover:dark:bg-gray-900/20 even:bg-gray-300">
-                                <td v-for="titulo in titulos" class=" text-center py-4 px-2 sm:py-3 w-64">
-                                    <span v-if="titulo['type'] === 'alterNumber'" class="max-w-[120px]"> {{ parseInt(claseFromController[titulo['order']])+1 }} </span>
-                                    <p v-if="titulo['type'] === 'text'" class="mx-auto text-center text-sm min-w-[200px]"> {{ PrimerasPalabras(claseFromController[titulo['order']], 18) }} </p>
-                                    <p v-if="titulo['type'] === 'minitext'" class="mx-auto text-center text-sm max-w-[120px]"> {{ PrimerasPalabras(claseFromController[titulo['order']], 10) }} </p>
-                                    <span v-if="titulo['type'] === 'number'"> {{ number_format(claseFromController[titulo['order']], 0, false) }} </span>
-                                    <span v-if="titulo['type'] === 'numberWithUM'"> 
-                                        {{ number_format(claseFromController[titulo['order']], 0, false) }} &nbsp;&nbsp; {{claseFromController.unidad_de_medida}}
-                                    </span>
-                                    <span v-if="titulo['type'] === 'dinero'"> {{ number_format(claseFromController[titulo['order']], 0, true) }} </span>
-                                    <span v-if="titulo['type'] === 'date'"> {{ formatDate(claseFromController[titulo['order']], false) }} </span>
-                                    <span v-if="titulo['type'] === 'datetime'"> {{ formatDate(claseFromController[titulo['order']], true) }} </span>
-                                    <span v-if="titulo['type'] === 'foreign'" class="min-w-[400px]"> {{ claseformularioa[titulo['order']][titulo['nameid']] }} </span>
-                                    <span v-if="titulo['type'] === 'boolEnviado'" class="max-w-[90px]"> {{ (claseFromController[titulo['order']] ? '✅' : 'Guardado') }} </span>
-                                    <p v-if="titulo['type'] === 'selectsMultiple'" class="min-w-[200px]"> {{ (claseFromController[titulo['newName']]) }} </p>
-                                </td>
+                            <td class="whitespace-nowrap py-4 px-2 sm:py-3">
+                                        <div class="flex justify-center items-center">
+                                            <div class="rounded-md overflow-hidden">
+                                                <InfoButton v-show="can(['update user'])" type="button"
+                                                    @click="(data.editOpen = true), (data.user = user)"
+                                                    class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">
+                                                    <Squares2X2Icon class="w-4 h-4" />
+                                                </InfoButton>
+    <!--                                            <DangerButton v-show="can(['delete user'])" type="button"-->
+    <!--                                                @click="(data.deleteOpen = true), (data.user = user)"-->
+    <!--                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.delete">-->
+    <!--                                                <TrashIcon class="w-4 h-4" />-->
+    <!--                                            </DangerButton>-->
+                                            </div>
+                                        </div>
+                                    </td>
+                             <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.necesidad }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.justificacion }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.actividad }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.cantidad }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.valor_unitario }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.valor_total_solicitatdo_por_necesidad }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.periodo_de_inicio_de_ejecucion }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.vigencias_anteriores }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.valor_asignado_en_la_vigencia_anterior }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.procesos_involucrados }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.plan_de_mejoramiento_al_que_apunta_la_necesidad }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.linea_del_plan_desarrollo_al_que_apunta_la_necesidad }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.frecuencia_de_uso }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.mantenimientos_requeridos }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.capacidad_instalada }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.riesgo_de_la_inversion }} </span></td>
+                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.valor_total_de_la_solicitud_actual }} </span></td>
                             </tr>
+<!--                            building  -->
+
+
+
+<!--                            <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"-->
+<!--                                class="border-t border-gray-200 dark:border-gray-700 hover:bg-sky-100 hover:dark:bg-gray-900/20 even:bg-gray-300">-->
+<!--                                <td v-for="titulo in titulos" class=" text-center py-4 px-2 sm:py-3 w-64">-->
+<!--                                    <span v-if="titulo['type'] === 'alterNumber'" class="max-w-[120px]"> {{ parseInt(claseFromController[titulo['order']])+1 }} </span>-->
+<!--                                    <p v-if="titulo['type'] === 'text'" class="mx-auto text-center text-sm min-w-[200px]"> {{ PrimerasPalabras(claseFromController[titulo['order']], 30) }} </p>-->
+<!--                                    <p v-if="titulo['type'] === 'minitext'" class="mx-auto text-center text-sm max-w-[120px]"> {{ PrimerasPalabras(claseFromController[titulo['order']], 30) }} </p>-->
+<!--                                    <span v-if="titulo['type'] === 'number'"> {{ number_format(claseFromController[titulo['order']], 0, false) }} </span>-->
+<!--                                    <span v-if="titulo['type'] === 'numberWithUM'">-->
+<!--                                        {{ number_format(claseFromController[titulo['order']], 0, false) }}&nbsp{{claseFromController.unidad_de_medida}}-->
+<!--                                    </span>-->
+<!--                                    <span v-if="titulo['type'] === 'dinero'"> {{ number_format(claseFromController[titulo['order']], 0, true) }} </span>-->
+<!--                                    <span v-if="titulo['type'] === 'date'"> {{ formatDate(claseFromController[titulo['order']], false) }} </span>-->
+<!--                                    <span v-if="titulo['type'] === 'datetime'"> {{ formatDate(claseFromController[titulo['order']], true) }} </span>-->
+<!--                                    <span v-if="titulo['type'] === 'foreign'" class="min-w-[400px]"> {{ claseformularioa[titulo['order']][titulo['nameid']] }} </span>-->
+<!--                                    <span v-if="titulo['type'] === 'boolEnviado'" class="max-w-[90px]"> {{ (claseFromController[titulo['order']] ? '✅' : 'Guardado') }} </span>-->
+<!--                                    <p v-if="titulo['type'] === 'selectsMultiple'" class="min-w-[200px]"> {{ (claseFromController[titulo['newName']]) }} </p>-->
+<!--                                </td>-->
+<!--                            </tr>-->
                         </tbody>
                     </table>
                     <h2 v-else class="text-center text-xl my-8">Sin Registros</h2>

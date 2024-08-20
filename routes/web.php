@@ -1,6 +1,5 @@
 <?php
 
-use App\Exports\FormExport;
 use App\Http\Controllers\ParametrosController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
@@ -10,15 +9,17 @@ use App\Http\Controllers\EjemploController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\FormuController;
 use App\Http\Controllers\IdeasController;
+use App\Http\Controllers\FormSimplificadoController;
 
+use App\Exports\FormExport;
 use App\Http\Controllers\SubiExcel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 
-Route::get('/', [FormularioController::class, 'welcome'])->name('welcome');
-//Route::get('/', function () { return redirect('/login'); });
+//Route::get('/', [FormularioController::class, 'welcome'])->name('welcome');
+Route::get('/', function () { return redirect('/login'); });
 Route::get('/dashboard', [UserController::class, 'Dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/setLang/{locale}', function ($locale) {
@@ -26,7 +27,7 @@ Route::get('/setLang/{locale}', function ($locale) {
     return back();
 })->name('setlang');
 
-Route::middleware('auth', 'verified')->group(function () {
+Route::middleware('auth')->group(function () { //  , 'verified'
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -54,8 +55,8 @@ Route::middleware('auth', 'verified')->group(function () {
     })->name('downClaro');
 
     Route::get('/formularioSA', [FormularioController::class, 'formularioSA'])->name('formularioSA');
-    Route::get('/PreFormSimplificado', [FormularioController::class, 'PreFormSimplificado'])->name('PreFormSimplificado');
-    Route::get('/IndexFormSimplificado/{idLider}/{opcionAprobado}', [FormularioController::class, 'IndexFormSimplificado'])->name('IndexFormSimplificado');
+    Route::get('/PreFormSimplificado', [FormSimplificadoController::class, 'PreFormSimplificado'])->name('PreFormSimplificado');
+    Route::get('/IndexFormSimplificado/{idLider}/{opcionAprobado}', [FormSimplificadoController::class, 'IndexFormSimplificado'])->name('IndexFormSimplificado');
     Route::get('/CategoriasSimilares', [IdeasController::class, 'index'])->name('CategoriasSimilares');
     Route::resource('/formulario', FormularioController::class);
     Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');

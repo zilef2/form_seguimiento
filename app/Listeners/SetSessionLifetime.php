@@ -21,11 +21,10 @@ class SetSessionLifetime
      */
     public function handle(object $event): void
     {
-        // Modifica el tiempo de vida de la sesión aquí
-        if (config('app.env') === 'local') {
-            Session::save(); // Guarda la sesión antes de modificar el tiempo de vida
-            config(['session.lifetime' => 604800]); // 1 semana
-            Session::save();
-        }
+//        if (config('app.env') === 'local') {
+//            Session::save(); // Guarda la sesión antes de modificar el tiempo de vida
+//            config(['session.lifetime' => 604800]); // 1 semana
+//            Session::save();
+//        }
     }
 }

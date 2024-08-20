@@ -114,9 +114,9 @@ const titulos = [
 <!--                    </PrimaryButton>-->
 <!--                    <Create :show="data.createOpen" @close="data.createOpen = false" :roles="props.roles"-->
 <!--                        v-if="can(['create user'])" :title="props.title" :titulos="titulos"/>-->
-<!--                    <Edit :show="data.editOpen" @close="data.editOpen = false" :user="data.user" :roles="props.roles"-->
-<!--                        v-if="can(['update user'])" :title="props.title" :titulos="titulos" :losSelect="props.losSelect"-->
-<!--                    :numberPermissions ="props.numberPermissions"/>-->
+                    <Edit :show="data.editOpen" @close="data.editOpen = false" :user="data.user" :roles="props.roles"
+                        v-if="can(['update user'])" :title="props.title" :titulos="titulos" :losSelect="props.losSelect"
+                    :numberPermissions ="props.numberPermissions"/>
 <!--                    <Delete :show="data.deleteOpen" @close="data.deleteOpen = false" :user="data.user"-->
 <!--                        :title="props.title" />-->
 <!--                    <DeleteBulk :show="data.deleteBulkOpen"-->
@@ -151,7 +151,7 @@ const titulos = [
                                         <ChevronUpDownIcon class="w-4 h-4" />
                                     </div>
                                 </th>
-                                <th class="px-2 py-4 cursor-pointer" 
+                                <th class="px-2 py-4 cursor-pointer"
                                     v-on:click="order('roles')"
                                 >
                                     <div class="flex justify-between items-center">
@@ -227,24 +227,24 @@ const titulos = [
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.celular }}</td>
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.area }}</td>
                                 <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.agregado }}</td>
-                                
+
 <!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">{{ user.cargo }}</td>-->
-<!--                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">-->
-<!--                                    <div class="flex justify-center items-center">-->
-<!--                                        <div class="rounded-md overflow-hidden">-->
-<!--                                            <InfoButton v-show="can(['update user'])" type="button"-->
-<!--                                                @click="(data.editOpen = true), (data.user = user)"-->
-<!--                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">-->
-<!--                                                <PencilIcon class="w-4 h-4" />-->
-<!--                                            </InfoButton>-->
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">
+                                    <div class="flex justify-center items-center">
+                                        <div class="rounded-md overflow-hidden">
+                                            <InfoButton v-show="can(['update user'])" type="button"
+                                                @click="(data.editOpen = true), (data.user = user)"
+                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">
+                                                <PencilIcon class="w-4 h-4" />
+                                            </InfoButton>
 <!--                                            <DangerButton v-show="can(['delete user'])" type="button"-->
 <!--                                                @click="(data.deleteOpen = true), (data.user = user)"-->
 <!--                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.delete">-->
 <!--                                                <TrashIcon class="w-4 h-4" />-->
 <!--                                            </DangerButton>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
-<!--                                </td>-->
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

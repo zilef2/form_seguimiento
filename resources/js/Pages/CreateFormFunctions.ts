@@ -56,6 +56,7 @@ export function handledinerVigAnt(form) {
     let value = form.valor_asignado_en_la_vigencia_anterior.toString().replace(/\$|\./g, '');
     let dinerou = parseInt(value)
     if (dinerou > 9_999_999_999_999 || dinerou < 0) form.valor_asignado_en_la_vigencia_anterior = 0
-    
+
     form.valor_asignado_en_la_vigencia_anterior = plata_format(form.valor_asignado_en_la_vigencia_anterior)
 }
+

@@ -32,8 +32,12 @@ class FormularioController extends Controller
         //        $this->middleware('permission:delete formulario', ['only' => ['destroy', 'destroyBulk']]);
         $this->thisAtributos = (new formulario())->getFillable(); //not using
     }
-    public function Mapear(){
-        return Formulario::Where('id', '>', 0);
+    public function Mapear($numberPermissions){
+        $user = Myhelp::AuthU();
+        if($numberPermissions < 1){
+            return Formulario::Where('user_id', $user->id);
+        }
+        return Formulario::Query();
     }
     public function Dependencias(){
         $Selects['unidad_de_medida'] = Myhelp::nombreYvalue('unidad_de_medida');
@@ -81,13 +85,10 @@ class FormularioController extends Controller
                         'email' => 'YaDiligenciado',
                     ],
                 ];
-            }
-            )->toArray();
+            })->toArray();
+
         $cedlideres = $this->getcedLideres($request);
-
-
         $infoEnviada = $this->InfoEnviada($request->identUser);
-
 
         return Inertia::render('Welcome', [
             'canLogin' => Route::has('login'),
@@ -173,13 +174,9 @@ class FormularioController extends Controller
     }
 
     //validar si si se usa
-    public function index(Request $request)
-    {
-        $numberPermissions = MyModels::getPermissionToNumber(
-            Myhelp::WriteAuthLog($this, ' --formularios index-- ')
-        );
-
-        $formularios = $this->Mapear();
+    public function index(Request $request){
+        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' --formularios index-- '));
+        $formularios = $this->Mapear($numberPermissions);
         $this->Filtros($formularios, $request);
         $losSelect = $this->Dependencias();
 
@@ -228,7 +225,7 @@ class FormularioController extends Controller
         return [$formuResult,$valorTotal];
     }
 
-    private function Filtros(&$formularios, $request)
+    public function Filtros(&$formularios, $request)
     {
         if ($request->has('search')) {
             $formularios = $formularios->where(function ($query) use ($request) {
@@ -278,12 +275,13 @@ class FormularioController extends Controller
     public function formularioSA(Request $request)
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' formularios SA '));
-        $formus = Formulario::Query();
+        $formus = $this->Mapear($numberPermissions);
+
         $this->Filtros($formus, $request);
         [$formularios,$totalValorUnitario] = $this->MapearSA($formus);
         $losSelect = $this->Dependencias();
 
-        $perPage = $request->has('perPage') ? $request->perPage : 1000;
+        $perPage = $request->has('perPage') ? $request->perPage : 10000;
         $total = $formularios->count();
         $page = request('page', 1); // Current page number
         $fromController = new LengthAwarePaginator(
@@ -306,54 +304,7 @@ class FormularioController extends Controller
         ]);
     }
 
-    private function MapearSimplificado($formus)
-    {
-        $valorTotal = clone $formus;
-        $valorTotal =  $valorTotal->sum('valor_total_solicitatdo_por_necesidad');
 
-        $formuResult = $formus->get()->map(function ($form) {
-            $form->userName = $form->userName();
-            $form->Categori = $form->categoria();
-            $form->proceso_que_solicita_presupuest = $form->proceso_que_solicita_presupuesto();
-
-            $form->procesos_involucrado = $form->BDToString('procesos_involucrados');
-            $form->plan_de_mejoramiento_al_que_apunta_la_necesida = $form->BDToString('plan_de_mejoramiento_al_que_apunta_la_necesidad');
-            $form->linea_del_plan_desarrollo_al_que_apunta_la_necesida = $form->BDToString('linea_del_plan_desarrollo_al_que_apunta_la_necesidad');
-            return $form;
-        });
-
-        return [$formuResult,$valorTotal];
-    }
-    public function IndexFormSimplificado(Request $request,$idLider,$opcionAprobado)
-    {
-        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' IndexFormSimplificado '));
-        $formus = Formulario::Query();
-        $this->Filtros($formus, $request);
-        [$formularios,$totalValorUnitario] = $this->MapearSimplificado($formus);
-        $losSelect = $this->Dependencias();
-
-        $perPage = $request->has('perPage') ? $request->perPage : 1000;
-        $total = $formularios->count();
-        $page = request('page', 1); // Current page number
-        $fromController = new LengthAwarePaginator(
-            $formularios->forPage($page, $perPage),
-            $total,
-            $perPage,
-            $page,
-            ['path' => request()->url()]
-        );
-        return Inertia::render($this->FromController . '/IndexFormSimplificado', [
-            'fromController' => $fromController,
-            'total' => $formularios->count(),
-            'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . 'SA')]],
-            'title' => __('app.label.' . $this->FromController),
-            'filters' => $request->all(['search', 'field', 'order','soloEnviados','searcLider','liderchu']),
-            'perPage' => (int)$perPage,
-            'numberPermissions' => $numberPermissions,
-            'losSelect' => $losSelect,
-            'totalValorUnitario' => (int) $totalValorUnitario,
-        ]);
-    }
 
     public function EnviarFormulario(Request $request) // FormularioStoreRequest
     {
@@ -430,7 +381,7 @@ class FormularioController extends Controller
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formularios');
             $user = User::Where('identificacion', $request->identificacion_user)->first();
             if(!$user){ return back();}
-            
+
             DB::beginTransaction();
             $numeroTotal = count($request['necesidad']);
             $formulario = Formulario::Where('user_id', $user->id)->get();
@@ -510,7 +461,7 @@ class FormularioController extends Controller
             $planmejor = Myhelp::ImplodeSinNulos($request['plan_de_mejoramiento_al_que_apunta_la_necesidad'],$index);
             $lineadelplan = Myhelp::ImplodeSinNulos($request['linea_del_plan_desarrollo_al_que_apunta_la_necesidad'],$index);
             $riesgou = Myhelp::ImplodeSinNulos($request['riesgo_de_la_inversion'],$index);
-            
+
             $anexou = '';
             if (isset($request['anexos']))
                 $anexou = $request['anexos'][$index] ?? '';
@@ -620,23 +571,7 @@ class FormularioController extends Controller
         $formulario->delete();
         return back()->with('success', __('app.label.deleted_successfully', ['name' => count($request->id) . ' ' . __('app.label.formulario')]));
     }
-    public function PreFormSimplificado()
-    {
-        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' IndexFormSimplificado '));
-        $ArrayIdentificaciones = Formulario::All()->pluck('identificacion_user');
-
-        $Arraylideres = User::WhereIn('identificacion',$ArrayIdentificaciones)->pluck('name','id');
-
-        $estadosFormulario = EstadoFormulario::all()->toArray();
-
-
-         return Inertia::render($this->FromController . '/PreFormSimplificado', [
-            'numberPermissions' => $numberPermissions,
-            'Arraylideres' => $Arraylideres,
-            'estadosFormulario' => $estadosFormulario,
-        ]);
-    }
     //FIN : STORE - UPDATE - DELETE
 
-   
+
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SMultiple extends Model
 {
@@ -21,4 +22,10 @@ class SMultiple extends Model
         'value',
         'formulario_id',
     ];
+
+    public function Formulario(): BelongsTo
+    {
+        return $this->belongsTo(Formulario::class);
+    }
+
 }

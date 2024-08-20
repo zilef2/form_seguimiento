@@ -34,13 +34,13 @@ class UserUpdateRequest extends FormRequest
             Rule::unique('users','identificacion')->ignore($id),
             Rule::unique('users','email')->ignore($id),
 
-            'email' => 'required|string|max:255',
-            'identificacion' => 'required|Integer',
-            'area' => 'required',
-            'cargo' => 'required',
+//            'email' => 'required|string|max:255',
+//            'identificacion' => 'required|Integer',
+            'area' => 'nullable',
+            'cargo' => 'nullable',
             'sexo' => 'nullable',
             'fecha_nacimiento' => 'nullable',
-            'empresa_id' => 'nullable',
+//            'empresa_id' => 'nullable',
         ];
     }
 }

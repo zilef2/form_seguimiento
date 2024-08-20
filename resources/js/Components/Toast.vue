@@ -1,7 +1,7 @@
 <template>
     <transition name="slide-fade">
         <div v-if="flash.success && isVisible"
-            class="absolute top-8 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
+            class="fixed top-8 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-green-600 rounded-lg">
                 <div>
                     <CheckCircleIcon class="h-8 w-8 text-white" fill="currentColor" />
@@ -17,7 +17,7 @@
         </div>
     </transition>
     <transition name="slide-fade">
-        <div v-if="flash.info && isVisible" class="absolute top-4 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
+        <div v-if="flash.info && isVisible" class="fixed top-4 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-primary rounded-lg">
                 <div>
                     <InformationCircleIcon class="h-8 w-8 text-white" fill="currentColor" />
@@ -33,7 +33,7 @@
         </div>
     </transition>
     <transition name="slide-fade">
-        <div v-if="flash.warning && isVisible" class="absolute top-24 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
+        <div v-if="flash.warning && isVisible" class="fixed top-24 right-4 w-8/12 md:w-6/12 lg:w-3/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-amber-600 rounded-lg">
                 <div>
                     <ExclamationTriangleIcon class="h-8 w-8 text-white" fill="currentColor" />
@@ -49,7 +49,7 @@
         </div>
     </transition>
     <transition name="slide-fade">
-        <div v-if="flash.error && isErrorVisible" class="absolute top-4 right-4 w-3/4 2xl:w-7/12 z-[100]">
+        <div v-if="flash.error && isErrorVisible" class="fixed top-4 right-8 w-3/4 2xl:w-8/12 z-[100]">
             <div class="flex p-4 justify-between items-center bg-red-600 rounded-lg">
                 <div>
                     <ExclamationCircleIcon class="h-8 w-8 text-white" fill="currentColor" />
@@ -85,7 +85,7 @@ export default {
             isVisible: false,
             isErrorVisible: false,
             timeout: null,
-            // visibility2: 'absolute'
+            // visibility2: 'fixed'
         }
     },
     methods: {

@@ -17,11 +17,13 @@ const downClaro = () => { window.open('downClaro' , '_blank') }
 
 <template>
     <nav
-        class="bg-gray-900 border-gray-700 text-gray-300 lg:bg-white dark:bg-gray-900 border-b lg:border-gray-100 dark:border-gray-800 lg:text-gray-500 dark:text-gray-300">
+        class="bg-gray-900 border-gray-700 text-gray-300 border-b
+            lg:text-gray-500 lg:bg-white lg:border-gray-100
+            dark:border-gray-800  dark:text-gray-300 dark:bg-gray-900">
         <!-- Primary Navigation Menu -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 2xl:px-1">
+            <div class="flex justify-between h-14 xl:h-20 gap-20">
+                <div class="flex mr-6">
                     <!-- Hamburger -->
                     <div class="mr-4 shrink-0 flex items-center lg:hidden">
                         <button v-on:click="emit('open')"
@@ -34,7 +36,7 @@ const downClaro = () => { window.open('downClaro' , '_blank') }
 <!--                        <Link :href="route('dashboard')" class="flex items-center space-x-2">-->
 <!--                          <p>{{ $page.props.app.name }}</p>-->
 <!--                        </Link>-->
-                        <Link :href="route('user.index')" class="flex font-bold items-center space-x-4 mx-2">
+                        <Link :href="route('dashboard')" class="flex font-bold items-center space-x-2 mx-2">
                           <ApplicationLogo class="hidden md:block h-14 w-auto fill-current" />
 <!--                          <p>{{ $page.props.auth.userempresa }}</p>-->
                         </Link>
@@ -42,7 +44,7 @@ const downClaro = () => { window.open('downClaro' , '_blank') }
                 </div>
                 <div class="flex items-center space-x-2">
                     <!-- <SwitchLangNavbar /> -->
-                    <SwitchDarkModeNavbar />
+<!--                    <SwitchDarkModeNavbar />-->
                     <div class="">
                         <!-- Settings Dropdown -->
                         <div class="relative">

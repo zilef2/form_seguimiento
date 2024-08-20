@@ -6,6 +6,7 @@ use App\helpers\Myhelp;
 use App\helpers\MyModels;
 use App\Http\Requests\FormularioOneStoreRequest;
 use App\Models\Formulario;
+use App\Models\SMultiple;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class FormuController extends Controller
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formul');
             $authu = Myhelp::AuthU();
             $todosMisForm = Formulario::all();
-            $laUltimaNecesidad = 1;
+            $laUltimaNecesidad = 0;
             if ($todosMisForm) {
                 if ($todosMisForm->last())
                     $laUltimaNecesidad = $todosMisForm->last()->numero_necesidad;
@@ -56,22 +57,22 @@ class FormuController extends Controller
             ]);
 
             DB::commit();
-
-//            return Redirect::route('Store2', ['fid' => $formulario->id]);
-            return redirect()->route('Store2', ['fid' => $formulario->id]);
-//            return back()->with('success', __('app.label.firstPart'));
+            return redirect()->route('Store2', ['fid' => $formulario->id])->with('success','Se ha guardado la 1ra Parte');
         } catch (QueryException $e) {
             $mensajeErrorCompleto = "Error SQL: " . $e->getMessage() . "\n" .
                 "SQL: " . $e->sql . "\n" .
                 "Bindings: " . json_encode($e->bindings) . "\n" .
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
+            Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
+            return back()->with('error', $mensajeErrorCompleto);
+//            dd($mensajeErrorCompleto);
+
         } catch (\Throwable $th) {
             DB::rollback();
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine() . ' | Ubi: ' . $th->getFile();
-        } finally {
-            Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . $mensajeErrorCompleto);
+            Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
+            return back()->with('error', $mensajeErrorCompleto);
 //            dd($mensajeErrorCompleto);
-            return back()->with('error', __('app.label.created_error', ['name' => 'Formulario1: ']) . $mensajeErrorCompleto);
         }
     }
 
@@ -91,43 +92,53 @@ class FormuController extends Controller
             'losSelect' => $dependenciasForm->dependencias2Multiples(),
         ]);
     }
+
     //post
-    public function PostStore2(Request $request,$fid) //todo: poner validaciones de backend
+    public function PostStore2(Request $request, $fid): \Illuminate\Http\RedirectResponse //todo: poner validaciones de backend
     {
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formul');
+            $dependenciasForm = new dependenciasForm();
             $authu = Myhelp::AuthU();
             $elform = Formulario::Find($fid);
-            if($elform['procesos_involucrados']){
-                return redirect()->route('formularioSA')->with(['error','Ya se ha diligenciado este formulario']);
+            $validarYaSeEjecuto = SMultiple::Where('tipo', 'procesos_involucrados')
+                    ->Where('formulario_id', $fid)
+                    ->count() !== 0;
+
+            if($validarYaSeEjecuto){
+            return redirect()->route('formularioSA')
+                ->with(['error' => 'Ya se ha diligenciado este formulario']);
             }
 
             DB::beginTransaction();
+
+            $dependenciasForm->seleccionMultiple($request,'procesos_involucrados',$elform);
+            $dependenciasForm->seleccionMultiple($request,'plan_de_mejoramiento_al_que_apunta_la_necesidad',$elform);
+            $dependenciasForm->seleccionMultiple($request,'linea_del_plan_desarrollo_al_que_apunta_la_necesidad',$elform);
+            $dependenciasForm->seleccionMultiple($request,'riesgo_de_la_inversion',$elform);
+
             $elform->update([
-                'procesos_involucrados' => $request->procesos_involucrados,//sel multiple
-                'plan_de_mejoramiento_al_que_apunta_la_necesidad' => $request->plan_de_mejoramiento_al_que_apunta_la_necesidad,//sel multiple
-                'linea_del_plan_desarrollo_al_que_apunta_la_necesidad' => $request->linea_del_plan_desarrollo_al_que_apunta_la_necesidad,//sel multiple
-                'frecuencia_de_uso' => $request->frecuencia_de_uso,//sel unica
-                'mantenimientos_requeridos' => $request->mantenimientos_requeridos,//sel unica
-                'capacidad_instalada' => $request->capacidad_instalada,//sel unica
-                'riesgo_de_la_inversion' => $request->riesgo_de_la_inversion,//sel unica
+               'frecuencia_de_uso' => $request->frecuencia_de_uso['value'],
+               'mantenimientos_requeridos' => $request->mantenimientos_requeridos['value'],
+               'capacidad_instalada' => $request->capacidad_instalada,
             ]);
 
             DB::commit();
-
-            return redirect()->route('formularioSA');
+            return redirect()->route('formulario.create')->with(['success' => 'Éxito. Desea agregar mas necesidades?']);
         } catch (QueryException $e) {
             $mensajeErrorCompleto = "Error SQL: " . $e->getMessage() . "\n" .
                 "SQL: " . $e->sql . "\n" .
                 "Bindings: " . json_encode($e->bindings) . "\n" .
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
+            Myhelp::EscribirEnLog($this, ' ERROR_FORMU_FINAL: ' . $mensajeErrorCompleto);
+            dd($mensajeErrorCompleto);
+            return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         } catch (\Throwable $th) {
             DB::rollback();
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine() . ' | Ubi: ' . $th->getFile();
-        } finally {
             Myhelp::EscribirEnLog($this, ' ERROR_FORMU_FINAL: ' . $mensajeErrorCompleto);
-//            dd($mensajeErrorCompleto);
-            return back()->with('error', __('app.label.created_error', ['name' => 'Formulario1: ']) . $mensajeErrorCompleto);
+            dd($mensajeErrorCompleto);
+            return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         }
     }
 

@@ -94,7 +94,7 @@ const data = reactive({
         {label: "Vicerrectoría de Investigación y Extensión", value: 41},
         {label: "Virtualidad", value: 42},
     ],
-    
+
     //lista pendiente por integrar
     lista_pros_presupuestp: [
         {value:1,label:"Bienestar"},
@@ -380,7 +380,7 @@ const data = reactive({
     classOfTextLG: "min-w-[400px] max-h-[110px] p-4",
     classOfTextXL: "min-w-[600px] max-h-[110px] p-4",
     classOfText_checkbox: "min-w-[480px] max-h-[350px] overflow-y-scroll p-4",
-    
+
     //el checkbox de ninguno
     checkdisabled:[[false,false,false,false]]
 });
@@ -445,17 +445,17 @@ function toggleSelection2(value, conteoi) {
     let selectedIndex = form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].indexOf(value);
     let modoCero = false
     let elcheckbox
-    
+
     //validar que tenga ceros
     if (value === 0 || form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)) {
         modoCero = true
         modoNinguno(conteoi)
     }
-    
+
     //pintar los checkboxes
     if (modoCero) {
         pintarTodoCero(conteoi)
-    
+
         form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi] = [0]
         if (selectedIndex !== -1) {
             form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
@@ -463,14 +463,14 @@ function toggleSelection2(value, conteoi) {
     } else {
         elcheckbox = document.getElementById('0_b' + conteoi);
         elcheckbox.checked = false;
-    
+
         if (selectedIndex === -1) {
             form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].push(value);
         } else {
             form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].splice(selectedIndex, 1);
         }
     }
-    
+
     //3) desabilitar los otros
     if(!form.plan_de_mejoramiento_al_que_apunta_la_necesidad[conteoi].includes(0)){
         modoNinguno(conteoi,false) //habilitar
@@ -559,7 +559,7 @@ function RecuperarInfoGuardada(Formulario) {
             data.checkdisabled[index] = [false, false, false, false];
         }
     })
-    
+
     setTimeout(() => recuperaform(Formulario), 200)
 }
 
@@ -600,7 +600,7 @@ function recuperaform(Formulario) {
             });
         }
 
-        
+
         if (!data.checkdisabled[index]) {
             data.checkdisabled[index] = [false,false,false,false];
         }
@@ -632,7 +632,7 @@ function recuperaform(Formulario) {
                 //form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[index].filter(item => item !== null);
             });
         }
-       
+
         //riesgo
         let CheckRiesgo
 
@@ -661,7 +661,7 @@ function recuperaform(Formulario) {
             data.Otras_capacidad_instalada[index] = true
         }
         form.capacidad_instalada[index] = element.capacidad_instalada
-        
+
         if (element.unidad_de_medida !== 'Meses' && element.unidad_de_medida !== 'Unidades') {
             data.Otras_unidad_de_medida[index] = true
         }
@@ -692,7 +692,7 @@ const AumentarMasUno = () => {
         "procesos involucrados" : form.procesos_involucrados[ene].length > 0,
         "plan de mejoramiento" : form.plan_de_mejoramiento_al_que_apunta_la_necesidad[ene].length > 0,
         "linea del plan desarrollo" : form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad[ene].length > 0,
-        
+
         'frecuencia de uso': !!(form.frecuencia_de_uso[ene]),
         'mantenimientos requeridos': !!(form.mantenimientos_requeridos[ene]),
         'capacidad instalada': !!(form.capacidad_instalada[ene]),
@@ -706,8 +706,8 @@ const AumentarMasUno = () => {
             break;
         }
     }
-    
-    if(Bandera) return 
+
+    if(Bandera) return
 
     let Bandera2;
     if (!!form.vigencias_anteriores[ene]) {
@@ -718,7 +718,7 @@ const AumentarMasUno = () => {
         }
     }
     // console.log("=>(Welcome.vue:724) Bandera2", Bandera2);
-    
+
     // let Bandera3;
     // if (!!form.categoria[ene]) {
     //     if (form.categoria[ene] === ) {
@@ -785,7 +785,7 @@ function BorraFila(index) {
     form.unidad_de_medida.splice(index,1)
 
     data.checkdisabled.splice(index,1)
-    
+
 
     data.ConteoCosas--
 }
@@ -812,7 +812,7 @@ watchEffect(() => {
                         data.valor_total_solicitatdo_por_necesidad[index] = 0
                     }
 
-                    
+
                 } catch (exceptionVar) {
                     form.valor_total_solicitatdo_por_necesidad[index] = 0
                     data.valor_total_solicitatdo_por_necesidad[index] = 0
@@ -832,7 +832,7 @@ function handleCantidad(conteoi) {
         form.cantidad[conteoi] = 0
     }
     canti = parseFloat(canti)
-    
+
     if (canti > 9_999_999 || canti < 0) form.cantidad[conteoi] = 0
     if(isNaN(canti) && (canti > 9000000 || canti < 0)) form.cantidad[conteoi] = 0
 
@@ -847,7 +847,7 @@ function handledinero(conteoi) {
     let value = form.valor_unitario[conteoi].toString().replace(/[$,.]/g, '');
     let dinerou = parseInt(value)
     if (dinerou > 9_999_999_999_999 || dinerou < 0) form.valor_unitario[conteoi] = 0
-    
+
     form.valor_unitario[conteoi] = plata_format(form.valor_unitario[conteoi])
 }
 
@@ -855,14 +855,14 @@ function handledinerVigAnt(conteoi) {
     let value = form.valor_asignado_en_la_vigencia_anterior[conteoi].toString().replace(/\$|\./g, '');
     let dinerou = parseInt(value)
     if (dinerou > 9_999_999_999_999 || dinerou < 0) form.valor_asignado_en_la_vigencia_anterior[conteoi] = 0
-    
+
     form.valor_asignado_en_la_vigencia_anterior[conteoi] = plata_format(form.valor_asignado_en_la_vigencia_anterior[conteoi])
 }
 
 watch(() => form.vigencias_anteriores, (NuevaVig) => {
     NuevaVig.forEach((element, index) => {
         if (element === 'No' || element === 'no') {
-            
+
             data.desabilitar_vigencias_anteriores[index] = true
             form.valor_asignado_en_la_vigencia_anterior[index] = 0
         } else {
@@ -876,7 +876,7 @@ watch(() => form.actividad, (nuevaActi) => {
     nuevaActi.forEach((element, index) => {
         if (element.length > valorMaxActividad) {
             form.actividad[index] = form.actividad[index].substring(0,valorMaxActividad)
-        } 
+        }
     })
 }, {deep: true});
 
@@ -928,7 +928,7 @@ watch(() => form.capacidad_instalada, (nuevx) => {
 }, {deep: true});
 
 watch(() => form.categoria, (nuevx) => {
-    
+
     nuevx.forEach((element, index) => {
         if (!isNaN(element) && element == data.OpcionOtra) {
             data.Otras_categoria[index] = false
@@ -1075,7 +1075,7 @@ const create = (validator, second) => {
                 HayElementosVacios = false
             }
         });
-        
+
         form.valor_total_de_la_solicitud_actual = data.total_todo
         if (EstaSeguro) {
             if (HayElementosVacios) {
@@ -1216,7 +1216,7 @@ const create = (validator, second) => {
 <!--                                                <button @click="scrollToEnd" class="bg-blue-400">Desplazar a la derecha</button>-->
 <!--                                            </div>-->
 
-                                            
+
                                             <div :class="data.classOfTxtAreas">
                                                     <!--                          {{ conteoi + 1 }}-->
                                                  <label class="text-md text-gray-900 font-extrabold"> Necesidad </label>
@@ -1313,7 +1313,7 @@ const create = (validator, second) => {
                                                 <div class="w-full inline-flex">
                                                     <input v-model="form.cantidad[conteoi]"
                                                            @keydown.enter.prevent="create" @blur="metodoConThrottle"
-                                                           type="text" 
+                                                           type="text"
                                                            onkeypress="return (event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46)"
                                                            step="0.1"
                                                            @input="handleCantidad(conteoi)"
@@ -1432,7 +1432,8 @@ const create = (validator, second) => {
 
 
                                             <div class="min-w-[450px] max-h-[250px] p-4">
-                                                <label class="text-md text-gray-900 font-bold">Plan de Mejoramiento y Mantenimiento -PMM- al que
+                                                <label class="text-md text-gray-900 font-bold">
+                                                  Plan de Mejoramiento y Mantenimiento -PMM- al que
                                                     apunta la
                                                     necesidad</label>
                                                 <p class="text-md text-gray-700">
@@ -1564,7 +1565,7 @@ const create = (validator, second) => {
                                                 <p class="text-md text-gray-700">Seleccionar ¿Cuáles son los posibles riesgos involucrados en actividad?</p>
                                                 <div v-for="(option,inde) in props.losSelect.riesgo_de_la_inversion" :key="inde" class="mt-3">
                                                     <input type="checkbox" :id="inde+'_d'+conteoi"
-                                                           :value="option.value" 
+                                                           :value="option.value"
                                                            :checked="isSelected_riesgo(option.value)"
                                                            @change="toggleSelectio_riesgo(option.value,conteoi)"
                                                            @keydown.enter.prevent="create"
@@ -1581,9 +1582,9 @@ const create = (validator, second) => {
                                                    v-for="itemsito in form.riesgo_de_la_inversion[conteoi]"
                                                    class="font-bold mt-1">
                                                     - {{ props.losSelect.riesgo_de_la_inversion.find((item) => item.value === itemsito)?.label }}
-                                                </p> 
+                                                </p>
                                             </div>
-                                            
+
                                             <div class="min-w-[500px] max-h-[110px] p-4">
                                                 <label class="text-md text-gray-900 font-bold capitalize">anexos (opcional)</label>
                                                 <p class="text-md text-gray-700 my-2">
@@ -1716,7 +1717,7 @@ const create = (validator, second) => {
                                         Guardar sin enviar
                                     </PrimaryButton>
                                     <PrimaryButton
-                                        class="text-white w-full mx-auto max-w-sm rounded-md text-center 
+                                        class="text-white w-full mx-auto max-w-sm rounded-md text-center
                                          py-2 px-4 inline-flex items-center focus:outline-none md:float-right"
                                         :class="{ 'opacity-25': form.processing }"
                                         :disabled="form.processing"
@@ -1737,7 +1738,7 @@ const create = (validator, second) => {
 
 
                 <div class="grid mx-auto mt-12 text-gray-700 text-center">
-                    <div v-if="data.mensajeYaHaSidoGuardado === ''" 
+                    <div v-if="data.mensajeYaHaSidoGuardado === ''"
                          class="grid mx-auto sm:mx-0 text-center">
                         <p class="text-lg text-black dark:text-white">{{ $page.props.app.name }} ©️</p>
                     </div>
@@ -1746,7 +1747,7 @@ const create = (validator, second) => {
                     </div>
                 </div>
 <!--                qwe {{ props.infoEnviada}}-->
-                
+
                 <div v-if="data.mensajeYaHaSidoGuardado !== ''" class="my-8">
                     <TablaResumenEnviado
                         :identificacion_user = form.identificacion_user
@@ -1756,7 +1757,7 @@ const create = (validator, second) => {
                 </div>
             </section>
         </div>
-        
+
     </div>
 </template>
 <style>

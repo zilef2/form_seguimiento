@@ -27,10 +27,12 @@ use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use ZipArchive;
 
-class UserController extends Controller {
+class UserController extends Controller
+{
     public $thisAtributos;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('permission:create user', ['only' => ['create', 'store']]);
         $this->middleware('permission:read user', ['only' => ['index', 'show']]);
         $this->middleware('permission:update user', ['only' => ['edit', 'update']]);
@@ -39,22 +41,36 @@ class UserController extends Controller {
 
     }
 
-    public function Dashboard() {
-//        if($numberPermissions > 1){
-        $sourcePath = storage_path('app/public/anexosPrimerForm');
-        $files = File::files($sourcePath);
+    public function Dashboard()
+    {
+        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' --dashboard-- '));
+        $files = $npermission = 0;
+        $user = Myhelp::AuthU();
+        if ($numberPermissions > 1) {
+            $sourcePath = storage_path('app/public/anexosPrimerForm');
+            $files = File::files($sourcePath);
+            $files = count($files);
 
+            $enviado = (int)Formulario::Where('enviado', 1)->count();
+            $guardado = (int)Formulario::Where('enviado', 0)->count();
+            $npermission = (int)Permission::count();
+        } else {
+            $enviado = (int)Formulario::Where('enviado', 1)
+                ->Where('user_id',$user->id)->count();
+            $guardado = (int)Formulario::Where('enviado', 0)
+                ->Where('user_id',$user->id)->count();
+        }
         return Inertia::render('Dashboard', [
-                'users' => (int) User::count(),
-//                'roles' => (int) Role::count(),
-                'formulariosEnviados'  => (int) Formulario::Where('enviado',1)->count(),
-                'formulariosGuardados' =>(int) Formulario::Where('enviado',0)->count(),
-                'permissions'   => (int) Permission::count(),
-                'nanexos'   => count($files),
-            ]);
-//        }else{
-//            return redirect()->route('Dashboard.index');
-//        }
+            'users' => (int)User::count(),
+             //   'roles' => (int) Role::count(),
+            'formulariosEnviados' => $enviado,
+            'formulariosGuardados' => $guardado,
+
+            'permissions' => $npermission,
+            'nanexos' => $files,
+            'numberPermissions' => $numberPermissions,
+        ]);
+
 
     }
 
@@ -80,11 +96,12 @@ class UserController extends Controller {
 
         session()->flash('message', ' Archivos descargados.');
 //        return back()->download($filePath)->deleteFileAfterSend(true);
-        
+
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
-    
-    public function SelectsMasivos($numberPermissions) {
+
+    public function SelectsMasivos($numberPermissions)
+    {
 //        $empresatemp = new empresa();
 //        $modelInstance = resolve('App\\Models\\' . ucfirst('empresa'));
 //        $ultima = $modelInstance::All();
@@ -93,7 +110,8 @@ class UserController extends Controller {
 //        return $result;
     }
 
-    public function MapearClasePP(&$users, $numberPermissions,$request,&$roles){
+    public function MapearClasePP(&$users, $numberPermissions, $request, &$roles)
+    {
 //        $role = auth()->user()->roles->pluck('name')[0];
         if ($numberPermissions < 9) {
             $roles = Role::where('name', '<>', 'superadmin')->where('name', '<>', 'admin')->get();
@@ -110,7 +128,7 @@ class UserController extends Controller {
 //            dd($request->field, $request->has(['field', 'order']));
         if ($request->has(['field', 'order'])) {
             $users = $users->orderBy($request->field, $request->order);
-            
+
         } else {
             $users = $users->orderBy('updated_at', 'desc');
         }
@@ -123,36 +141,37 @@ class UserController extends Controller {
             })->where('name', '!=', 'admin')->where('name', '!=', 'Superadmin');
             // $users->where('name', 'LIKE', "%" . $request->search . "%");
         }
-        
+
         $users = $users->get()->map(function ($user) {
             return $user;
         })->filter();
     }
 
 
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $permissions = Myhelp::EscribirEnLog($this, ' users');
         $numberPermissions = MyModels::getPermissionToNumber($permissions);
 
         $users = User::query()->with('roles');
-        $this->MapearClasePP($users,$numberPermissions,$request,$roles);
-        
+        $this->MapearClasePP($users, $numberPermissions, $request, $roles);
+
 
         $perPage = $request->has('perPage') ? $request->perPage : 10;
         $total = $users->count();
         $page = request('page', 1); // Current page number
-        $fromController =  new LengthAwarePaginator($users->forPage($page, $perPage), $total, $perPage, $page, ['path' => request()->url()]);
+        $fromController = new LengthAwarePaginator($users->forPage($page, $perPage), $total, $perPage, $page, ['path' => request()->url()]);
 
         $losSelect = $this->SelectsMasivos($numberPermissions);
         return Inertia::render('User/Index', [
-            'breadcrumbs'           => [['label' => __('app.label.user'), 'href' => route('user.index')]],
-            'title'                 => __('app.label.user'),
-            'filters'               => $request->all(['search', 'field', 'order']),
-            'perPage'               => (int) $perPage,
-            'users'                 => $fromController,
-            'roles'                 => $roles,
-            'numberPermissions'     => $numberPermissions,
-            'losSelect'             => $losSelect,
+            'breadcrumbs' => [['label' => __('app.label.user'), 'href' => route('user.index')]],
+            'title' => __('app.label.user'),
+            'filters' => $request->all(['search', 'field', 'order']),
+            'perPage' => (int)$perPage,
+            'users' => $fromController,
+            'roles' => $roles,
+            'numberPermissions' => $numberPermissions,
+            'losSelect' => $losSelect,
         ]);
     }
 
@@ -161,25 +180,28 @@ class UserController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(){}
+    public function create()
+    {
+    }
 
     //! STORE - UPDATE - DELETE
-    public function store(UserStoreRequest $request){
+    public function store(UserStoreRequest $request)
+    {
         $permissions = Myhelp::EscribirEnLog($this, 'STORE:users');
         $user = Auth::user();
         DB::beginTransaction();
         try {
-            if(isset($request->sexo['value'])){
+            if (isset($request->sexo['value'])) {
                 $sexo = is_string($request->sexo) ? $request->sexo : $request->sexo['value'];
-            }else{
+            } else {
                 $sexo = 'Masculino';
             }
 
             $user = User::create([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'area'     => $request->area,
-                'cargo'     => $request->cargo,
+                'name' => $request->name,
+                'email' => $request->email,
+                'area' => $request->area,
+                'cargo' => $request->cargo,
                 'identificacion' => $request->identificacion,
                 'celular' => $request->celular,
                 'sexo' => $sexo,
@@ -197,26 +219,32 @@ class UserController extends Controller {
             return back()->with('error', __('app.label.created_error', ['name' => __('app.label.user')]) . $th->getMessage() . ' L:' . $th->getLine() . ' Ubi: ' . $th->getFile());
         }
     }
-    //fin store functions
-    public function show($id){}public function edit($id){}
 
-    public function update(UserUpdateRequest $request, $id){
+    //fin store functions
+    public function show($id)
+    {
+    }
+
+    public function edit($id)
+    {
+    }
+
+    public function update(Request $request, $id)
+    { //UserUpdateRequest
         Myhelp::EscribirEnLog($this, 'UPDATE:users', '', false);
         DB::beginTransaction();
         try {
             $sexo = is_string($request->sexo) ? $request->sexo : $request->sexo['value'];
             $user = User::findOrFail($id);
-            $empresaID = is_null($request->empresa_id) ? $user->empresa_id : $request->empresa_id['value'];
             $user->update([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'area'     => $request->area,
-                'cargo'     => $request->cargo,
+                'name' => $request->name,
+                'email' => $request->email,
+                'area' => $request->area,
+                'cargo' => $request->cargo,
                 'identificacion' => $request->identificacion,
                 'celular' => $request->celular,
                 'sexo' => $sexo,
                 'fecha_nacimiento' => Myhelp::updatingDate($request->fecha_nacimiento),
-                'empresa_id' => $empresaID,
             ]);
 
             $user->syncRoles($request->role);
@@ -226,17 +254,19 @@ class UserController extends Controller {
         } catch (\Throwable $th) {
             DB::rollback();
             Myhelp::EscribirEnLog($this, 'UPDATE:users', 'usuario id:' . $user->id . ' | ' . $user->name . '  fallo en el actualizado', false);
-            return back()->with('error', __('app.label.updated_error', ['name' => $user->name]) . $th->getMessage() . ' L:' . $th->getLine() . ' Ubi: ' . $th->getFile());
+            dd($th->getMessage() . ' L:' . $th->getLine() . ' Ubi: ' . $th->getFile());
+            return back()->with('error', __('app.label.updated_error', ['name' => $user->name]));
         }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy(User $user){
+    public function destroy(User $user)
+    {
         $permissions = Myhelp::EscribirEnLog($this, 'DELETE:users');
 
         try {
@@ -259,15 +289,17 @@ class UserController extends Controller {
             return back()->with('error', __('app.label.deleted_error', ['name' => count($request->id) . ' ' . __('app.label.user')]) . $th->getMessage() . ' L:' . $th->getLine() . ' Ubi: ' . $th->getFile());
         }
     }
+
     //FIN : STORE - UPDATE - DELETE
 
-    public function subirexceles(){ //just  a view
+    public function subirexceles()
+    { //just  a view
         Myhelp::EscribirEnLog($this, ' materia');
 
         return Inertia::render('User/subirExceles', [
-            'breadcrumbs'   => [['label' => __('app.label.user'), 'href' => route('user.index')]],
-            'title'         => __('app.label.user'),
-            'numUsuarios'   => count(User::all()) - 1,
+            'breadcrumbs' => [['label' => __('app.label.user'), 'href' => route('user.index')]],
+            'title' => __('app.label.user'),
+            'numUsuarios' => count(User::all()) - 1,
             // 'UniversidadSelect'   => Universidad::all()
         ]);
     }
@@ -276,7 +308,6 @@ class UserController extends Controller {
     {
         return Excel::download(new MultipleExport, 'CMA_Respaldo.xlsx');
     }
-
 
 
 }

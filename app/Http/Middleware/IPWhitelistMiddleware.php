@@ -21,7 +21,8 @@ class IPWhitelistMiddleware
 //        if (!in_array($request->ip(), $allowedIPs)) {
 //            return response()->json(['error' => 'Acceso no autorizado.'], 403);
 //        }
-
-        return $next($request);
+        $response = $next($request);
+//                  dd(session()->all());
+        return $response;
     }
 }
