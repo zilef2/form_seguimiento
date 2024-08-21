@@ -47,6 +47,7 @@ class Formulario extends Model
         'cantidad_sugerida',
         'valor_unitario_sugerida',
         'valor_total_solicitatdo_por_necesidad_sugerida',
+        'estado',
         'Nombre',
     ];
 

@@ -28,7 +28,12 @@ const data = reactive({
 
 //very usefull
 const justNames = props.titulos.map(names => names['order'] )
-const form = useForm({ ...Object.fromEntries(justNames.map(field => [field, ''])) });
+const form = useForm({ ...Object.fromEntries(justNames.map(field => [field, ''])),
+    liderId:props.lider.id,
+    cantidad_sugerida:'',
+    valor_unitario_sugerida:'',
+    valor_total_solicitatdo_por_necesidad_sugerida:'',
+});
 onMounted(() => {
     if(props.numberPermissions > 9000){
         const valueRAn = Math.floor(Math.random() * 9 + 1)
@@ -37,6 +42,7 @@ onMounted(() => {
         // form.hora_inicial = '0'+valueRAn+':00'//temp
         // form.fecha = '2023-06-01'
     }
+
     // data.printForm.length -= 1 //dependex
 });
 
@@ -54,6 +60,9 @@ watchEffect(() => {
             form[names['order']] =
                 props.necesidad[names['order']]
         });
+        form.cantidad_sugerida = props.necesidad.cantidad_sugerida
+        form.valor_unitario_sugerida = props.necesidad.valor_unitario_sugerida
+        form.valor_total_solicitatdo_por_necesidad_sugerida = props.necesidad.valor_total_solicitatdo_por_necesidad_sugerida
     }
 })
 
@@ -64,7 +73,7 @@ const calcular10 = () =>{
 }
 
 const update = () => {
-    form.put(route('formularioupdate2', props.lider?.id), {
+    form.put(route('formularioupdate2', props.necesidad?.id), {
         preserveScroll: true,
         onSuccess: () => {
             emit("close")
@@ -87,7 +96,7 @@ const update = () => {
                 </h2>
 <!--                borrar aquiiii-->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-2">
-                    <div class=""> 
+                    <div class="">
                         <InputLabel :for="estado" :value="lang().label.estado" />
                         <TextInput :id="estado" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             :value="props.estadosFormulario.find(ele =>  ele.id === form.estado).nombre"
@@ -95,51 +104,51 @@ const update = () => {
                             :error="form.errors.estado" />
                         <InputError class="mt-2" :message="form.errors.estado" />
                     </div>
-                    
-                    <div class=""> 
+
+                    <div class="">
                         <InputLabel :for="nombre" :value="lang().label.nombre" />
                         <TextInput :id="nombre" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.nombre" required placeholder="nombre"
                             :error="form.errors.nombre" />
                         <InputError class="mt-2" :message="form.errors.nombre" />
                     </div>
-                    <div class="md:col-span-2"> 
+                    <div class="md:col-span-2">
                         <InputLabel :for="necesidad" :value="lang().label.necesidad" />
                         <TextInput :id="necesidad" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.necesidad" required placeholder="necesidad"
                             :error="form.errors.necesidad" />
                         <InputError class="mt-2" :message="form.errors.necesidad" />
                     </div>
-                    <div class="md:col-span-2"> 
+                    <div class="md:col-span-2">
                         <InputLabel :for="justificacion" :value="lang().label.justificacion" />
                         <TextInput :id="justificacion" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.justificacion" required placeholder="justificacion"
                             :error="form.errors.justificacion" />
                         <InputError class="mt-2" :message="form.errors.justificacion" />
                     </div>
-                    <div class="md:col-span-2 mb-12"> 
+                    <div class="md:col-span-2 mb-12">
                         <InputLabel :for="actividad" :value="lang().label.actividad" />
                         <TextInput :id="actividad" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.actividad" required placeholder="actividad"
                             :error="form.errors.actividad" />
                         <InputError class="mt-2" :message="form.errors.actividad" />
                     </div>
-                    
+
                     <div class="md:col-span-full"><p class="text-center underline cursor-pointer" @click="calcular10"> Disminuir 10%</p></div>
-                    
-                    
-                    
+
+
+
                     <FormDiv :nombre="'cantidad'" v-model:valor="form.cantidad" :form="form" disabled="true"/>
-                    <div class=""> 
+                    <div class="">
                         <InputLabel :for="cantidad_sugerida" :value="lang().label.cantidad_sugerida" />
                         <TextInput :id="cantidad_sugerida" type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.cantidad_sugerida" required placeholder="cantidad_sugerida"
                             :error="form.errors.cantidad_sugerida" />
                         <InputError class="mt-2" :message="form.errors.cantidad_sugerida" />
                     </div>
-                    
+
                     <FormDiv :nombre="'valor_unitario'" v-model:valor="form.valor_unitario" :form="form" :disabled="true"/>
-                    <div class=""> 
+                    <div class="">
                         <InputLabel :for="valor_unitario_sugerida" :value="lang().label.valor_unitario_sugerida" />
                         <TextInput :id="valor_unitario_sugerida" type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.valor_unitario_sugerida" required placeholder="valor_unitario_sugerida"
@@ -147,30 +156,30 @@ const update = () => {
                         <InputError class="mt-2" :message="form.errors.valor_unitario_sugerida" />
                     </div>
                     <FormDiv :nombre="'valor_total_solicitatdo_por_necesidad'" v-model:valor="form.valor_total_solicitatdo_por_necesidad" :form="form" :disabled="true"/>
-                    <div class=""> 
+                    <div class="">
                         <InputLabel :for="valor_total_solicitatdo_por_necesidad_sugerida" :value="lang().label.valor_total_solicitatdo_por_necesidad_sugerida" />
                         <TextInput :id="valor_total_solicitatdo_por_necesidad_sugerida" type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.valor_total_solicitatdo_por_necesidad_sugerida" required placeholder="valor_total_solicitatdo_por_necesidad_sugerida"
                             :error="form.errors.valor_total_solicitatdo_por_necesidad_sugerida" />
                         <InputError class="mt-2" :message="form.errors.valor_total_solicitatdo_por_necesidad_sugerida" />
                     </div>
-                    
-                    
-                    <div class="mt-8"> 
+
+
+                    <div class="mt-8">
                         <InputLabel :for="periodo_de_inicio_de_ejecucion" :value="lang().label.periodo_de_inicio_de_ejecucion" />
                         <TextInput :id="periodo_de_inicio_de_ejecucion" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.periodo_de_inicio_de_ejecucion" required placeholder="periodo_de_inicio_de_ejecucion"
                             :error="form.errors.periodo_de_inicio_de_ejecucion" />
                         <InputError class="mt-2" :message="form.errors.periodo_de_inicio_de_ejecucion" />
                     </div>
-                    <div class="mt-8"> 
+                    <div class="mt-8">
                         <InputLabel :for="vigencias_anteriores" :value="lang().label.vigencias_anteriores" />
                         <TextInput :id="vigencias_anteriores" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.vigencias_anteriores" required placeholder="vigencias_anteriores"
                             :error="form.errors.vigencias_anteriores" />
                         <InputError class="mt-2" :message="form.errors.vigencias_anteriores" />
                     </div>
-                    <div class=""> 
+                    <div class="">
                         <InputLabel :for="valor_asignado_en_la_vigencia_anterior" :value="lang().label.valor_asignado_en_la_vigencia_anterior" />
                         <TextInput :id="valor_asignado_en_la_vigencia_anterior" disabled type="text" class="mt-1 block w-full bg-gray-100"
                             v-model="form.valor_asignado_en_la_vigencia_anterior" required placeholder="valor_asignado_en_la_vigencia_anterior"
@@ -178,9 +187,9 @@ const update = () => {
                         <InputError class="mt-2" :message="form.errors.valor_asignado_en_la_vigencia_anterior" />
                     </div>
                 </div>
-                
-                
-                
+
+
+
 <!--                props.estadosFormulario.find(ele =>  ele.id === claseFromController.estado).nombre-->
                 <div class=" my-8 flex justify-end">
                     <SecondaryButton :disabled="form.processing" @click="emit('close')"> {{ lang().button.close }}

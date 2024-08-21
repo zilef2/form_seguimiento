@@ -7,6 +7,7 @@ use App\helpers\MyModels;
 use App\Models\EstadoFormulario;
 use App\Models\Formulario;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -47,10 +48,22 @@ class FormSimplificadoController extends FormularioController
     private function MapearSimplificado($formus)
     {
         $valorTotal = clone $formus;
-        $valorTotal =  $valorTotal->sum('valor_total_solicitatdo_por_necesidad');
-        
+//        $valorTotal =  $valorTotal->sum('valor_total_solicitatdo_por_necesidad');
+        $valorTotal = $formus->get()->sum(function ($formu) {
+            if ($formu->estado == 4) {
+                return $formu->valor_total_solicitatdo_por_necesidad_sugerida;
+            } else {
+                return $formu->valor_total_solicitatdo_por_necesidad;
+            }
+        });
+
+//        $formus = $formus->orderBy('estado','desc');
+//        $formus = $formus->orderBy('estado', 'asc')->get();
+//        dd(
+//            $formus[0]->getattributes(),
+//            $formus[1]->getattributes()
+//        );
         $formuResult = $formus->get()->map(function ($form) {
-            $form->userName = $form->userName();
             $form->userName = $form->userName();
             $form->Categori = $form->categoria();
             $form->proceso_que_solicita_presupuest = $form->proceso_que_solicita_presupuesto();
@@ -104,12 +117,13 @@ class FormSimplificadoController extends FormularioController
 
         if ($request->has(['field', 'order'])) {
             if($request->field == 'numero_necesidad'){
+//                $formularios = $formularios->orderBy('estado');
                 $formularios = $formularios->orderBy(DB::raw('CAST(numero_necesidad AS UNSIGNED)'), $request->order);
             }else{
                 $formularios = $formularios->orderBy($request->field, $request->order);
             }
         }
-        $formularios = $formularios->orderBy('updated_at', 'DESC');
+        $formularios = $formularios->orderBy('estado', 'asc');
     }
     public function IndexFormSimplificado(Request $request,$idLider)
     {
@@ -145,12 +159,11 @@ class FormSimplificadoController extends FormularioController
             'totalValorUnitario' => (int) $totalValorUnitario,
         ]);
     }
-    
+
     public function formularioupdate2(Request $request,$fid){
         try {
             Myhelp::EscribirEnLog($this, ' formularioupdate2 : formu');
             $formulario = Formulario::Find($fid);
-
             DB::beginTransaction();
             $formulario->update([
                 'cantidad_sugerida' => $request->cantidad_sugerida,
@@ -160,7 +173,7 @@ class FormSimplificadoController extends FormularioController
             ]);
 
             DB::commit();
-            return redirect()->route('IndexFormSimplificado', ['idLider' => $formulario->id,'opcionAprobado'])->with('success','Segurencia éxitosa');
+            return redirect()->route('IndexFormSimplificado', ['idLider' => $request->liderId])->with('success','Sugerencia éxitosa');
         } catch (QueryException $e) {
             $mensajeErrorCompleto = "Error SQL: " . $e->getMessage() . "\n" .
                 "SQL: " . $e->sql . "\n" .
