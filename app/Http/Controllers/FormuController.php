@@ -38,6 +38,7 @@ class FormuController extends Controller
 
             DB::beginTransaction();
             $formulario = Formulario::create([
+                'Nombre' => $request->Nombre,
                 'identificacion_user' => $authu->identificacion,
                 'user_id' => $authu->id,
                 'valor_total_de_la_solicitud_actual' => 0,
@@ -54,6 +55,7 @@ class FormuController extends Controller
                 'vigencias_anteriores' => $request->vigencias_anteriores['value'],
                 'valor_asignado_en_la_vigencia_anterior' => $request->valor_asignado_en_la_vigencia_anterior,
                 'enviado' => 0,
+                'estado' => 0,
             ]);
 
             DB::commit();
@@ -75,6 +77,7 @@ class FormuController extends Controller
 //            dd($mensajeErrorCompleto);
         }
     }
+    
 
     //get
     public function GetStore2($fid)
@@ -131,13 +134,11 @@ class FormuController extends Controller
                 "Bindings: " . json_encode($e->bindings) . "\n" .
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
             Myhelp::EscribirEnLog($this, ' ERROR_FORMU_FINAL: ' . $mensajeErrorCompleto);
-            dd($mensajeErrorCompleto);
             return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         } catch (\Throwable $th) {
             DB::rollback();
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine() . ' | Ubi: ' . $th->getFile();
             Myhelp::EscribirEnLog($this, ' ERROR_FORMU_FINAL: ' . $mensajeErrorCompleto);
-            dd($mensajeErrorCompleto);
             return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         }
     }

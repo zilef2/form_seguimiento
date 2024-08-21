@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () { //  , 'verified'
 
     Route::get('/formularioSA', [FormularioController::class, 'formularioSA'])->name('formularioSA');
     Route::get('/PreFormSimplificado', [FormSimplificadoController::class, 'PreFormSimplificado'])->name('PreFormSimplificado');
-    Route::get('/IndexFormSimplificado/{idLider}/{opcionAprobado}', [FormSimplificadoController::class, 'IndexFormSimplificado'])->name('IndexFormSimplificado');
+    Route::get('/IndexFormSimplificado/{idLider}', [FormSimplificadoController::class, 'IndexFormSimplificado'])->name('IndexFormSimplificado');
     Route::get('/CategoriasSimilares', [IdeasController::class, 'index'])->name('CategoriasSimilares');
     Route::resource('/formulario', FormularioController::class);
     Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () { //  , 'verified'
     Route::resource('/formu', FormuController::class);
     Route::get('/Store2/{fid}', [FormuController::class, 'GetStore2'])->name('Store2');
     Route::post('/Store2/{fid}', [FormuController::class, 'PostStore2'])->name('PStore2');
+    Route::put('formularioupdate2/{fid}', [FormSimplificadoController::class, 'formularioupdate2'])->name('formularioupdate2');
 //    Route::match(['get', 'post'],
 });
 

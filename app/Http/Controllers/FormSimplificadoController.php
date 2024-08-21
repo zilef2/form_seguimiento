@@ -29,7 +29,6 @@ class FormSimplificadoController extends FormularioController
                 ];
             });
 
-        $estadosFormulario = EstadoFormulario::all()->toArray();
         /*
             estado' => 1, 'nombre' => 'Sin revisar']);
             estado' => 2, 'nombre' => 'Aprobado']);
@@ -40,7 +39,7 @@ class FormSimplificadoController extends FormularioController
         return Inertia::render($this->FromController . '/PreFormSimplificado', [
             'numberPermissions' => $numberPermissions,
             'Arraylideres' => $Arraylideres,
-            'estadosFormulario' => $estadosFormulario,
+            'estadosFormulario' => EstadoFormulario::all()->toArray(),
 //            'cedLideres' => Inertia::lazy(fn() => $cedlideres),
         ]);
     }
@@ -49,8 +48,9 @@ class FormSimplificadoController extends FormularioController
     {
         $valorTotal = clone $formus;
         $valorTotal =  $valorTotal->sum('valor_total_solicitatdo_por_necesidad');
-
+        
         $formuResult = $formus->get()->map(function ($form) {
+            $form->userName = $form->userName();
             $form->userName = $form->userName();
             $form->Categori = $form->categoria();
             $form->proceso_que_solicita_presupuest = $form->proceso_que_solicita_presupuesto();
@@ -111,7 +111,7 @@ class FormSimplificadoController extends FormularioController
         }
         $formularios = $formularios->orderBy('updated_at', 'DESC');
     }
-    public function IndexFormSimplificado(Request $request,$idLider,$opcionAprobado)
+    public function IndexFormSimplificado(Request $request,$idLider)
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' IndexFormSimplificado '));
         $lider = User::find($idLider);
@@ -132,16 +132,48 @@ class FormSimplificadoController extends FormularioController
             ['path' => request()->url()]
         );
         return Inertia::render($this->FromController . '/IndexFormSimplificado', [
+            'numberPermissions' => $numberPermissions,
             'fromController' => $fromController,
             'total' => $formularios->count(),
             'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . 'SA')]],
             'title' => __('app.label.' . $this->FromController),
             'filters' => $request->all(['search', 'field', 'order','soloEnviados','searcLider','liderchu']),
             'perPage' => (int)$perPage,
-            'numberPermissions' => $numberPermissions,
             'losSelect' => $losSelect,
             'lider' => $lider,
+            'estadosFormulario' => EstadoFormulario::all()->toArray(),
             'totalValorUnitario' => (int) $totalValorUnitario,
         ]);
+    }
+    
+    public function formularioupdate2(Request $request,$fid){
+        try {
+            Myhelp::EscribirEnLog($this, ' formularioupdate2 : formu');
+            $formulario = Formulario::Find($fid);
+
+            DB::beginTransaction();
+            $formulario->update([
+                'cantidad_sugerida' => $request->cantidad_sugerida,
+                'valor_unitario_sugerida' => $request->valor_unitario_sugerida,
+                'valor_total_solicitatdo_por_necesidad_sugerida' => $request->valor_total_solicitatdo_por_necesidad_sugerida,
+                'estado' => 4, //Sugerencia
+            ]);
+
+            DB::commit();
+            return redirect()->route('IndexFormSimplificado', ['idLider' => $formulario->id,'opcionAprobado'])->with('success','Segurencia éxitosa');
+        } catch (QueryException $e) {
+            $mensajeErrorCompleto = "Error SQL: " . $e->getMessage() . "\n" .
+                "SQL: " . $e->sql . "\n" .
+                "Bindings: " . json_encode($e->bindings) . "\n" .
+                "Ubicación: " . $e->getFile() . ":" . $e->getLine();
+            Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
+            return back()->with('error', $mensajeErrorCompleto);
+
+        } catch (\Throwable $th) {
+            DB::rollback();
+            $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine() . ' | Ubi: ' . $th->getFile();
+            Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
+            return back()->with('error', $mensajeErrorCompleto);
+        }
     }
 }

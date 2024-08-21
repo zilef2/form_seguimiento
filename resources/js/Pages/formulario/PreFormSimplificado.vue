@@ -160,7 +160,7 @@ const select = () => {
                     </div>
 
                     <div class="text-center flex mx-auto">
-                        <Link :href="route('IndexFormSimplificado',[form.Arraylideres, 0 ])" class="flex items-center py-1 px-4">
+                        <Link :href="route('IndexFormSimplificado',[form.Arraylideres ])" class="flex items-center py-1 px-4">
                             <PresentationChartLineIcon class="w-6 h-6" />
                             <span class="ml-3">Mostrar tabla</span>
                         </Link>
