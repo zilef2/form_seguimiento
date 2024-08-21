@@ -17,9 +17,6 @@ Algunas caracteristicas del software son:
 - Composer
 - Mysql
 - Apache
-# Installation
-``` bash
-```
 
 # Important commands
 ``` bash
@@ -29,14 +26,19 @@ php artisan key:generate
 php artisan migrate:fresh --seed
 ```
 
+# Reuniones
+## NUEVOS REQUISITOS DE PRESUPEUSTO PARA 2025 (1 julio 2024)
 
-# Packages
-- [Vue](https://vuejs.org/)
-- [Inertia](https://inertiajs.com/)
-- [Tailwind](https://tailwindcss.com/)
-- [Spatie](https://spatie.be/docs/laravel-permission/v5/introduction)
-- [Floating Vue](https://floating-vue.starpad.dev/)
-- [VueUse](https://vueuse.org/)
-- [Hero Icons](https://heroicons.com/)
-- [HeadlessUI](https://headlessui.com/)
-- [laravel excel](https://laravel-excel.com/)
+- Poder subir varios adjuntos para la misma necesidad
+- poder reemplazar el adjunto
+- poder ver los adjuntos.
+
+
+### 3 Pasos para las necesidades: parte subir Excel, parte seleccionables y parte adjuntos.
+
+
+
+EL paso de manuela es hacer los adjustes de por ejemplo : el valor solicitado, 
+
+
+Agregar el CPD ???

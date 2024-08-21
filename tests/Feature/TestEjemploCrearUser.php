@@ -17,4 +17,9 @@ class TestEjemploCrearUser extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function createApplication()
+    {
+        // TODO: Implement createApplication() method.
+    }
 }
