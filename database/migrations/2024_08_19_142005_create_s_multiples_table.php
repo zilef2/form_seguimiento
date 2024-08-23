@@ -8,6 +8,12 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * 
+      el 21 agosto quedaron listas estas migraciones
+    sudo php artisan migrate --path=/database/migrations/2024_08_01_130407_create_estado_formularios_table.php
+    sudo php artisan migrate --path=/database/migrations/2024_08_19_142005_create_s_multiples_table.php
+    sudo php artisan db=>seed --class=TablasFrontendSeeder
+     * 
      */
     public function up(): void
     {

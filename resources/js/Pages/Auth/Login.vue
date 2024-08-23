@@ -32,15 +32,13 @@ const submit = () => {
 
         <Head :title="lang().label.login" />
         <template #illustration>
-            <!-- <AuntheticationIllustration type="login" class="w-72 h-auto" /> -->
-            <!-- <mypass class="w-72 h-auto"></mypass> -->
-            <login class="w-full h-auto"></login>
+            <login class="w-full h-full"></login>
         </template>
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="">
             <div>
                 <InputLabel for="email" :value="lang().label.identificacion" />
 <!--                <TextInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autofocus autocomplete="username"  :error="form.errors.email" />-->

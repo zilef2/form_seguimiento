@@ -62,11 +62,8 @@ const downClaro = () => { window.open('downClaro' , '_blank') }
                                                 <CheckBadgeIcon class="ml-[2px] w-4 h-4 text-white dark:text-white lg:text-primary"
                                                     v-show="$page.props.auth.user.email_verified_at" />
                                             </span>
-                                            <span v-show="$page.props.auth.user.email_verified_at" class="flex items-center justify-start text-sm truncate">
-                                                {{ version }}
-                                            </span>
-                                            <span v-show="$page.props.auth.user.email_verified_at" class="flex items-center justify-start text-sm truncate">
-                                                {{ version + 1 }}
+                                            <span class="flex items-center justify-start text-sm truncate">
+                                                Version: {{ version }}
                                             </span>
                                             <ChevronDownIcon class="ml-2 h-5 w-5 fill-current" />
                                         </button>

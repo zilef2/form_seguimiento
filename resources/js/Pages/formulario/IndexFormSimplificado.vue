@@ -108,26 +108,15 @@ const titulos = [
     {order: 'estado', label: 'estado', type: 'text'},
     {order: 'nombre', label: 'nombre', type: 'text'},
     {order: 'necesidad', label: 'necesidad', type: 'text'},
-    {order: 'justificacion', label: 'justificacion', type: 'text'},
     {order: 'actividad', label: 'Actividad', type: 'text'},
     {order: 'cantidad', label: 'Cantidad', type: 'numberWithUM'},
     {order: 'valor_unitario', label: 'Valor unitario', type: 'dinero'},
     {order: 'valor_total_solicitatdo_por_necesidad', label: 'Valor total solicitatdo por necesidad', type: 'dinero'},
+    {order: 'justificacion', label: 'justificacion', type: 'text'},
     {order: 'periodo_de_inicio_de_ejecucion', label: 'Periodo de inicio de ejecucion', type: 'text'},
     {order: 'vigencias_anteriores', label: 'Vigencias anteriores', type: 'text'},
     {order: 'valor_asignado_en_la_vigencia_anterior', label: 'Valor asignado en la vigencia anterior', type: 'dinero'},
 
-    // { order: 'procesos_involucrados', label: 'Procesos involucrados', type: 'selectsMultiple',newName:'procesos_involucrado'},
-    // { order: 'plan_de_mejoramiento_al_que_apunta_la_necesidad', label: 'Plan de mejoramiento al que apunta la necesidad', type: 'selectsMultiple',newName:'plan_de_mejoramiento_al_que_apunta_la_necesida'},
-    // { order: 'linea_del_plan_desarrollo_al_que_apunta_la_necesidad', label: 'Linea del plan desarrollo al que apunta la necesidad', type: 'selectsMultiple',newName:'linea_del_plan_desarrollo_al_que_apunta_la_necesida'},
-
-    {order: 'frecuencia_de_uso', label: 'Frecuencia de uso', type: 'text'},
-    // { order: 'mantenimientos_requeridos', label: 'Mantenimientos requeridos', type: 'text' },
-    // { order: 'capacidad_instalada', label: 'Capacidad instalada', type: 'text' },
-    // { order: 'riesgo_de_la_inversion', label: 'Riesgo de la inversion', type: 'text' },
-    // { order: 'valor_total_de_la_solicitud_actual', label: 'Valor total de la solicitud actual', type: 'dinero' },
-    // { order: 'identificacion_user', label: 'cc', type: 'minitext' },
-    // { order: 'enviado', label: 'Enviado', type: 'boolEnviado'},
 ];
 
 onBeforeUnmount(() => {
@@ -143,7 +132,6 @@ onBeforeUnmount(() => {
             <!--             {{ props.losSelect }} -->
             <div class="px-4 sm:px-0">
                 <div class=" rounded-lg overflow-hidden w-fit">
-                    v-if="can(['sugerencia user'])"
                     <Sugerir :show="data.editOpen" @close="data.editOpen = false"
                              :necesidad="data.necesidad" :lider="lider"
                              :title="props.title" :titulos="titulos" :losSelect="props.losSelect"
@@ -203,113 +191,76 @@ onBeforeUnmount(() => {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"
-                            class="border-t border-gray-200 dark:border-gray-700 hover:bg-sky-100 hover:dark:bg-gray-900/20 even:bg-gray-300">
-                            <td class="whitespace-nowrap py-4 px-2 sm:py-3">
-                                <div v-if="!claseFromController.cantidad_sugerida"
-                                     class="flex justify-center items-center">
-                                    <div class="rounded-md overflow-hidden">
-                                        <InfoButton v-show="can(['update user'])" type="button"
-                                                    @click="(data.editOpen = true), (data.necesidad = claseFromController)"
-                                                    class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">
-                                            <Squares2X2Icon class="w-4 h-4"/>
-                                        </InfoButton>
-                                        <!--                                            <DangerButton v-show="can(['delete user'])" type="button"-->
-                                        <!--                                                @click="(data.deleteOpen = true), (data.user = user)"-->
-                                        <!--                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.delete">-->
-                                        <!--                                                <TrashIcon class="w-4 h-4" />-->
-                                        <!--                                            </DangerButton>-->
+                            <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"
+                                class="border-t border-gray-200 dark:border-gray-700 hover:bg-sky-100 hover:dark:bg-gray-900/20 even:bg-gray-300">
+                                <td class="whitespace-nowrap py-4 px-2 sm:py-3">
+                                    <div v-if="!claseFromController.cantidad_sugerida"
+                                         class="flex justify-center items-center">
+                                        <div class="rounded-md overflow-hidden">
+                                            <InfoButton v-show="can(['update user'])" type="button"
+                                                        @click="(data.editOpen = true), (data.necesidad = claseFromController)"
+                                                        class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">
+                                                <Squares2X2Icon class="w-4 h-4"/>
+                                            </InfoButton>
+                                            <!--                                            <DangerButton v-show="can(['delete user'])" type="button"-->
+                                            <!--                                                @click="(data.deleteOpen = true), (data.user = user)"-->
+                                            <!--                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.delete">-->
+                                            <!--                                                <TrashIcon class="w-4 h-4" />-->
+                                            <!--                                            </DangerButton>-->
+                                        </div>
                                     </div>
-                                </div>
-                                <div> Ok
-                                </div>
-                            </td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{
-                                    props.estadosFormulario.find(ele => ele.id === claseFromController.estado).nombre
-                                }} </span></td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span
-                                class="max-w-[220px] min-w-[40px]"> {{ claseFromController.Nombre }} </span></td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span
-                                class="max-w-[220px] min-w-[40px]"> {{ claseFromController.necesidad }} </span></td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span
-                                class="max-w-[220px] min-w-[40px]"> {{ claseFromController.justificacion }} </span></td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span
-                                class="max-w-[220px] min-w-[40px]"> {{ claseFromController.actividad }} </span></td>
-
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64">
-                                <div v-if="claseFromController.cantidad_sugerida" class="max-w-[220px] min-w-[40px]">
-                                    <b class="line-through">{{ claseFromController.cantidad }}</b>
-                                    <p class="text-lg"> {{ claseFromController.cantidad_sugerida }}</p>
-                                </div>
-                                <span v-else class="max-w-[220px] min-w-[40px]">
-                                    {{ claseFromController.valor_unitario }}
-                                </span>
-                            </td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64">
-                                <div v-if="claseFromController.valor_unitario_sugerida"
-                                     class="max-w-[220px] min-w-[40px]">
-                                    <b class="line-through">{{ claseFromController.valor_unitario }}</b>
-                                    <p class="text-lg"> {{ claseFromController.valor_unitario_sugerida }}</p>
-                                </div>
-                                <span v-else class="max-w-[220px] min-w-[40px]">
-                                    {{ claseFromController.valor_unitario }}
-                                </span>
-                            </td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64">
-                                <div v-if="claseFromController.valor_total_solicitatdo_por_necesidad_sugerida"
-                                     class="max-w-[220px] min-w-[40px]">
-                                    <b class="line-through">{{
-                                            claseFromController.valor_total_solicitatdo_por_necesidad
-                                        }}</b>
-                                    <p class="text-lg">
-                                        {{ claseFromController.valor_total_solicitatdo_por_necesidad_sugerida }}</p>
-                                </div>
-                                <span v-else class="max-w-[220px] min-w-[40px]">
-                                    {{ claseFromController.valor_total_solicitatdo_por_necesidad }}
-                                </span>
-                            </td>
-
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{
-                                    claseFromController.periodo_de_inicio_de_ejecucion
-                                }} </span></td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{
-                                    claseFromController.vigencias_anteriores
-                                }} </span></td>
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{
-                                    claseFromController.valor_asignado_en_la_vigencia_anterior
-                                }} </span></td>
-                            <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.procesos_involucrados }} </span></td>-->
-                            <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.plan_de_mejoramiento_al_que_apunta_la_necesidad }} </span></td>-->
-                            <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.linea_del_plan_desarrollo_al_que_apunta_la_necesidad }} </span></td>-->
-                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span
-                                class="max-w-[220px] min-w-[40px]"> {{ claseFromController.frecuencia_de_uso }} </span>
-                            </td>
-                            <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.mantenimientos_requeridos }} </span></td>-->
-                            <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.capacidad_instalada }} </span></td>-->
-                            <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.riesgo_de_la_inversion }} </span></td>-->
-                            <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.valor_total_de_la_solicitud_actual }} </span></td>-->
-                        </tr>
-                        <!--                            building  -->
-
-
-                        <!--                            <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"-->
-                        <!--                                class="border-t border-gray-200 dark:border-gray-700 hover:bg-sky-100 hover:dark:bg-gray-900/20 even:bg-gray-300">-->
-                        <!--                                <td v-for="titulo in titulos" class=" text-center py-4 px-2 sm:py-3 w-64">-->
-                        <!--                                    <span v-if="titulo['type'] === 'alterNumber'" class="max-w-[120px]"> {{ parseInt(claseFromController[titulo['order']])+1 }} </span>-->
-                        <!--                                    <p v-if="titulo['type'] === 'text'" class="mx-auto text-center text-sm min-w-[200px]"> {{ PrimerasPalabras(claseFromController[titulo['order']], 30) }} </p>-->
-                        <!--                                    <p v-if="titulo['type'] === 'minitext'" class="mx-auto text-center text-sm max-w-[120px]"> {{ PrimerasPalabras(claseFromController[titulo['order']], 30) }} </p>-->
-                        <!--                                    <span v-if="titulo['type'] === 'number'"> {{ number_format(claseFromController[titulo['order']], 0, false) }} </span>-->
-                        <!--                                    <span v-if="titulo['type'] === 'numberWithUM'">-->
-                        <!--                                        {{ number_format(claseFromController[titulo['order']], 0, false) }}&nbsp{{claseFromController.unidad_de_medida}}-->
-                        <!--                                    </span>-->
-                        <!--                                    <span v-if="titulo['type'] === 'dinero'"> {{ number_format(claseFromController[titulo['order']], 0, true) }} </span>-->
-                        <!--                                    <span v-if="titulo['type'] === 'date'"> {{ formatDate(claseFromController[titulo['order']], false) }} </span>-->
-                        <!--                                    <span v-if="titulo['type'] === 'datetime'"> {{ formatDate(claseFromController[titulo['order']], true) }} </span>-->
-                        <!--                                    <span v-if="titulo['type'] === 'foreign'" class="min-w-[400px]"> {{ claseformularioa[titulo['order']][titulo['nameid']] }} </span>-->
-                        <!--                                    <span v-if="titulo['type'] === 'boolEnviado'" class="max-w-[90px]"> {{ (claseFromController[titulo['order']] ? '✅' : 'Guardado') }} </span>-->
-                        <!--                                    <p v-if="titulo['type'] === 'selectsMultiple'" class="min-w-[200px]"> {{ (claseFromController[titulo['newName']]) }} </p>-->
-                        <!--                                </td>-->
-                        <!--                            </tr>-->
+                                    <div v-else class="text-center"> 
+                                        <p class="text-center mx-auto">Ok</p>
+                                    </div>
+                                </td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ props.estadosFormulario.find(ele => ele.id === claseFromController.estado).nombre }} </span></td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.Nombre }} </span></td>
+                                <td class=" text-center py-4 px-2 sm:py-3"><span class="max-w-[320px] min-w-[140px]"> {{ claseFromController.necesidad }} </span></td>
+                                <td class=" text-center py-4 px-2 sm:py-3"><span class="max-w-[320px] min-w-[140px]"> {{ claseFromController.actividad }} </span></td>
+    
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64">
+                                    <div v-if="claseFromController.cantidad_sugerida" class="max-w-[220px] min-w-[40px]">
+                                        <b class="line-through">{{ claseFromController.cantidad }}</b>
+                                        <p class="text-lg"> {{ claseFromController.cantidad_sugerida }}</p>
+                                    </div>
+                                    <span v-else class="max-w-[220px] min-w-[40px]">
+                                        {{ claseFromController.valor_unitario }}
+                                    </span>
+                                </td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64">
+                                    <div v-if="claseFromController.valor_unitario_sugerida"
+                                         class="max-w-[220px] min-w-[40px]">
+                                        <b class="line-through">{{ claseFromController.valor_unitario }}</b>
+                                        <p class="text-lg"> {{ claseFromController.valor_unitario_sugerida }}</p>
+                                    </div>
+                                    <span v-else class="max-w-[220px] min-w-[40px]">
+                                        {{ claseFromController.valor_unitario }}
+                                    </span>
+                                </td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64">
+                                    <div v-if="claseFromController.valor_total_solicitatdo_por_necesidad_sugerida"
+                                         class="max-w-[220px] min-w-[40px]">
+                                        <b class="line-through">{{ claseFromController.valor_total_solicitatdo_por_necesidad }}</b>
+                                        <p class="text-lg">{{ claseFromController.valor_total_solicitatdo_por_necesidad_sugerida }}</p>
+                                    </div>
+                                    <span v-else class="max-w-[220px] min-w-[40px]">
+                                        {{ claseFromController.valor_total_solicitatdo_por_necesidad }}
+                                    </span>
+                                </td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-max-[350px]"><span class="max-w-[220px] min-w-[40px]"> {{ PrimerasPalabras(claseFromController.justificacion,35) }} </span></td>
+    
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.periodo_de_inicio_de_ejecucion }} </span></td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.vigencias_anteriores }} </span></td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.valor_asignado_en_la_vigencia_anterior }} </span></td>
+                                <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.procesos_involucrados }} </span></td>-->
+                                <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.plan_de_mejoramiento_al_que_apunta_la_necesidad }} </span></td>-->
+                                <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.linea_del_plan_desarrollo_al_que_apunta_la_necesidad }} </span></td>-->
+    <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.frecuencia_de_uso }} </span></td>-->
+                                <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.mantenimientos_requeridos }} </span></td>-->
+                                <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.capacidad_instalada }} </span></td>-->
+                                <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.riesgo_de_la_inversion }} </span></td>-->
+                                <!--                            <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.valor_total_de_la_solicitud_actual }} </span></td>-->
+                            </tr>
                         </tbody>
                     </table>
                     <h2 v-else class="text-center text-xl my-8">Sin Registros</h2>

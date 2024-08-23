@@ -31,7 +31,7 @@ onMounted(() => {
 
 });
 const form = useForm({
-    Arraylideres: props.Arraylideres[0],
+    Arraylideres: props.Arraylideres[0] ?? 0,
 });
 
 watchEffect(() => {
@@ -70,12 +70,10 @@ const select = () => {
     }
 }
 // <!--</editor-fold>-->
-
 </script>
 
 <template>
     <Head :title="props.title"/>
-
     <AuthenticatedLayout>
         <section class=" body-font">
             <div class="container px-5 py-24 mx-auto">
@@ -159,13 +157,15 @@ const select = () => {
                         </div>
                     </div>
 
-                    <div class="text-center flex mx-auto">
+                    <div v-if="form.Arraylideres" class="text-center flex mx-auto">
                         <Link :href="route('IndexFormSimplificado',[form.Arraylideres ])" class="flex items-center py-1 px-4">
                             <PresentationChartLineIcon class="w-6 h-6" />
                             <span class="ml-3">Mostrar tabla</span>
                         </Link>
                     </div>
-
+                    <div v-if="form.Arraylideres" class="text-center flex mx-auto">
+                        <span class="ml-3">Ningún líder ha enviado el formulario aún</span>
+                    </div>
                 </div>
             </div>
         </section>

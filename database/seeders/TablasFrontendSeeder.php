@@ -10,7 +10,11 @@ class TablasFrontendSeeder extends Seeder
 {
     /**
      * php artisan migrate --path=/database/migrations/nombre_de_la_migracion.php
-     * php artisan db=>seed --class=administrativosUserSeeder
+     * 
+     * 
+     * NOTE: 21 de agosto 2024, se procede a subir la informacion a la base de datos de colmayor
+     php artisan db:seed --class=TablasFrontendSeeder
+
     */
     public function run(){
         //planmejoramientonecesidad

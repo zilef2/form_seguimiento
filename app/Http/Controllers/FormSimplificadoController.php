@@ -7,6 +7,7 @@ use App\helpers\MyModels;
 use App\Models\EstadoFormulario;
 use App\Models\Formulario;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -18,7 +19,10 @@ class FormSimplificadoController extends FormularioController
     public function PreFormSimplificado()
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' IndexFormSimplificado '));
-        $ArrayIdentificaciones = Formulario::Where('enviado', 0)->pluck('identificacion_user'); //cambiar a enviado 1
+        $esteanio = Carbon::today()->year;
+        $ArrayIdentificaciones = Formulario::Where('enviado', 1)
+            ->WhereYear('created_at',$esteanio)
+            ->pluck('identificacion_user'); //cambiar a enviado 1
 
         $Arraylideres = User::WhereIn('identificacion', $ArrayIdentificaciones)
             ->WhereNot('name','Superadmin')
@@ -29,7 +33,6 @@ class FormSimplificadoController extends FormularioController
                     'label' => $user->name
                 ];
             });
-
         /*
             estado' => 1, 'nombre' => 'Sin revisar']);
             estado' => 2, 'nombre' => 'Aprobado']);
