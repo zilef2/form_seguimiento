@@ -4,14 +4,16 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+//use PHPUnit\Framework\TestCase;
 use Tests\TestCase;
+
 
 class TestEjemploCrearUser extends TestCase
 {
     /**
      * A basic feature test example.
      */
-    public function test_example(): void
+    public function test_example()
     {
         $response = $this->get('/');
 

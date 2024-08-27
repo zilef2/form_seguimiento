@@ -32,7 +32,7 @@ const submit = () => {
 
         <Head :title="lang().label.login" />
         <template #illustration>
-            <login class="w-full h-full"></login>
+            <login class="w-full h-auto"></login>
         </template>
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
             {{ status }}
