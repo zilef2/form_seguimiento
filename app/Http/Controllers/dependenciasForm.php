@@ -8,7 +8,6 @@ use App\Models\actividades;
 use App\Models\Formulario;
 use App\Models\SMultiple;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class dependenciasForm extends Controller
 {
@@ -101,10 +100,15 @@ class dependenciasForm extends Controller
 
     public function seleccionMultiple($request,$atributo,$elform)
     {
+    //     dd($elform,
+    //     $elform->id
+    // );
         foreach ($request->{$atributo} as $index => $item) {
+            // dd($item);
             SMultiple::create([
                 'tipo' => 'procesos_involucrados',
-                'value' => $item['value'],
+                // 'value' => $item['value'],
+                'value' => $item,
                 'formulario_id' => $elform->id,
             ]);
         }

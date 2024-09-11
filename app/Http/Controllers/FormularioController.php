@@ -4,21 +4,15 @@ namespace App\Http\Controllers;
 
 use App\helpers\MyModels;
 use App\Http\Requests\FormularioStoreRequest;
-use App\Models\EstadoFormulario;
 use App\Models\Formulario;
 use App\Models\User;
-use Google\Service\Forms\Form;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Http\Request;
 use App\helpers\Myhelp;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Illuminate\Foundation\Application;
-use PhpOffice\PhpSpreadsheet\Writer\Ods\Formula;
 
 class FormularioController extends Controller
 {
@@ -199,7 +193,12 @@ class FormularioController extends Controller
         $dependenciasForm = new dependenciasForm();
 
         return Inertia::render($this->FromController . '/CreateWindow', [
-            'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . '.index')]],
+            'breadcrumbs' => [
+                [
+                    'label' => __('app.label.' . $this->FromController),
+                    'href' => route($this->FromController . 'SA')
+                ]
+            ],
             'title' => __('app.label.' . $this->FromController),
             'numberPermissions' => $numberPermissions,
             'losSelect' => $dependenciasForm->Dependencias(),
@@ -294,7 +293,12 @@ class FormularioController extends Controller
         return Inertia::render($this->FromController . '/IndexSA', [
             'fromController' => $fromController,
             'total' => $formularios->count(),
-            'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . 'SA')]],
+            'breadcrumbs' => [
+                [
+                    'label' => __('app.label.' . $this->FromController),
+                    'href' => route($this->FromController . 'SA')
+                ]
+            ],
             'title' => __('app.label.' . $this->FromController),
             'filters' => $request->all(['search', 'field', 'order','soloEnviados','searcLider','liderchu']),
             'perPage' => (int)$perPage,
@@ -376,7 +380,7 @@ class FormularioController extends Controller
         }
         return false;
     }
-    public function store(Request $request){ //
+    public function store(Request $request){
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formularios');
             $user = User::Where('identificacion', $request->identificacion_user)->first();
@@ -386,6 +390,7 @@ class FormularioController extends Controller
             $numeroTotal = count($request['necesidad']);
             $formulario = Formulario::Where('user_id', $user->id)->get();
             $actualizados = 0;
+
             if ($formulario) {
                 foreach ($request['necesidad'] as $index => $item) {
                     $justify = $request['justificacion'][$index];

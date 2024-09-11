@@ -45,22 +45,14 @@ onMounted(() => {
 
 })
 
-// export function handlePaste(event) {
-//     event.preventDefault();
-//     let pasteContent = (event.clipboardData || window.clipboardData).getData('text');
-//     pasteContent = pasteContent.replace(/\D/g, '');
-//     this.form.cantidad = pasteContent;
-// }
-
 watchEffect(() => {
     handleCantidad(form)
     form.valor_total_solicitatdo_por_necesidad = calcularTotal(form.valor_unitario,form.cantidad,data)
 })
 
 
-const validaciones = () =>{
+const validaciones = () =>{}
 
-}
 const create = () => {
     //todo: validar que el total sea numero
     form.valor_unitario = parseInt(form.valor_unitario.toString().replace(/\$|\./g, ''))
@@ -78,7 +70,6 @@ const create = () => {
         onFinish: () => null,
     })
 }
-
 
 </script>
 

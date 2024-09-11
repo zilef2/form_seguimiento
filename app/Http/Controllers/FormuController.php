@@ -7,10 +7,8 @@ use App\helpers\MyModels;
 use App\Http\Requests\FormularioOneStoreRequest;
 use App\Models\Formulario;
 use App\Models\SMultiple;
-use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -24,8 +22,7 @@ class FormuController extends Controller
         return Redirect::route('formularioSA');
     }
 
-    public function store(FormularioOneStoreRequest $request)
-    {
+    public function store(FormularioOneStoreRequest $request){
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formul');
             $authu = Myhelp::AuthU();
@@ -67,14 +64,12 @@ class FormuController extends Controller
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
             Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
             return back()->with('error', $mensajeErrorCompleto);
-//            dd($mensajeErrorCompleto);
 
         } catch (\Throwable $th) {
             DB::rollback();
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine() . ' | Ubi: ' . $th->getFile();
             Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
             return back()->with('error', $mensajeErrorCompleto);
-//            dd($mensajeErrorCompleto);
         }
     }
     
@@ -84,12 +79,14 @@ class FormuController extends Controller
     {
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' --formularios GetStore2-- '));
         $dependenciasForm = new dependenciasForm();
-//dd(
-//    $dependenciasForm->dependencias2Multiples()
-//);
+
         return Inertia::render($this->FromController . '/CreateWindow2', [
             'formularioGuardado' => Formulario::Find($fid),
-            'breadcrumbs' => [['label' => __('app.label.' . $this->FromController), 'href' => route($this->FromController . '.create')]],
+            'breadcrumbs' => [
+                [
+                    'label' => __('app.label.' . $this->FromController),
+                    'href' => route($this->FromController . '.create')]
+                ],
             'title' => __('app.label.' . $this->FromController),
             'numberPermissions' => $numberPermissions,
             'losSelect' => $dependenciasForm->dependencias2Multiples(),

@@ -65,17 +65,20 @@ export function DisminuirForm(form,nuev){
 
 //<editor-fold desc="usages: createWindows2.vue">
 const LabelNinguno = (elem):boolean =>{
-    console.log("=>(CreateWindow2.vue:41) elem", elem);
     return elem.label === 'Ninguno';
 }
 export function borrarprocesos_involucrados(form):void {
-  if(form.procesos_involucrados.some(LabelNinguno)){
-    form.procesos_involucrados = [ { "label": "Ninguno", "value": 9 } ]
+  if(form.procesos_involucrados){
+    if(form.procesos_involucrados.some(LabelNinguno)){
+      form.procesos_involucrados = [ { "label": "Ninguno", "value": 9 } ]
+    }
   }
 }
 export function borrarplan_de_mejoramiento_al_que_apunta_la_necesidad(form):void {
-  if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad.some(LabelNinguno)){
-    form.plan_de_mejoramiento_al_que_apunta_la_necesidad = [ { "label": "Ninguno", "value": 0 } ]
+  if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad){
+    if(form.plan_de_mejoramiento_al_que_apunta_la_necesidad.some(LabelNinguno)){
+      form.plan_de_mejoramiento_al_que_apunta_la_necesidad = [ { "label": "Ninguno", "value": 0 } ]
+    }
   }
 }
 //</editor-fold>
