@@ -43,25 +43,25 @@ onMounted(() => {
     // form.proceso_que_solicita_presupuesto = 'Biblioteca';
     // form.necesidad = 'Prueba necesidad ' + (valueRAn);
 
-    form.procesos_involucrados = { label: "Bienestar", value: "Bienestar" };
-    form.plan_de_mejoramiento_al_que_apunta_la_necesidad = {
+    form.procesos_involucrados = [{ label: "Bienestar", value: "Bienestar" }];
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad = [{
       label: "PMM Institucional",
       value: "PMM Institucional",
-    };
-    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad = {
+    }];
+    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad = [{
       label: "1. Academia Transformadora de Vidas",
       value: "1. Academia Transformadora de Vidas",
-    };
+    }];
     form.frecuencia_de_uso = {
       label: "Días estipulados en el contrato",
       value: "Días estipulados en el contrato",
     };
     form.mantenimientos_requeridos = { label: "Diario", value: "Diario" };
     form.capacidad_instalada = { label: "No", value: "No" };
-    form.riesgo_de_la_inversion = {
+    form.riesgo_de_la_inversion = [{
       label: "Riesgos de Corrupción",
       value: "Riesgos de Corrupción",
-    };
+    }];
   }
 });
 console.log(
@@ -265,11 +265,7 @@ const create = (event) => {
               <ul>
                 <li v-for="(errorMessages, field) in form.errors" :key="field">
                   <strong>{{ field.replace(/_/g, " ") }}:</strong>
-                  <ul>
-                    {{
-                      errorMessages
-                    }}
-                  </ul>
+                  <ul>{{ errorMessages }}</ul>
                 </li>
               </ul>
             </div>

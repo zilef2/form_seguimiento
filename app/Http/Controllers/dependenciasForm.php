@@ -103,14 +103,24 @@ class dependenciasForm extends Controller
     //     dd($elform,
     //     $elform->id
     // );
-        foreach ($request->{$atributo} as $index => $item) {
-            // dd($item);
-            SMultiple::create([
-                'tipo' => 'procesos_involucrados',
-                // 'value' => $item['value'],
-                'value' => $item,
-                'formulario_id' => $elform->id,
-            ]);
+        try {
+            foreach ($request->{$atributo} as $index => $item) {
+//        if(is_array($item) && !isset($item['value']))dd($item);
+                SMultiple::create([
+                    'tipo' => 'procesos_involucrados',
+                    'value' => $item['value'],
+//                'value' => $item,
+                    'formulario_id' => $elform->id,
+                ]);
+            }
+        } catch (\Throwable $e) {
+             dd($item);
+            $mensajeErrorCompleto = "function seleccionMultiple: " . $e->getMessage() . "\n" .
+                "SQL: " . $e->sql . "\n" .
+                "Bindings: " . json_encode($e->bindings) . "\n" .
+                "Ubicación: " . $e->getFile() . ":" . $e->getLine();
+            Myhelp::EscribirEnLog($this, ' ERROR_FORMU_FINAL: ' . $mensajeErrorCompleto);
+            return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         }
     }
 }

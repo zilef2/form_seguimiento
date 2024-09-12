@@ -213,7 +213,12 @@ onBeforeUnmount(() => {
                                         <p class="text-center mx-auto">Ok</p>
                                     </div>
                                 </td>
-                                <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ props.estadosFormulario.find(ele => ele.id === claseFromController.estado).nombre }} </span></td>
+                                <td class=" text-center py-4 px-2 sm:py-3 w-64">
+                                    <span class="max-w-[220px] min-w-[40px]">
+                                        {{ props.estadosFormulario.find(ele => ele.id === claseFromController.estado)?.nombre }}
+                                        -- {{ claseFromController.estado }}
+                                    </span>
+                                </td>
                                 <td class=" text-center py-4 px-2 sm:py-3 w-64"><span class="max-w-[220px] min-w-[40px]"> {{ claseFromController.Nombre }} </span></td>
                                 <td class=" text-center py-4 px-2 sm:py-3"><span class="max-w-[320px] min-w-[140px]"> {{ claseFromController.necesidad }} </span></td>
                                 <td class=" text-center py-4 px-2 sm:py-3"><span class="max-w-[320px] min-w-[140px]"> {{ claseFromController.actividad }} </span></td>

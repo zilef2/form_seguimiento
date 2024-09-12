@@ -28,22 +28,34 @@ onMounted(() => {
     form.valor_asignado_en_la_vigencia_anterior = 0
     // if(props.numberPermissions > 9000) {
          const valueRAn = Math.floor(Math.random() * (900) + 1)
+        form.Nombre = 'Alejo';
         form.proceso_que_solicita_presupuesto = 'Biblioteca';
         form.necesidad = 'Prueba necesidad '+ (valueRAn);
         form.justificacion = 'Prueba justificacion '+ (valueRAn);
         form.actividad = 'Prueba actividad '+ (valueRAn);
-        form.categoria = {name:'ARL'}
-        form.unidad_de_medida = {value:'Días'}
+        form.categoria = {
+          name: "Edictos",
+          value: "Edictos",
+        };
+        form.unidad_de_medida = {
+          label: "Días",
+          value: "Días",
+        };
         form.cantidad = '2'
-        form.valor_unitario = '3'
+        form.valor_unitario = '31'
         // form.valor_total_solicitatdo_por_necesidad = 0
-        form.periodo_de_inicio_de_ejecucion = {value:'Entre enero y abril'}
-        form.vigencias_anteriores = {value:'No'}
+        form.periodo_de_inicio_de_ejecucion = {
+          label: "Entre enero y abril",
+          value: "Entre enero y abril",
+        };
+        form.vigencias_anteriores = form.periodo_de_inicio_de_ejecucion = {
+          label: "No",
+          value: "No",
+        };
         // form.valor_asignado_en_la_vigencia_anterior = 0
     // }
-
-
 })
+
 
 watchEffect(() => {
     handleCantidad(form)

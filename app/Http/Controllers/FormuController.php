@@ -116,11 +116,11 @@ class FormuController extends Controller
             $dependenciasForm->seleccionMultiple($request,'plan_de_mejoramiento_al_que_apunta_la_necesidad',$elform);
             $dependenciasForm->seleccionMultiple($request,'linea_del_plan_desarrollo_al_que_apunta_la_necesidad',$elform);
             $dependenciasForm->seleccionMultiple($request,'riesgo_de_la_inversion',$elform);
-
             $elform->update([
-               'frecuencia_de_uso' => $request->frecuencia_de_uso['value'],
-               'mantenimientos_requeridos' => $request->mantenimientos_requeridos['value'],
-               'capacidad_instalada' => $request->capacidad_instalada,
+                'frecuencia_de_uso' => $request->frecuencia_de_uso['value'],
+                'mantenimientos_requeridos' => $request->mantenimientos_requeridos['value'],
+                'capacidad_instalada' => $request->capacidad_instalada,
+                'enviado' => 1,
             ]);
 
             DB::commit();

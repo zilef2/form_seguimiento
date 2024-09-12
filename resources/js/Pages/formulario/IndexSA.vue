@@ -181,28 +181,28 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
 
         <div class="space-y-1">
             <div class="px-4 sm:px-0"><div class=" rounded-lg overflow-hidden w-fit"></div></div>
-            <div class=" bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+            <div class=" bg-white dark:bg-gray-800 shadow rounded-lg">
                 <div
                      v-sticky="{ zIndex: 100 }"
-                     class="flex justify-items-start p-2 gap-6 dark:bg-gray-900/50 text-left top-0 bg-white"
+                     class="flex justify-items-start p-4 gap-6 dark:bg-gray-900/50 text-left top-0 bg-white rounded-lg border-gray-100 border-2"
                      :class="data.claseSticky">
                     <div class="flex">
-                        <SelectInput v-model="data.params.perPage" :dataSet="data.dataSet" />
+<!--                        <SelectInput v-model="data.params.perPage" :dataSet="data.dataSet" />-->
                         <!-- <DangerButton @click="data.deleteBulkOpen = true"
                             v-show="data.selectedId.length != 0 && can(['delete formulario'])" class="px-3 py-1.5"
                             v-tooltip="lang().tooltip.delete_selected">
                             <TrashIcon class="w-5 h-5" />
                         </DangerButton> -->
                     </div>
-                    <TextInput v-if="props.numberPermissions >= 0" v-model="data.params.search" type="text"
+                    <TextInput v-model="data.params.search" type="text"
                         placeholder="Necesidad o justificacion"
                         class="block w-1/6 md:w-1/5 rounded-lg" />
 <!--                    <SelectInput v-model="data.frontp.category" :dataSet="props.losSelect.ListarCategoria"-->
 <!--                        class="block w-1/6 md:w-1/5 rounded-lg" />-->
-                    <SelectInput v-model="data.params.liderchu" :dataSet="props.losSelect.todasLideres"
+                    <SelectInput v-show="can(['read user'])" v-model="data.params.liderchu" :dataSet="props.losSelect.todasLideres"
                         class="block w-1/6 md:w-1/5 rounded-lg" />
 
-                    <TextInput v-if="props.numberPermissions >= 0" v-model="data.params.searcLider" type="number"
+                    <TextInput v-show="can(['read user'])" v-model="data.params.searcLider" type="number"
                         placeholder="Cedula"
                         class="block w-1/6 md:w-1/5 rounded-lg" />
                     <div class="grid grid-rows-3 my-auto mx-1 h-12 z-20">
@@ -228,9 +228,9 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                         </caption>
                         <thead class="sticky top-0 z-10 bg-white uppercase text-sm border-t border-gray-200 dark:border-gray-700">
                             <tr class="dark:bg-gray-900/50">
-                                <!--                                <th class="px-2 py-4 text-center">-->
-<!--                                    <Checkbox v-model:checked="data.multipleSelect" @change="selectAll" />-->
-<!--                                </th>-->
+                                                                <th class="px-2 py-4 text-center">
+                                    <Checkbox v-model:checked="data.multipleSelect" @change="selectAll" />
+                                </th>
 <!--                                <th v-if="numberPermissions > 1" class="px-2 py-4">Accion</th>-->
 
 <!--                                <th class="px-2 py-4 text-center">#</th>-->
@@ -247,6 +247,9 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                         <tbody>
                             <tr v-for="(claseFromController, indexu) in props.fromController.data" :key="indexu"
                                 class="border-t border-gray-200 dark:border-gray-700 hover:bg-sky-100 hover:dark:bg-gray-900/20 even:bg-gray-300">
+                                <th class="px-2 py-4 text-center">
+                                    <Checkbox v-model:checked="data.multipleSelect" @change="selectAll" />
+                                </th>
                                 <td v-for="titulo in titulos" class=" text-center py-4 px-2 sm:py-3 w-64">
                                     <span v-if="titulo['type'] === 'alterNumber'" class="max-w-[120px]"> {{ parseInt(claseFromController[titulo['order']])+1 }} </span>
                                     <p v-if="titulo['type'] === 'text'" class="mx-auto text-center text-sm min-w-[200px]"> {{ PrimerasPalabras(claseFromController[titulo['order']], 18) }} </p>
@@ -276,6 +279,8 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                 <!--                    v-if="props.total"-->
                 <div class="flex justify-between items-center p-2 border-t border-gray-200 dark:border-gray-700">
                     <Pagination :links="props.fromController" :filters="data.params" />
+                        <SelectInput v-model="data.params.perPage" :dataSet="data.dataSet" class="max-h-12" />
+                    
                 </div>
             </div>
         </div>
