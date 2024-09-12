@@ -12,9 +12,9 @@ import vSelect from "vue-select"; import "vue-select/dist/vue-select.css";
 import VueDatePicker from '@vuepic/vue-datepicker';
 
 const props = defineProps({
+    individual: Object, //formulario
     show: Boolean,
     title: String,
-    formularioa: Object,
     titulos: Object, //parametros de la clase principal
     losSelect:Object,
 

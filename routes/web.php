@@ -58,7 +58,8 @@ Route::middleware('auth')->group(function () { //  , 'verified'
     Route::get('/PreFormSimplificado', [FormSimplificadoController::class, 'PreFormSimplificado'])->name('PreFormSimplificado');
     Route::get('/IndexFormSimplificado/{idLider}', [FormSimplificadoController::class, 'IndexFormSimplificado'])->name('IndexFormSimplificado');
     Route::get('/CategoriasSimilares', [IdeasController::class, 'index'])->name('CategoriasSimilares');
-    Route::resource('/formulario', FormularioController::class);
+    Route::resource('/formulario', FormularioController::class)->except('edit');
+    Route::get('/formularioEdit/{id}', [FormularioController::class,'edit'])->name('formularioEdit');
     Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
     Route::get('/get-string', [FormularioController::class, 'getString'])->name('seguridad');
 
@@ -70,7 +71,6 @@ Route::middleware('auth')->group(function () { //  , 'verified'
 });
 
 // ultimo comit 25sept
-
 require __DIR__ . '/auth.php';
 
 // <editor-fold desc="Artisan">

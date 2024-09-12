@@ -59,7 +59,7 @@ class FormuController extends Controller
             return redirect()->route('Store2', ['fid' => $formulario->id])->with('success','Se ha guardado la 1ra Parte');
         } catch (QueryException $e) {
             $mensajeErrorCompleto = "Error SQL: " . $e->getMessage() . "\n" .
-                "SQL: " . $e->sql . "\n" .
+                "SQL: " . $e->getSql() . "\n" .
                 "Bindings: " . json_encode($e->bindings) . "\n" .
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
             Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
@@ -72,7 +72,7 @@ class FormuController extends Controller
             return back()->with('error', $mensajeErrorCompleto);
         }
     }
-    
+
 
     //get
     public function GetStore2($fid)
@@ -127,7 +127,7 @@ class FormuController extends Controller
             return redirect()->route('formulario.create')->with(['success' => 'Éxito. Desea agregar mas necesidades?']);
         } catch (QueryException $e) {
             $mensajeErrorCompleto = "Error SQL: " . $e->getMessage() . "\n" .
-                "SQL: " . $e->sql . "\n" .
+                "SQL: " . $e->getSql() . "\n" .
                 "Bindings: " . json_encode($e->bindings) . "\n" .
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
             Myhelp::EscribirEnLog($this, ' ERROR_FORMU_FINAL: ' . $mensajeErrorCompleto);

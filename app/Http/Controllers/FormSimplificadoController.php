@@ -179,7 +179,7 @@ class FormSimplificadoController extends FormularioController
             return redirect()->route('IndexFormSimplificado', ['idLider' => $request->liderId])->with('success','Sugerencia éxitosa');
         } catch (QueryException $e) {
             $mensajeErrorCompleto = "Error SQL: " . $e->getMessage() . "\n" .
-                "SQL: " . $e->sql . "\n" .
+                "SQL: " . $e->getSql() . "\n" .
                 "Bindings: " . json_encode($e->bindings) . "\n" .
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
             Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));

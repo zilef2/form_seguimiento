@@ -30,7 +30,6 @@ user_id: 0,
 enviado:0,
 valor_total_de_la_solicitud_actual:0,
 
-
 });
 
 

@@ -309,7 +309,6 @@ class FormularioController extends Controller
     }
 
 
-
     public function EnviarFormulario(Request $request) // FormularioStoreRequest
     {
         Myhelp::EscribirEnLog($this, ' Beginning EnviarFormulario(Enviar):formularios');
@@ -538,11 +537,30 @@ class FormularioController extends Controller
 
     //fin store functions
 
-    public function show($id){}public function edit($id){}
+    public function show($id){}
+
+    public function edit($id){
+        $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' --formularios edit-- '));
+        $dependenciasForm = new dependenciasForm();
+        $elform = Formulario::find($id);
+
+        return Inertia::render($this->FromController . '/EditWindow', [
+            'elform' => $elform,
+            'breadcrumbs' => [
+                [
+                    'label' => __('app.label.' . $this->FromController),
+                    'href' => route($this->FromController . 'SA')
+                ]
+            ],
+            'title' => __('app.label.' . $this->FromController),
+            'numberPermissions' => $numberPermissions,
+            'losSelect' => $dependenciasForm->Dependencias(),
+        ]);
+    }
 
     public function update(Request $request, $id)
     {
-        $permissions = Myhelp::EscribirEnLog($this, ' Begin UPDATE:formularios');
+        Myhelp::EscribirEnLog($this, 'Begin UPDATE:formularios');
         DB::beginTransaction();
         $formulario = Formulario::findOrFail($id);
         $request->merge(['no_nada_id' => $request->no_nada['id']]);

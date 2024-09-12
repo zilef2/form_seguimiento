@@ -116,7 +116,7 @@ class dependenciasForm extends Controller
         } catch (\Throwable $e) {
              dd($item);
             $mensajeErrorCompleto = "function seleccionMultiple: " . $e->getMessage() . "\n" .
-                "SQL: " . $e->sql . "\n" .
+                "SQL: " . $e->getSql() . "\n" .
                 "Bindings: " . json_encode($e->bindings) . "\n" .
                 "Ubicación: " . $e->getFile() . ":" . $e->getLine();
             Myhelp::EscribirEnLog($this, ' ERROR_FORMU_FINAL: ' . $mensajeErrorCompleto);
