@@ -11,24 +11,32 @@
             v-model="thevalor"
         />
     </div>
-    
 </template>
+
 <script setup>
-import {defineProps, defineEmits, ref, watch, onMounted} from 'vue';
-import InputError from "@/Components/InputError.vue";
+import { defineProps, defineEmits, ref, watch } from 'vue';
 
 const emit = defineEmits(['update:valor']);
 
 const props = defineProps({
-    placeholder:String,
+    placeholder: String,
     valor: {
         type: String,
         default: '',
-        required: true
+        required: true,
     },
-    nombre:String,
-})
+    nombre: String,
+});
+
+// Hacer que thevalor sea reactivo y refleje cambios desde props.valor
 let thevalor = ref(props.valor);
+
+// Ver si cambia el valor en props.valor y actualizar thevalor
+watch(() => props.valor, (newVal) => {
+    thevalor.value = newVal;
+});
+
+// Emitir el valor actualizado cuando thevalor cambie
 watch(thevalor, (newVal) => {
     emit('update:valor', newVal);
 });

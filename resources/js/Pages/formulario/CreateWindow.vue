@@ -6,7 +6,8 @@ import TextAreaZilef from "@/Pages/formulario/TextAreaZilef.vue";
 import {form} from "@/Pages/formunique";
 import SelectInput from "@/Components/SelectInput.vue";
 import InputError from "@/Components/InputError.vue";
-import vselect from "vue-select";import "vue-select/dist/vue-select.css";
+import vselect from "vue-select";
+import "vue-select/dist/vue-select.css";
 import TextInput from "@/Components/TextInput.vue";
 import {handledinero, handleCantidad, calcularTotal, handledinerVigAnt} from "@/Pages/CreateFormFunctions";
 import {reactive, ref, watch,onMounted, watchEffect} from "vue";
@@ -48,7 +49,7 @@ onMounted(() => {
           label: "Entre enero y abril",
           value: "Entre enero y abril",
         };
-        form.vigencias_anteriores = form.periodo_de_inicio_de_ejecucion = {
+        form.vigencias_anteriores = {
           label: "No",
           value: "No",
         };
@@ -75,8 +76,8 @@ const create = () => {
     form.post(route('formu.store'), {
         preserveScroll: false,
         forceFormData: false,
-        onSuccess: () => null,
-        // onSuccess: () => form.reset(),
+        // onSuccess: () => null,
+        onSuccess: () => form.reset(),
         onError: () => null,
         // onError: () => alert('¡Hay campos faltantes!'),
         onFinish: () => null,
@@ -106,8 +107,8 @@ const create = () => {
                                 La necesidad tiene un nombre o un pseudonimo?
                             </label>
                             <TextInput v-model="form.Nombre" type="text"
-                        class="block w-full rounded-lg" placeholder="Nombre" />
-                            <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>
+                                class="block w-full rounded-lg" placeholder="Nombre" />
+                            <InputError class="mt-2" :message="form.errors.Nombre"/>
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

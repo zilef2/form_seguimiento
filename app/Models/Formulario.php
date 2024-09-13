@@ -54,8 +54,11 @@ class Formulario extends Model
     public function user(){return $this->belongsTo(User::class);}
     public function userName(){return $this->user->name;}
     public function proceso_que_solicita_presupuesto(){
-        if($this->proceso_que_solicita_presupuesto)
-            return MyConst::proceso_que_solicita_presupuesto()[intval($this->proceso_que_solicita_presupuesto)];
+        if($this->proceso_que_solicita_presupuesto){
+            $PSP = intval($this->proceso_que_solicita_presupuesto);
+            if(isset(MyConst::proceso_que_solicita_presupuesto()[$PSP]))
+                return MyConst::proceso_que_solicita_presupuesto()[$PSP];
+        }
         return '';
     }
 

@@ -120,15 +120,11 @@ const titulos = [
     // { order: 'numero_necesidad', label: '#', type: 'alterNumber' },
     {order: 'identificacion_user', label: 'cc', type: 'minitext'},
     {order: 'userName', label: 'Lider', type: 'text'},
+    {order: 'Nombre', label: 'Nombre', type: 'minitext'},
     {order: 'necesidad', label: 'necesidad', type: 'text'},
-    {order: 'justificacion', label: 'justificacion', type: 'text'},
-    {
-        order: 'proceso_que_solicita_presupuesto',
-        label: 'Proceso que solicita presupuesto',
-        type: 'selectsMultiple',
-        newName: 'proceso_que_solicita_presupuest'
-    },
-    {order: 'actividad', label: 'Actividad', type: 'text'},
+    {order: 'justificacion', label: 'justificacion', type: 'bigtext'},
+    {order: 'proceso_que_solicita_presupuesto', label: 'Proceso que solicita presupuesto', type: 'selectsMultiple', newName: 'proceso_que_solicita_presupuest'},
+    {order: 'actividad', label: 'Actividad', type: 'bigtext'},
     // { order: 'categoria', label: 'Categoria', type: 'text' },
     {order: 'categoria', label: 'Categoria', type: 'selectsMultiple', newName: 'Categori'},
     {order: 'cantidad', label: 'Cantidad', type: 'number'},
@@ -254,7 +250,7 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                             <th class="px-2 py-4 text-center">
                                 <Checkbox v-model:checked="data.multipleSelect" @change="selectAll"/>
                             </th>
-                            <th v-if="numberPermissions > 1" class="px-2 py-4">Accion</th>
+                            <th class="px-2 py-4">Accion</th>
                             <!--                                <th class="px-2 py-4 text-center">#</th>-->
                             <th v-for="titulo in titulos" class="px-2 py-4 cursor-pointer text-center w-64"
                                 v-on:click="order(titulo['order'])">
@@ -281,8 +277,8 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                                     <div class="rounded-md overflow-hidden">
                                         <Link :href="route('formularioEdit',claseFromController.id)" class="items-center py-2 px-1 underline text-sky-600">
                                             <InfoButton  type="button"
-                                                class="px-2 py-1.5 rounded-none" v-tooltip="lang().tooltip.edit">
-                                                <PencilIcon class="w-4 h-4" /> asd {{claseFromController.id}}
+                                                class="px-2 py-1.5 rounded-lg" v-tooltip="lang().tooltip.edit">
+                                                <PencilIcon class="w-4 h-4" />
                                             </InfoButton>
                                         </Link>
 
@@ -306,6 +302,10 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                                 <p v-if="titulo['type'] === 'minitext'"
                                    class="mx-auto text-center text-sm max-w-[120px]">
                                     {{ PrimerasPalabras(claseFromController[titulo['order']], 10) }}
+                                </p>
+                                <p v-if="titulo['type'] === 'bigtext'"
+                                   class="mx-auto text-center text-sm max-w-[300px]">
+                                    {{ PrimerasPalabras(claseFromController[titulo['order']], 26) }}
                                 </p>
                                 <span v-if="titulo['type'] === 'number'"> {{ number_format(claseFromController[titulo['order']], 0, false) }} </span>
                                 <span v-if="titulo['type'] === 'dinero'"> {{ number_format(claseFromController[titulo['order']], 0, true) }} </span>

@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/vue3';
 
 export const form = useForm({
+Nombre: '',
 identificacion_user: '',
 proceso_que_solicita_presupuesto: '',
 necesidad: '',

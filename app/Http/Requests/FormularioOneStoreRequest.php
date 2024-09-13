@@ -32,7 +32,7 @@ class FormularioOneStoreRequest extends FormRequest
 //            'valor_total_de_la_solicitud_actual' => 'required',
 //            'valor_total_asignado_en_vigencia_anterior' => 'nullable',
 
-//            todo 'nombre' => 'required',
+            'Nombre' => 'required',
             'necesidad' => 'required',
             'justificacion' => 'required',
             'actividad' => 'required',

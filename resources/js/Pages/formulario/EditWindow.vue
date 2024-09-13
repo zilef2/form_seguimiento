@@ -8,8 +8,8 @@ import InputError from "@/Components/InputError.vue";
 import vselect from "vue-select";
 import "vue-select/dist/vue-select.css";
 import TextInput from "@/Components/TextInput.vue";
-import {handledinero, handleCantidad, calcularTotal, handledinerVigAnt} from "@/Pages/CreateFormFunctions";
-import {reactive, ref, watch,onMounted, watchEffect} from "vue";
+import {RestoreFormOnEdit, handledinero, handleCantidad, calcularTotal, handledinerVigAnt} from "@/Pages/CreateFormFunctions";
+import {reactive, ref, watch, onMounted, watchEffect} from "vue";
 import SimpleToast from "@/Components/SimpleToast.vue";
 
 
@@ -52,54 +52,33 @@ const form = useForm({
     anexos: '',
 
     user_id: 0,
-    enviado:0,
-    valor_total_de_la_solicitud_actual:0,
+    enviado: 0,
+    valor_total_de_la_solicitud_actual: 0,
 
 });
 
 onMounted(() => {
     form.reset()
 
-    form.valor_asignado_en_la_vigencia_anterior = 0
-    // if(props.numberPermissions > 9000) {
-         const valueRAn = Math.floor(Math.random() * (900) + 1)
-        form.Nombre = props.elform.Nombre;
-        form.proceso_que_solicita_presupuesto = props.elform.proceso_que_solicita_presupuesto
-        form.necesidad = props.elform.necesidad
-        console.log("=>(EditWindow.vue:69) form.necesidad", form.necesidad);
-        form.justificacion = 'Prueba justificacion '+ (valueRAn);
-        // form.actividad = 'Prueba actividad '+ (valueRAn);
-        // form.categoria = {
-        //   name: "Edictos",
-        //   value: "Edictos",
-        // };
-        // form.unidad_de_medida = {
-        //   label: "Días",
-        //   value: "Días",
-        // };
-        // form.cantidad = '2'
-        // form.valor_unitario = '31'
-        // // form.valor_total_solicitatdo_por_necesidad = 0
-        // form.periodo_de_inicio_de_ejecucion = {
-        //   label: "Entre enero y abril",
-        //   value: "Entre enero y abril",
-        // };
-        // form.vigencias_anteriores = form.periodo_de_inicio_de_ejecucion = {
-        //   label: "No",
-        //   value: "No",
-        // };
-        // form.valor_asignado_en_la_vigencia_anterior = 0
-    // }
+    if(props.numberPermissions > 9000) {}
+    
+    RestoreFormOnEdit(form,props)
+    
 })
 
+// watch(() => form.cantidad, (newVal) => {
+//     form.cantidad = handleCantidad(newVal)
+// });
 
 watchEffect(() => {
-    handleCantidad(form)
-    form.valor_total_solicitatdo_por_necesidad = calcularTotal(form.valor_unitario,form.cantidad,data)
+    console.log("=>(EditWindow.vue:88) form.vigencias_anteriores.value", form.vigencias_anteriores);
+    if (form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
+    
+    form.valor_total_solicitatdo_por_necesidad = calcularTotal(form.valor_unitario, form.cantidad, data)
 })
 
 
-const validaciones = () =>{}
+const validaciones = () => {}
 
 const update = () => {
     //todo: validar que el total sea numero
@@ -107,7 +86,7 @@ const update = () => {
     form.valor_asignado_en_la_vigencia_anterior = parseInt(form.valor_asignado_en_la_vigencia_anterior.toString().replace(/\$|\./g, ''))
     console.log("=>(updateWindow.vue:51) form.valor_unitario", form.valor_unitario);
 
-    if(form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
+    if (form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
     form.post(route('formu.store'), {
         preserveScroll: false,
         forceFormData: false,
@@ -118,20 +97,20 @@ const update = () => {
         onFinish: () => null,
     })
 }
-
 </script>
 
 <template>
     <Head title="Dashboard"/>
     <AuthenticatedLayout>
-    <SimpleToast :flash="$page.props.flash" />
+        <SimpleToast :flash="$page.props.flash"/>
         <Breadcrumb :title="title" :breadcrumbs="breadcrumbs"/>
-        <div class="bg-gray-100 dark:bg-gray-900 py-2 md:py-16 lg:py-2">
+<!--        py-2 md:py-16 lg:py-2-->
+        <div class="bg-gray-100 dark:bg-gray-900 -mt-80">
             <div class="flex-wrap mx-auto px-1 sm:px-6 lg:px-8 gap-8">
                 <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 md:p-10 lg:p-12">
                     <h1 class="text-2xl font-bold text-[#499884] dark:text-gray-100 mb-6">Necesidades económicas anuales por dependencia</h1>
                     <p class="text-gray-600 dark:text-gray-400 mb-8">
-                      El siguiente formulario tiene
+                        El siguiente formulario tiene
                     </p>
                     <form @submit.prevent="update" method="POST" class="space-y-6 grid grid-cols-2 gap-4">
                         <div class="col-span-2">
@@ -142,7 +121,7 @@ const update = () => {
                                 La necesidad tiene un nombre o un pseudonimo?
                             </label>
                             <TextInput v-model="form.Nombre" type="text"
-                        class="block w-full rounded-lg" placeholder="Nombre" />
+                                       class="block w-full rounded-lg" placeholder="Nombre"/>
                             <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>
                         </div>
                         <div class="col-span-2">
@@ -216,7 +195,7 @@ const update = () => {
                             <label class="text-md text-gray-900 font-bold capitalize">valor total</label>
                             <p class="text-md text-gray-700">Valor generado automáticamente</p>
                             <div class="w-full inline-flex">
-<!--                                    @blur="metodoConThrottle"-->
+                                <!--                                    @blur="metodoConThrottle"-->
                                 <input
                                     disabled @keydown.enter.prevent="update"
                                     v-model="data.valor_total_solicitatdo_por_necesidad"
@@ -241,7 +220,7 @@ const update = () => {
                             <InputError class="mt-2" :message="form.errors.vigencias_anteriores"/>
                         </div>
 
-                         <div v-show="form.vigencias_anteriores && form.vigencias_anteriores.value != 'No'" class="">
+                        <div v-show="form.vigencias_anteriores && form.vigencias_anteriores.value != 'No'" class="">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize">
                                 valor asignado en la vigencia anterior
                             </label>

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\helpers\MyConst;
 use App\helpers\Myhelp;
 use App\helpers\MyModels;
 use App\Http\Requests\FormularioOneStoreRequest;
+use App\Models\EstadoFormulario;
 use App\Models\Formulario;
 use App\Models\SMultiple;
 use Illuminate\Database\QueryException;
@@ -32,10 +34,15 @@ class FormuController extends Controller
                 if ($todosMisForm->last())
                     $laUltimaNecesidad = $todosMisForm->last()->numero_necesidad;
             }
+            $estadoSinRevisar = EstadoFormulario::all()->first()->estado;
 
             DB::beginTransaction();
+            $arrayPSP = MyConst::proceso_que_solicita_presupuesto();
+            $indicePSP = array_search($request->proceso_que_solicita_presupuesto, $arrayPSP);
             $formulario = Formulario::create([
                 'Nombre' => $request->Nombre,
+                'proceso_que_solicita_presupuesto' => $indicePSP, //todo: deberia ser desde el usuario
+                //todo: aclarar como estan todos los select (creo que hay 3)
                 'identificacion_user' => $authu->identificacion,
                 'user_id' => $authu->id,
                 'valor_total_de_la_solicitud_actual' => 0,
@@ -52,7 +59,7 @@ class FormuController extends Controller
                 'vigencias_anteriores' => $request->vigencias_anteriores['value'],
                 'valor_asignado_en_la_vigencia_anterior' => $request->valor_asignado_en_la_vigencia_anterior,
                 'enviado' => 0,
-                'estado' => 0,
+                'estado' => $estadoSinRevisar,
             ]);
 
             DB::commit();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\helpers\MyConst;
 use App\helpers\MyModels;
 use App\Http\Requests\FormularioStoreRequest;
 use App\Models\Formulario;
@@ -204,7 +205,8 @@ class FormularioController extends Controller
             'losSelect' => $dependenciasForm->Dependencias(),
         ]);
     }
-    //empieza Formularios SA
+
+    //<editor-fold desc="empieza Formularios SA">
     private function MapearSA($formus)
     {
         $valorTotal = clone $formus;
@@ -307,6 +309,7 @@ class FormularioController extends Controller
             'totalValorUnitario' => (int) $totalValorUnitario,
         ]);
     }
+    //</editor-fold>
 
 
     public function EnviarFormulario(Request $request) // FormularioStoreRequest
@@ -543,6 +546,8 @@ class FormularioController extends Controller
         $numberPermissions = MyModels::getPermissionToNumber(Myhelp::WriteAuthLog($this, ' --formularios edit-- '));
         $dependenciasForm = new dependenciasForm();
         $elform = Formulario::find($id);
+        $indicePSP = $elform->proceso_que_solicita_presupuesto;
+        $elform->proceso_que_solicita_presupuesto = MyConst::proceso_que_solicita_presupuesto()[$indicePSP];
 
         return Inertia::render($this->FromController . '/EditWindow', [
             'elform' => $elform,
