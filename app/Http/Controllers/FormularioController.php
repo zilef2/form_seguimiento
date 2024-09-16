@@ -563,19 +563,10 @@ class FormularioController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
-    {
-        Myhelp::EscribirEnLog($this, 'Begin UPDATE:formularios');
-        DB::beginTransaction();
-        $formulario = Formulario::findOrFail($id);
-        $request->merge(['no_nada_id' => $request->no_nada['id']]);
-        $formulario->update($request->all());
+    
 
-        DB::commit();
-        Myhelp::EscribirEnLog($this, 'UPDATE:formularios EXITOSO', 'formulario id:' . $formulario->id . ' | ' . $formulario->nombre, false);
-        return back()->with('success', __('app.label.updated_successfully2', ['nombre' => $formulario->nombre]));
-    }
 
+    //<editor-fold desc="delete and bulk">
     /**
      * Remove the specified resource from storage.
      *
@@ -585,7 +576,7 @@ class FormularioController extends Controller
 
     public function destroy($formularioid)
     {
-//        $permissions = Myhelp::EscribirEnLog($this, 'DELETE:formularios');
+        Myhelp::EscribirEnLog($this, 'DELETE:formularios');
         $formulario = Formulario::find($formularioid);
         $elnombre = $formulario->nombre;
         $formulario->delete();
@@ -600,6 +591,7 @@ class FormularioController extends Controller
         return back()->with('success', __('app.label.deleted_successfully', ['name' => count($request->id) . ' ' . __('app.label.formulario')]));
     }
     //FIN : STORE - UPDATE - DELETE
+    //</editor-fold>
 
 
 }

@@ -87,7 +87,7 @@ const update = () => {
     console.log("=>(updateWindow.vue:51) form.valor_unitario", form.valor_unitario);
 
     if (form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
-    form.post(route('formu.store'), {
+    form.put(route('formu.update',props.elform.id), {
         preserveScroll: false,
         forceFormData: false,
         onSuccess: () => null,
@@ -117,12 +117,12 @@ const update = () => {
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Nombre
                             </label>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label class="block font-medium text-gray-700 dark:text-gray-300 my-3">
                                 La necesidad tiene un nombre o un pseudonimo?
                             </label>
                             <TextInput v-model="form.Nombre" type="text"
                                        class="block w-full rounded-lg" placeholder="Nombre"/>
-                            <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>
+                            <InputError class="mt-2" :message="form.errors.Nombre"/>
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -130,8 +130,11 @@ const update = () => {
                             </label>
                             <SelectInput v-model="form.proceso_que_solicita_presupuesto"
                                          :dataSet="props.losSelect.proceso_que_solicita_presupuesto"
-                                         class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"
-                                         autocomplete="off" placeholder="Especifique"/>
+                                         class="w-full mx-1 bg-zinc-200 text-black font-mono
+                                         ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300
+                                         placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200
+                                         dark:shadow-md dark:shadow-purple-500 dark:text-white"
+                                        />
                             <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>
                         </div>
                         <div class="col-span-2">

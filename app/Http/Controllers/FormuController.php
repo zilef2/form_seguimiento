@@ -24,6 +24,8 @@ class FormuController extends Controller
         return Redirect::route('formularioSA');
     }
 
+
+    //<editor-fold desc="3 functions to save">
     public function store(FormularioOneStoreRequest $request){
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formul');
@@ -146,5 +148,35 @@ class FormuController extends Controller
             return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         }
     }
+    //</editor-fold>
 
+    
+    public function update(Request $request, $id)
+    {
+        Myhelp::EscribirEnLog($this, 'Begin UPDATE:formu');
+        DB::beginTransaction();
+        $formulario = Formulario::findOrFail($id);
+//        dd($formulario,$request->all());
+        $formulario->update([
+              "unidad_de_medida" => $request->unidad_de_medida['value'],
+              "periodo_de_inicio_de_ejecucion" => $request->periodo_de_inicio_de_ejecucion['value'],
+              "vigencias_anteriores" => $request->vigencias_anteriores['value'],
+              
+//              "proceso_que_solicita_presupuesto" => $request->proceso_que_solicita_presupuesto,
+              "necesidad" => $request->necesidad,
+              "justificacion" => $request->justificacion,
+              "actividad" => $request->actividad,
+              "categoria" => $request->categoria,
+              
+              "cantidad" => $request->cantidad,
+              "valor_unitario" => $request->valor_unitario,
+              "valor_total_solicitatdo_por_necesidad" => $request->valor_total_solicitatdo_por_necesidad,
+              
+              "valor_asignado_en_la_vigencia_anterior" => $request->valor_asignado_en_la_vigencia_anterior,
+              //todo: recalcular "valor_total_de_la_solicitud_actual" => $request->valor_total_de_la_solicitud_actual,
+        ]);
+        DB::commit();
+        Myhelp::EscribirEnLog($this, 'UPDATE:formularios EXITOSO', 'formulario id:' . $formulario->id . ' | ' . $formulario->nombre, false);
+        return back()->with('success', __('app.label.updated_successfully2', ['nombre' => $formulario->nombre]));
+    }
 }
