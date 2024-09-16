@@ -547,7 +547,8 @@ class FormularioController extends Controller
         $dependenciasForm = new dependenciasForm();
         $elform = Formulario::find($id);
         $indicePSP = $elform->proceso_que_solicita_presupuesto;
-        $elform->proceso_que_solicita_presupuesto = MyConst::proceso_que_solicita_presupuesto()[$indicePSP];
+
+        $elform->proceso_que_solicita_presupuesto = $indicePSP ? MyConst::proceso_que_solicita_presupuesto()[$indicePSP] : '';
 
         return Inertia::render($this->FromController . '/EditWindow', [
             'elform' => $elform,

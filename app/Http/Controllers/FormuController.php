@@ -148,7 +148,6 @@ class FormuController extends Controller
             return back()->with('error', __('app.label.created_error', ['name' => 'Formulario: ']) . $mensajeErrorCompleto);
         }
     }
-    //</editor-fold>
 
     
     public function update(Request $request, $id)

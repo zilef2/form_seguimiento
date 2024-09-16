@@ -26,8 +26,9 @@ const data = reactive({
 
 })
 const form = useForm({
+    Nombre: '',
     identificacion_user: '',
-    proceso_que_solicita_presupuesto: '',
+    // proceso_que_solicita_presupuesto: '',
     necesidad: '',
     justificacion: '',
     actividad: '',
@@ -87,7 +88,7 @@ const update = () => {
     console.log("=>(updateWindow.vue:51) form.valor_unitario", form.valor_unitario);
 
     if (form.vigencias_anteriores.value === 'No') form.valor_asignado_en_la_vigencia_anterior = 0
-    form.put(route('formu.update',props.elform.id), {
+    form.put(route('formu.update'), {
         preserveScroll: false,
         forceFormData: false,
         onSuccess: () => null,
@@ -104,39 +105,38 @@ const update = () => {
     <AuthenticatedLayout>
         <SimpleToast :flash="$page.props.flash"/>
         <Breadcrumb :title="title" :breadcrumbs="breadcrumbs"/>
-<!--        py-2 md:py-16 lg:py-2-->
-        <div class="bg-gray-100 dark:bg-gray-900 -mt-80">
+        <div class="absolute top-56 left-1/2">
+        </div>
+<!--        py-2 md:py-12 lg:py-6 4xl:py-20-->
+        <div class="bg-gray-100 dark:bg-gray-900 py-2 md:py-12 lg:py-6 4xl:py-20">
             <div class="flex-wrap mx-auto px-1 sm:px-6 lg:px-8 gap-8">
                 <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 md:p-10 lg:p-12">
-                    <h1 class="text-2xl font-bold text-[#499884] dark:text-gray-100 mb-6">Necesidades económicas anuales por dependencia</h1>
-                    <p class="text-gray-600 dark:text-gray-400 mb-8">
-                        El siguiente formulario tiene
-                    </p>
+                    <h1 class="text-2xl text-[#499884] dark:text-gray-100 mb-6">Necesidades económicas anuales de <span class="font-bold">{{props.elform.proceso_que_solicita_presupuesto}}</span></h1>
+<!--                    <p class="text-gray-600 dark:text-gray-400 mb-8">-->
+<!--                        El siguiente formulario tiene-->
+<!--                    </p>-->
                     <form @submit.prevent="update" method="POST" class="space-y-6 grid grid-cols-2 gap-4">
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Nombre
                             </label>
-                            <label class="block font-medium text-gray-700 dark:text-gray-300 my-3">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 La necesidad tiene un nombre o un pseudonimo?
                             </label>
                             <TextInput v-model="form.Nombre" type="text"
                                        class="block w-full rounded-lg" placeholder="Nombre"/>
-                            <InputError class="mt-2" :message="form.errors.Nombre"/>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Proceso que solicita presupuesto
-                            </label>
-                            <SelectInput v-model="form.proceso_que_solicita_presupuesto"
-                                         :dataSet="props.losSelect.proceso_que_solicita_presupuesto"
-                                         class="w-full mx-1 bg-zinc-200 text-black font-mono
-                                         ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300
-                                         placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200
-                                         dark:shadow-md dark:shadow-purple-500 dark:text-white"
-                                        />
                             <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>
                         </div>
+<!--                        <div class="col-span-2">-->
+<!--                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">-->
+<!--                                Proceso que solicita presupuesto-->
+<!--                            </label>-->
+<!--                            <SelectInput v-model="form.proceso_que_solicita_presupuesto"-->
+<!--                                         :dataSet="props.losSelect.proceso_que_solicita_presupuesto"-->
+<!--                                         class="w-full mx-1 bg-zinc-200 text-black dark:text-white font-mono ring-1 ring-zinc-400 focus:ring-1 focus:ring-sky-300 outline-none duration-300 placeholder:text-black placeholder:opacity-50 rounded-md px-4 py-2 shadow-md focus:shadow-lg focus:shadow-sky-200 dark:shadow-md dark:shadow-purple-500"-->
+<!--                                         autocomplete="off" placeholder="Especifique"/>-->
+<!--                            <InputError class="mt-2" :message="form.errors.proceso_que_solicita_presupuesto"/>-->
+<!--                        </div>-->
                         <div class="col-span-2">
                             <TextAreaZilef v-model:valor="form.necesidad" placeholder="Describa aqui su " nombre="necesidad"/>
                             <InputError class="mt-2" :message="form.errors.necesidad"/>

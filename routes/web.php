@@ -63,10 +63,17 @@ Route::middleware('auth')->group(function () { //  , 'verified'
     Route::post('/EnviarFormulario', [FormularioController::class,'EnviarFormulario'])->name('EnviarFormulario');
     Route::get('/get-string', [FormularioController::class, 'getString'])->name('seguridad');
 
+
+
+
+    //<editor-fold desc="solo formu">
     Route::resource('/formu', FormuController::class);
     Route::get('/Store2/{fid}', [FormuController::class, 'GetStore2'])->name('Store2');
     Route::post('/Store2/{fid}', [FormuController::class, 'PostStore2'])->name('PStore2');
     Route::put('formularioupdate2/{fid}', [FormSimplificadoController::class, 'formularioupdate2'])->name('formularioupdate2');
+    //</editor-fold>
+
+
 //    Route::match(['get', 'post'],
 });
 

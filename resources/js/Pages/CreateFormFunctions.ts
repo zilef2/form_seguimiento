@@ -64,14 +64,12 @@ export function handledinerVigAnt(form) {
 
 export function RestoreFormOnEdit(form,props){
     form.Nombre = props.elform.Nombre;
-    console.log("=>(CreateFormFunctions.ts:67) props.elform.Nombre", props.elform.Nombre);
     form.proceso_que_solicita_presupuesto = props.elform.proceso_que_solicita_presupuesto
-    console.log("=>(CreateFormFunctions.ts:69) props.elform.proceso_que_solicita_presupuesto", props.elform.proceso_que_solicita_presupuesto);
     form.necesidad = props.elform.necesidad
     form.justificacion = props.elform.justificacion
     form.actividad = props.elform.actividad
     form.categoria = props.elform.categoria
-    
+
     form.unidad_de_medida = StringToLabelValue(props.elform.unidad_de_medida)
     form.cantidad = parseInt(props.elform.cantidad)
     form.valor_unitario = parseInt(props.elform.valor_unitario)
@@ -79,7 +77,7 @@ export function RestoreFormOnEdit(form,props){
     form.periodo_de_inicio_de_ejecucion = StringToLabelValue(props.elform.periodo_de_inicio_de_ejecucion)
     form.vigencias_anteriores = StringToLabelValue(props.elform.vigencias_anteriores)
     form.valor_asignado_en_la_vigencia_anterior = props.elform.valor_asignado_en_la_vigencia_anterior
-    
+
 }
 
 function StringToLabelValue(elString:string):Object{
