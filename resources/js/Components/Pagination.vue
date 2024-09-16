@@ -54,9 +54,11 @@ watchEffect(() => {
         <p>{{ lang().label.no_data }}</p>
     </div>
     <div v-if="links.links.length > 3">
+    <span class="right-0 mx-1">Registros/pág</span>
 <!--        hidden-->
         <ul
             class="flex justify-center items-center rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+
             <li v-for="(link, index) in links.links" :key="index">
                 <button v-on:click="goto(link.url)" class="px-4 py-2 hover:bg-primary hover:text-white"
                     :class="{ 'bg-primary text-white': link.active }" v-html="link.label"

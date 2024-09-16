@@ -6,11 +6,11 @@ return [
         'idea'=> 'idea',
         'Idea'=> 'Idea',
         //fin idea
-        'formulariosEnviados' => 'formularios Enviados',
-        'formulariosGuardados' => 'formularios Guardados',
+        'formulariosEnviados' => 'Necesidad Enviadas',
+        'formulariosGuardados' => 'Necesidad Guardadas',
         'agregado' => 'agregado',
-        'formulario' => 'formulario',
-        'Formulario' => 'Formulario',
+        'formulario' => 'Necesidad',
+        'Formulario' => 'Necesidad',
         'empresa' => 'empresa',
         'Empresa' => 'Empresa',
         'empresas' => 'empresas',
@@ -36,7 +36,7 @@ return [
         'Sexo' => 'Sexo',
         'Fecha nacimiento' => 'Fecha nacimiento',
         //dashboard
-        'formularios' => 'Formularios',
+        'formularios' => 'Necesidades',
         'roles' => 'roles',
 
         //parametros

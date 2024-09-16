@@ -147,4 +147,20 @@ class FormuController extends Controller
         }
     }
 
+
+    public function update(Request $request, $id)
+    {
+        Myhelp::EscribirEnLog($this, 'Begin UPDATE:formu');
+        DB::beginTransaction();
+        $formulario = Formulario::findOrFail($id);
+//        $request->merge(['no_nada_id' => $request->no_nada['id']]);
+        $formulario->update([
+            'Nombre' => $request->Nombre
+        ]);
+dd($formulario);
+        DB::commit();
+        Myhelp::EscribirEnLog($this, 'UPDATE:formularios EXITOSO', 'formulario id:' . $formulario->id . ' | ' . $formulario->nombre, false);
+        return back()->with('success', __('app.label.updated_successfully2', ['nombre' => $formulario->nombre]));
+    }
+
 }

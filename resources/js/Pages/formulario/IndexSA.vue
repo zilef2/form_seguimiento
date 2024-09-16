@@ -188,7 +188,7 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
         <div class="inline-flex text-center w-full">
             <Link :href="route('PreFormSimplificado')" v-show="can(['read user'])"
                   class="items-center py-2 px-1 underline text-sky-600">
-                Simplificar
+                Aprobar
             </Link>
             <Link :href="route('formulario.create')"
                   v-show="can(['create formulario'])" class="items-center py-2 px-1 underline text-sky-600">
@@ -220,12 +220,12 @@ data.hayCongelado = computed(() => (scrollY.value > 300));
                     <TextInput v-show="can(['read user'])" v-model="data.params.searcLider" type="number"
                                placeholder="Cedula"
                                class="block w-1/6 md:w-1/5 rounded-lg"/>
-                    <div class="grid grid-rows-3 my-auto mx-1 h-12 z-20">
-                        <div>
-                            <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="Todos"
-                                   checked/>
-                            <label for="guardados" class="mx-2 text-xs">Todos</label>
-                        </div>
+                    <div class="grid grid-rows-2 mb-0.5 mx-1 h-8 z-20 gap-3">
+<!--                        <div>-->
+<!--                            <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters" value="Todos"-->
+<!--                                   checked/>-->
+<!--                            <label for="guardados" class="mx-2 text-xs">Todos</label>-->
+<!--                        </div>-->
                         <div>
                             <input v-model="data.params.SoloEnviados" type="radio" name="booleanFilters"
                                    value="guardados"/>
