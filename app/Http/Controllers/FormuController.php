@@ -24,6 +24,8 @@ class FormuController extends Controller
         return Redirect::route('formularioSA');
     }
 
+
+    //<editor-fold desc="3 functions to save">
     public function store(FormularioOneStoreRequest $request){
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formul');
@@ -31,8 +33,9 @@ class FormuController extends Controller
             $todosMisForm = Formulario::all();
             $laUltimaNecesidad = 0;
             if ($todosMisForm) {
-                if ($todosMisForm->last())
+                if ($todosMisForm->last()){
                     $laUltimaNecesidad = $todosMisForm->last()->numero_necesidad;
+                }
             }
             $estadoSinRevisar = EstadoFormulario::all()->first()->estado;
 
@@ -72,7 +75,8 @@ class FormuController extends Controller
             Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
             return back()->with('error', $mensajeErrorCompleto);
 
-        } catch (\Throwable $th) {
+        } 
+        catch (\Throwable $th) {
             DB::rollback();
             $mensajeErrorCompleto = $th->getMessage() . ' L:' . $th->getLine() . ' | Ubi: ' . $th->getFile();
             Myhelp::EscribirEnLog($this, ' ERRORFORMU: ' . ($mensajeErrorCompleto));
@@ -100,13 +104,13 @@ class FormuController extends Controller
         ]);
     }
 
+
     //post
     public function PostStore2(Request $request, $fid): \Illuminate\Http\RedirectResponse //todo: poner validaciones de backend
     {
         try {
             Myhelp::EscribirEnLog($this, ' Beginning store(Guardar):formul');
             $dependenciasForm = new dependenciasForm();
-            $authu = Myhelp::AuthU();
             $elform = Formulario::Find($fid);
             $validarYaSeEjecuto = SMultiple::Where('tipo', 'procesos_involucrados')
                     ->Where('formulario_id', $fid)
@@ -119,10 +123,10 @@ class FormuController extends Controller
 
             DB::beginTransaction();
 
-            $dependenciasForm->seleccionMultiple($request,'procesos_involucrados',$elform);
-            $dependenciasForm->seleccionMultiple($request,'plan_de_mejoramiento_al_que_apunta_la_necesidad',$elform);
-            $dependenciasForm->seleccionMultiple($request,'linea_del_plan_desarrollo_al_que_apunta_la_necesidad',$elform);
-            $dependenciasForm->seleccionMultiple($request,'riesgo_de_la_inversion',$elform);
+            $dependenciasForm->GuardarSeleccionMultiple($request,'procesos_involucrados',$elform);
+            $dependenciasForm->GuardarSeleccionMultiple($request,'plan_de_mejoramiento_al_que_apunta_la_necesidad',$elform);
+            $dependenciasForm->GuardarSeleccionMultiple($request,'linea_del_plan_desarrollo_al_que_apunta_la_necesidad',$elform);
+            $dependenciasForm->GuardarSeleccionMultiple($request,'riesgo_de_la_inversion',$elform);
             $elform->update([
                 'frecuencia_de_uso' => $request->frecuencia_de_uso['value'],
                 'mantenimientos_requeridos' => $request->mantenimientos_requeridos['value'],
@@ -147,20 +151,51 @@ class FormuController extends Controller
         }
     }
 
-
+    //</editor-fold>
+    
+    
     public function update(Request $request, $id)
     {
         Myhelp::EscribirEnLog($this, 'Begin UPDATE:formu');
         DB::beginTransaction();
+        $dependenciasForm = new dependenciasForm();
+        
         $formulario = Formulario::findOrFail($id);
-//        $request->merge(['no_nada_id' => $request->no_nada['id']]);
+        
+        $frecuencia_de_uso = is_string($request->frecuencia_de_uso) ? $request->frecuencia_de_uso : $request->frecuencia_de_uso['value'];
+        $mantenimientos_requeridos = is_string($request->mantenimientos_requeridos) ? $request->mantenimientos_requeridos : $request->mantenimientos_requeridos['value'];
+        
         $formulario->update([
-            'Nombre' => $request->Nombre
+            'Nombre' => $request->Nombre,
+            "unidad_de_medida" => $request->unidad_de_medida['value'],
+            "periodo_de_inicio_de_ejecucion" => $request->periodo_de_inicio_de_ejecucion['value'],
+            "vigencias_anteriores" => $request->vigencias_anteriores['value'],
+            
+            //              "proceso_que_solicita_presupuesto" => $request->proceso_que_solicita_presupuesto,
+            "necesidad" => $request->necesidad,
+            "justificacion" => $request->justificacion,
+            "actividad" => $request->actividad,
+            "categoria" => $request->categoria,
+            
+            "cantidad" => $request->cantidad,
+            "valor_unitario" => $request->valor_unitario,
+            "valor_total_solicitatdo_por_necesidad" => $request->valor_total_solicitatdo_por_necesidad,
+            
+            "valor_asignado_en_la_vigencia_anterior" => $request->valor_asignado_en_la_vigencia_anterior,
+            //todo: recalcular "valor_total_de_la_solicitud_actual" => $request->valor_total_de_la_solicitud_actual,
+            
+            'frecuencia_de_uso' => $frecuencia_de_uso,
+            'mantenimientos_requeridos' => $mantenimientos_requeridos,
+            'capacidad_instalada' => $request->capacidad_instalada,
+            'enviado' => 1,
         ]);
-dd($formulario);
+        
+        $dependenciasForm->ActualizarSeleccionMultiple($request,'procesos_involucrados',$formulario);
+        $dependenciasForm->ActualizarSeleccionMultiple($request,'plan_de_mejoramiento_al_que_apunta_la_necesidad',$formulario);
+        $dependenciasForm->ActualizarSeleccionMultiple($request,'linea_del_plan_desarrollo_al_que_apunta_la_necesidad',$formulario);
+        $dependenciasForm->ActualizarSeleccionMultiple($request,'riesgo_de_la_inversion',$formulario);
         DB::commit();
         Myhelp::EscribirEnLog($this, 'UPDATE:formularios EXITOSO', 'formulario id:' . $formulario->id . ' | ' . $formulario->nombre, false);
         return back()->with('success', __('app.label.updated_successfully2', ['nombre' => $formulario->nombre]));
     }
-
 }

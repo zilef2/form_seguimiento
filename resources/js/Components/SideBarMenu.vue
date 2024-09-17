@@ -5,6 +5,7 @@ import {
     CheckBadgeIcon,
     KeyIcon,
     ShieldCheckIcon,
+    CurrencyDollarIcon,
     ClockIcon,
     PresentationChartLineIcon,
     BanknotesIcon,
@@ -76,7 +77,7 @@ const sidebarButtonsAdmin = [ //SAME AS WEB.PHP
                 class="bg-gray-700/40 dark:bg-gray-800/40 text-white rounded-lg hover:bg-primary dark:hover:bg-primary"
                 :class="{ 'bg-sky-600 dark:bg-sky-600': route().current('user.formularioSA') }">
                 <Link :href="route('formularioSA')" class="flex items-center py-2 px-4">
-                <UserIcon class="w-6 h-5" />
+                <CurrencyDollarIcon class="w-6 h-5" />
                 <span class="ml-3">{{ lang().label.formularios }}</span>
                 </Link>
             </li>
@@ -118,13 +119,21 @@ const sidebarButtonsAdmin = [ //SAME AS WEB.PHP
         </ul>
         <button @click="toggleContent2" v-show="can(['isAdmin'])" class="text-blue-500">{{ data.showContent2 ? 'Ocultar' : 'Mostrar' }}</button>
         <ul v-if="data.showContent2" class="space-y-2 my-4">
-            <div class="" v-for="value in sidebarButtons">
+            <div class="">
                 <li v-show="can(['istrabajador','issupervisor'])"
                     class="bg-gray-700/40 dark:bg-gray-800/40 text-white rounded-lg hover:bg-primary dark:hover:bg-primary"
-                    :class="{ 'bg-blue-700 dark:bg-blue-700': route().current(value+'.index') }">
-                    <Link :href="route(value+'.index')" class="flex items-center py-1 px-4">
+                    :class="{ 'bg-blue-700 dark:bg-blue-700': route().current('formulario'+'.index') }">
+                    <Link :href="route('formulario.index')" class="flex items-center py-1 px-4">
                         <PresentationChartLineIcon class="w-6 h-5" />
-                        <span class="ml-3">{{ lang().label[value] }}</span>
+                        <span class="ml-3">{{ lang().label.formulario }}</span>
+                    </Link>
+                </li>
+                <li v-show="can(['istrabajador','issupervisor'])"
+                    class="bg-gray-700/40 dark:bg-gray-800/40 text-white rounded-lg hover:bg-primary dark:hover:bg-primary"
+                    :class="{ 'bg-blue-700 dark:bg-blue-700': route().current('formulario'+'.index') }">
+                    <Link :href="route('formulario.index')" class="flex items-center py-1 px-4">
+                        <PresentationChartLineIcon class="w-6 h-5" />
+                        <span class="ml-3">{{ lang().label.formulario }} asd </span>
                     </Link>
                 </li>
             </div>

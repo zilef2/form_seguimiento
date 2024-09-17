@@ -40,7 +40,7 @@ class Myhelp {
         return $returningObject;
     }
 
-    //<editor-fold desc="SHOULDBESHARED">
+    //<editor-fold desc="SHOULD BE SHARED with the other zilef proyects">
     public static function nombreYvalueNew($tableName){
         $objeto = DB::table($tableName)->pluck('label');
         $returningObject = [];
@@ -50,14 +50,25 @@ class Myhelp {
         }
         return $returningObject;
     }
-    public static function vSelect($tableName): array
-    {
-        $objeto = DB::table($tableName)->select('id','label as name')->get()->toArray();
+    
+    public static function TheIdAndLabel($tipo){
+        $objeto = DB::table('selecsForm')->Where('tipo', $tipo)->get();
         $returningObject = [];
         foreach ($objeto as $index => $gen) {
-//            dd($gen);
+            $returningObject[$index]['value'] = $gen->id;
+            $returningObject[$index]['label'] = $gen->nombre;
+        }
+        return $returningObject;
+    }
+    
+    
+    public static function vSelect($tableName,$thename = 'name'): array
+    {
+        $objeto = DB::table($tableName)->select('id','label as '.$thename)->get()->toArray();
+        $returningObject = [];
+        foreach ($objeto as $index => $gen) {
             $returningObject[$index]['id'] = $gen->id;
-            $returningObject[$index]['name'] = $gen->name;
+            $returningObject[$index][$thename] = $gen->name;
         }
         return $returningObject;
     }
