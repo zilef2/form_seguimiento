@@ -32,8 +32,6 @@ class FormExport implements WithHeadingRow, ShouldAutoSize, FromQuery, WithMappi
         $this->linea_del_plan_desarrollo_al_que_apunta_la_necesidad = MyConst::linea_del_plan_desarrollo_al_que_apunta_la_necesidad();
         $this->actividades = MyConst::actividades();    
         $this->categoria = MyConst::categoria();    
-//        $this->frecuencia_de_uso = MyConst::frecuencia_de_uso();
-//        $this->riesgo_de_la_inversion = MyConst::riesgo_de_la_inversion();
     }
     
     public function query(){

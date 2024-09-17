@@ -77,6 +77,15 @@ export function RestoreFormOnEdit(form,props){
     form.periodo_de_inicio_de_ejecucion = StringToLabelValue(props.elform.periodo_de_inicio_de_ejecucion)
     form.vigencias_anteriores = StringToLabelValue(props.elform.vigencias_anteriores)
     form.valor_asignado_en_la_vigencia_anterior = props.elform.valor_asignado_en_la_vigencia_anterior
+    
+    //multiples
+    form.procesos_involucrados = props.elform.procesos_involucrados
+    form.plan_de_mejoramiento_al_que_apunta_la_necesidad = props.elform.plan_de_mejoramiento_al_que_apunta_la_necesidad
+    form.linea_del_plan_desarrollo_al_que_apunta_la_necesidad = props.elform.linea_del_plan_desarrollo_al_que_apunta_la_necesidad
+    form.frecuencia_de_uso = props.elform.frecuencia_de_uso
+    form.mantenimientos_requeridos = props.elform.mantenimientos_requeridos
+    form.capacidad_instalada = props.elform.capacidad_instalada
+    form.riesgo_de_la_inversion = props.elform.riesgo_de_la_inversion
 
 }
 

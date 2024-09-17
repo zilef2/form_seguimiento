@@ -550,6 +550,12 @@ class FormularioController extends Controller
 
         $elform->proceso_que_solicita_presupuesto = $indicePSP ? MyConst::proceso_que_solicita_presupuesto()[$indicePSP] : '';
 
+        //multiples
+        $elform->procesos_involucrados = $dependenciasForm->RecuperarSeleccionMultiple('procesos_involucrados',$elform);
+        $elform->plan_de_mejoramiento_al_que_apunta_la_necesidad = $dependenciasForm->RecuperarSeleccionMultiple('plan_de_mejoramiento_al_que_apunta_la_necesidad',$elform);
+        $elform->linea_del_plan_desarrollo_al_que_apunta_la_necesidad = $dependenciasForm->RecuperarSeleccionMultiple('linea_del_plan_desarrollo_al_que_apunta_la_necesidad',$elform);
+        $elform->riesgo_de_la_inversion = $dependenciasForm->RecuperarSeleccionMultiple('riesgo_de_la_inversion',$elform);
+        
         return Inertia::render($this->FromController . '/EditWindow', [
             'elform' => $elform,
             'breadcrumbs' => [

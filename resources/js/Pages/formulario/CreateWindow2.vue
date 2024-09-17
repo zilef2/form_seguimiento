@@ -64,12 +64,6 @@ onMounted(() => {
     }];
   }
 });
-console.log(
-  "=>(CreateWindow2.vue:67) form.procesos_involucrados",
-  form.procesos_involucrados
-);
-console.log("funciona pues mk");
-
 watchEffect(() => {
   handleCantidad(form);
   form.valor_total_solicitatdo_por_necesidad = calcularTotal(
@@ -135,15 +129,13 @@ const create = (event) => {
     <Breadcrumb :title="title" :breadcrumbs="breadcrumbs" />
     <div class="bg-gray-100 dark:bg-gray-900 py-2 md:py-16 lg:py-2">
       <div class="flex-wrap mx-auto px-1 sm:px-6 lg:px-8 gap-8">
-        <div
-          class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 md:p-10 lg:p-12"
-        >
+        <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 md:p-10 lg:p-12">
           <h1 class="text-2xl font-bold text-[#499884] dark:text-gray-100 mb-6">
             Necesidades económicas anuales por dependencia
           </h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-8">
-            Llena el siguiente formulario para que podamos ayudarte.
-          </p>
+<!--          <p class="text-gray-600 dark:text-gray-400 mb-8">-->
+<!--            Llena el siguiente formulario para que podamos ayudarte.-->
+<!--          </p>-->
           <form
             @submit.prevent="create"
             method="POST"
