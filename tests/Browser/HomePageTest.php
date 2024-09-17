@@ -13,6 +13,8 @@ class HomePageTest extends DuskTestCase
      */
     public function testExample(): void
     {
+
+
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
                     ->assertSee('Identificacion');
